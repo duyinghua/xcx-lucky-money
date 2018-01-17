@@ -1,0 +1,22 @@
+<template>
+    <view class="record-page container">
+
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+
+    export default class Record extends wepy.page {
+        methods = {}
+
+        onLoad() {
+        }
+
+    }
+
+</script>
+<style lang="less" rel="stylesheet/less">
+    .record-page {
+    }
+</style>
+

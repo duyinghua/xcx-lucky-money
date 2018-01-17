@@ -1,0 +1,22 @@
+<template>
+    <view class="extract-page container">
+
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+
+    export default class Extract extends wepy.page {
+        methods = {}
+
+        onLoad() {
+        }
+
+    }
+
+</script>
+<style lang="less" rel="stylesheet/less">
+    .extract-page {
+    }
+</style>
+

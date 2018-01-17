@@ -1,0 +1,83 @@
+<style lang="less">
+    .container {
+        color: #222;
+        background: #FAFAFA;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+</style>
+
+<script>
+    import wepy from 'wepy'
+    import 'wepy-async-function'
+    import login from './lib/login.js'
+
+    export default class extends wepy.app {
+        config = {
+            pages: [
+                'pages/index',
+                'pages/record',
+                'pages/extract',
+                'pages/createIssue'
+            ],
+            window: {
+                backgroundTextStyle: 'dark',
+                navigationBarBackgroundColor: '#CD3434',
+                navigationBarTitleText: '冲顶超人',
+                navigationBarTextStyle: 'white'
+            },
+            tabBar: {
+                color: '#808080',
+                selectedColor: '#CD3434',
+                list: [
+                    {
+                        pagePath: 'pages/index',
+                        text: '发红包',
+                        iconPath: 'img/tab-hongbao-d.png',
+                        selectedIconPath: 'img/tab-hongbao-a.png',
+                    }, {
+                        pagePath: 'pages/record',
+                        text: '我的记录',
+                        iconPath: 'img/tab-jilu-d.png',
+                        selectedIconPath: 'img/tab-jilu-a.png',
+                    }, {
+                        pagePath: 'pages/extract',
+                        text: '余额提现',
+                        iconPath: 'img/tab-qianbao-d.png',
+                        selectedIconPath: 'img/tab-qianbao-a.png',
+                    }
+                ]
+            },
+        }
+
+        globalData = {
+            appName: '冲顶超人',
+            appid: 'wx6a23764d2eaad662',
+            userInfo: null,
+            pageData: {
+                goodsDetail: {
+                    _reload: false
+                },
+                writeComment: {
+                    commentData: {}
+                },
+                myCollection: {
+                    dataList: [],
+                }
+            }
+        }
+
+        constructor() {
+            super()
+            this.use('requestfix')
+            this.use('promisify')
+        }
+
+        onLaunch() {
+            wepy.$instance.globalData.userInfo = wx.getStorageSync('USER_INFO')
+            login.doLogin()
+        }
+    }
+</script>

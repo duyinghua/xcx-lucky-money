@@ -1,0 +1,120 @@
+<template>
+    <view class="index-page container">
+        <view class="begin-box">
+            <image class="bg" src="../img/begin-bg.png"></image>
+            <view class="box">
+                <image class="photo" src="../img/demo-photo.png"></image>
+                <view class="input-box">
+                    <view class="label">红包(元)</view>
+                    <input class="input" placeholder="输入金额">
+                </view>
+                <view class="tip">24小时内未被领取，则红包原路退回</view>
+                <button class="begin-button" @tap="gameStart">开始出题</button>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
+
+
+    export default class Index extends wepy.page {
+        config = {
+            navigationBarTitleText: '冲顶超人'
+        }
+        data = {}
+
+
+        methods = {
+            gameStart(){
+                wx.navigateTo({
+                    url: 'createIssue'
+                })
+            }
+        }
+
+        onLoad() {
+        }
+
+
+        onShareAppMessage() {
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+            }
+        }
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+    .index-page {
+        .begin-box {
+            position: relative;
+            width: unit(698, rpx);
+            height: unit(650, rpx);
+            margin: unit(95, rpx) auto;
+            .bg {
+                width: unit(698, rpx);
+                height: unit(650, rpx);
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            .box {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                z-index: 1;
+                padding: 0 unit(64, rpx);
+                box-sizing: border-box;
+                .photo {
+                    display: block;
+                    width: unit(126, rpx);
+                    height: unit(126, rpx);
+                    margin: unit(12, rpx) auto;
+                }
+                .input-box {
+                    display: flex;
+                    margin: unit(110, rpx) 0 unit(100, rpx);
+                    .label {
+                        flex: 1;
+                        font-size: unit(32, rpx);
+                        height: unit(64, rpx);
+                        line-height: unit(64, rpx);
+                    }
+                    .input {
+                        font-size: unit(32, rpx);
+                        height: unit(64, rpx);
+                        line-height: unit(64, rpx);
+                        width: unit(404, rpx);
+                        border-bottom: 1px solid #DEDEDE;
+                    }
+                    .input-placeholder {
+                        color: #DEDEDE;
+                    }
+                }
+                .tip {
+                    color: #A5A5A5;
+                    font-size: unit(26, rpx);
+                    text-align: center;
+                }
+                .begin-button {
+                    margin-top: unit(38, rpx);
+                    width: unit(558, rpx);
+                    height: unit(80, rpx);
+                    border-radius: unit(80, rpx);
+                    background: #CD3434;
+                    text-align: center;
+                    color: #FFF;
+                    font-size: unit(32, rpx);
+                }
+            }
+
+        }
+    }
+</style>
