@@ -1,12 +1,18 @@
 <template>
     <view class="index-page container">
+        <view class="explain">
+            <view class="cont">
+                <image class="icon" src="../img/icon-wh.png"></image>
+                玩法说明
+            </view>
+        </view>
         <view class="begin-box">
             <image class="bg" src="../img/begin-bg.png"></image>
             <view class="box">
                 <image class="photo" src="../img/demo-photo.png"></image>
                 <view class="input-box">
                     <view class="label">红包(元)</view>
-                    <input class="input" placeholder="输入金额">
+                    <input class="input" placeholder="输入金额"/>
                 </view>
                 <view class="tip">24小时内未被领取，则红包原路退回</view>
                 <button class="begin-button" @tap="gameStart">开始出题</button>
@@ -51,11 +57,29 @@
 
 <style lang="less" rel="stylesheet/less">
     .index-page {
+        .explain {
+            margin: unit(46, rpx) unit(30, rpx) unit(15, rpx);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            .cont {
+                display: flex;
+                align-items: center;
+                color: #CD3434;
+                font-size: unit(26, rpx);
+                .icon {
+                    width: unit(26, rpx);
+                    height: unit(26, rpx);
+                    margin-right: unit(8, rpx);
+                }
+            }
+
+        }
         .begin-box {
             position: relative;
             width: unit(698, rpx);
             height: unit(650, rpx);
-            margin: unit(95, rpx) auto;
+            margin: 0 auto;
             .bg {
                 width: unit(698, rpx);
                 height: unit(650, rpx);

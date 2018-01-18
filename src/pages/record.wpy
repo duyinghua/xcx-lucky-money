@@ -1,13 +1,76 @@
 <template>
     <view class="record-page container">
-
+        <view class="tab">
+            <view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">我发出的</view>
+            <view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">我抢到的</view>
+        </view>
+        <view hidden="{{curTab!=1}}" class="send-record">
+            <view class="overview">
+                <view class="item">
+                    <view class="label">金额(元)</view>
+                    <view class="value">18888.8</view>
+                </view>
+                <view class="item">
+                    <view class="label">数量(个)</view>
+                    <view class="value">50</view>
+                </view>
+            </view>
+            <view class="list">
+                <view class="li" wx:for="1111" @tap="sendDetail">
+                    <view class="label">金额(元)</view>
+                    <view class="l1">
+                        <view class="left">18888.8</view>
+                        <view class="right">5道题</view>
+                    </view>
+                    <view class="l2">
+                        <view class="left">派发中</view>
+                        <view class="right">55%通过率</view>
+                    </view>
+                    <view class="l3">
+                        <view class="left">2018-02-06</view>
+                        <view class="right">15人参与</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view hidden="{{curTab!=2}}" class="receive-record">
+            <view class="overview">
+                <view class="item">
+                    <view class="label">金额(元)</view>
+                    <view class="value">18888.8</view>
+                </view>
+                <view class="item">
+                    <view class="label">数量(个)</view>
+                    <view class="value">50</view>
+                </view>
+            </view>
+            <view class="list">
+                <view class="li" wx:for="1111">
+                    <view class="amount">￥8.88</view>
+                    <view class="date">2018-02-06</view>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 <script>
     import wepy from 'wepy'
 
     export default class Record extends wepy.page {
-        methods = {}
+        data = {
+            curTab: 1
+        }
+        methods = {
+            tabHandler(num){
+                this.curTab = num;
+                this.$apply()
+            },
+            sendDetail(){
+                wx.navigateTo({
+                    url: 'sendDetail'
+                })
+            }
+        }
 
         onLoad() {
         }
@@ -17,6 +80,125 @@
 </script>
 <style lang="less" rel="stylesheet/less">
     .record-page {
+        .tab {
+            display: flex;
+            justify-content: space-between;
+            height: unit(96, rpx);
+            line-height: unit(96, rpx);
+            padding: 0 unit(96, rpx);
+            background: #FFF;
+            .item {
+                margin: 0 unit(45, rpx);
+                font-size: unit(32, rpx);
+                box-sizing: border-box;
+                color: #A5A5A5;
+                &.cur {
+                    color: #CD3434;
+                    border-bottom: unit(4, rpx) solid #CD3434;
+                }
+            }
+        }
+        .overview {
+            display: flex;
+            justify-content: space-between;
+            height: unit(96, rpx);
+            line-height: unit(96, rpx);
+            padding: 0 unit(70, rpx);
+            .item {
+                display: flex;
+                .label {
+                    color: #BFBFBF;
+                    font-size: unit(26, rpx);
+                    margin-right: unit(24, rpx);
+                }
+                .value {
+                    font-size: unit(36, rpx);
+                }
+            }
+        }
+        .send-record {
+            .list {
+                .li {
+                    background: #FFF;
+                    margin-bottom: unit(16, rpx);
+                    padding: unit(26, rpx) unit(96, rpx);
+                    .label {
+                        color: #DEDEDE;
+                        font-size: unit(26, rpx);
+                    }
+                    .l1 {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        height: unit(40, rpx);
+                        margin-top: unit(12, rpx);
+                        .left {
+                            text-align: left;
+                            color: #CD3434;
+                            font-size: unit(36, rpx);
+                            font-weight: bold;
+                        }
+                        .right {
+                            text-align: right;
+                            font-size: unit(26, rpx);
+                        }
+                    }
+                    .l2 {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        height: unit(34, rpx);
+                        .left {
+                            text-align: left;
+                            font-size: unit(20, rpx);
+                        }
+                        .right {
+                            text-align: right;
+                            color: #DEDEDE;
+                            font-size: unit(24, rpx);
+                        }
+                    }
+                    .l3 {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: unit(16, rpx);
+                        height: unit(24, rpx);
+                        .left {
+                            text-align: left;
+                            color: #DEDEDE;
+                            font-size: unit(20, rpx);
+                        }
+                        .right {
+                            text-align: right;
+                            color: #DEDEDE;
+                            font-size: unit(20, rpx);
+                        }
+                    }
+                }
+
+            }
+        }
+        .receive-record {
+            .list {
+                .li {
+                    background: #FFF;
+                    margin-bottom: unit(16, rpx);
+                    padding: unit(22, rpx) unit(96, rpx);
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .amount {
+                        color: #CD3434;
+                        font-size: unit(36, rpx);
+                    }
+                    .date {
+                        color: #DEDEDE;
+                        font-size: unit(24, rpx);
+                    }
+                }
+            }
+        }
     }
 </style>
 

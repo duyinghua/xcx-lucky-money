@@ -1,0 +1,148 @@
+<template>
+    <view class="sendDetail-page container">
+        <view class="amount-area">
+            ￥1888.88
+        </view>
+        <view class="desc">
+            <view class="txt">
+                共
+                <view class="red">1888.88</view>
+                元,已被
+                <view class="red">3</view>
+                位好友领取
+            </view>
+            <view class="explain">
+                <image class="icon" src="../img/icon-wh.png"></image>
+                玩法说明
+            </view>
+        </view>
+        <view class="list">
+            <view class="li" wx:for="1111">
+                <view class="photo">
+                    <image class="img" mode="widthFix" src="../img/demo-photo.png"></image>
+                </view>
+                <view class="info">
+                    <view class="row">
+                        <view class="name">只阿斯蒂芬</view>
+                        <view class="amount">￥4444.44</view>
+                    </view>
+                    <view class="row">
+                        <view class="level">亲密度55%</view>
+                        <view class="datetime">1月15日 10:18</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+
+    export default class SendDetail extends wepy.page {
+        data = {
+            curTab: 1
+        }
+        methods = {}
+
+        onLoad() {
+        }
+
+    }
+
+</script>
+<style lang="less" rel="stylesheet/less">
+    .sendDetail-page {
+        .amount-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: unit(255, rpx);
+            background: #CD3434;
+            color: #FFF;
+            font-size: unit(64, rpx);
+            font-weight: bold;
+        }
+        .desc {
+            display: flex;
+            justify-content: space-between;
+            height: unit(96, rpx);
+            line-height: unit(96, rpx);
+            padding: 0 unit(32, rpx);
+            .txt {
+                width: unit(520, rpx);
+                font-size: unit(26, rpx);
+                .red {
+                    display: inline-block;
+                    color: #CD3434;
+                }
+            }
+            .explain {
+                display: flex;
+                align-items: center;
+                color: #CD3434;
+                font-size: unit(26, rpx);
+                .icon {
+                    width: unit(26, rpx);
+                    height: unit(26, rpx);
+                    margin-right: unit(8, rpx);
+                }
+            }
+        }
+        .list {
+            .li {
+                display: flex;
+                align-items: center;
+                background: #FFF;
+                margin-bottom: unit(16, rpx);
+                padding: unit(26, rpx) unit(32, rpx);
+                .photo {
+                    width: unit(100, rpx);
+                    height: unit(100, rpx);
+                    border-radius: unit(6, rpx);
+                    background: #EEE;
+                    margin-right: unit(26, rpx);
+                    .img {
+                        width: unit(100, rpx);
+                        height: 0;
+                    }
+                }
+                .info {
+                    flex: 1;
+                    width: unit(200, rpx);
+                    .row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: unit(12, rpx);
+                        &:first-child {
+                            margin-top: 0;
+                        }
+                        .name {
+                            font-size: unit(26, rpx);
+                        }
+                        .amount {
+                            font-size: unit(28, rpx);
+                            font-weight: bold;
+                        }
+                        .level {
+                            color: #DEDEDE;
+                            font-size: unit(24, rpx);
+                        }
+                        .datetime {
+                            color: #DEDEDE;
+                            font-size: unit(24, rpx);
+                        }
+                    }
+
+                }
+                &:first-child {
+                    .amount {
+                        color: #CD3434;
+                    }
+                }
+            }
+
+        }
+    }
+</style>
+

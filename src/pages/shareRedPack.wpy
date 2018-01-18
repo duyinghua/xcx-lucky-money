@@ -1,0 +1,219 @@
+<template>
+    <view class="shareRedPack-page container">
+        <view class="main">
+            <image class="bg" mode="aspectFill" src="../img/share-bg.jpg"></image>
+            <view class="box">
+                <image class="photo" src="../img/demo-share.png"></image>
+                <view class="info">
+                    1个答题红包
+                    <view class="amount">￥88</view>
+                </view>
+                <view class="desc">
+                    <view>第一名</view>
+                    <view>回答正确</view>
+                    <view>独享一半红包！</view>
+                </view>
+                <button class="button" open-type="share">
+                    <image class="img" src="../img/share-friend.png"></image>
+                </button>
+                <button class="button" @tap="shareTimeline">
+                    <image class="img" src="../img/share-timeline.png"></image>
+                </button>
+                <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
+
+
+    export default class ShareRedPack extends wepy.page {
+        config = {
+            navigationBarTitleText: '冲顶超人'
+        }
+        data = {}
+
+        methods = {
+            shareTimeline(data){
+                this.clearCanvas();
+                this.drawShare(data);
+            }
+        }
+
+        clearCanvas() {
+            const ctx = wx.createCanvasContext('shareCanvas')
+            ctx.setFillStyle('white');
+            ctx.fillRect(0, 0, 320, 420);
+            ctx.draw();
+        }
+
+        async drawShare(data) {
+            wx.showLoading({
+                title: '图片生成中',
+                mask: true
+            })
+            const userImage = await wepy.downloadFile({url: data.user_imag || '../img/default-head.png'})
+            const goodsImage = await wepy.downloadFile({url: this.evaluData.item_info.image_url})
+            const ctx = wx.createCanvasContext('shareCanvas')
+            let yOffset = 20;
+            const halfX = 160;
+            ctx.setTextBaseline('top')
+            //  绘制背景
+            ctx.setFillStyle('white')
+            ctx.fillRect(0, 0, 320, 420)
+
+            //  绘制头像
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(halfX, yOffset + 18, 18, 0, 2 * Math.PI)
+            ctx.closePath();
+            ctx.clip()
+            ctx.drawImage(userImage.tempFilePath, halfX - 18, yOffset, 36, 36)
+            yOffset += 36;  //元素高度
+            ctx.restore()
+
+            //  绘制昵称
+            yOffset += 7;   //间距
+            ctx.setFillStyle('#464646')
+            ctx.setFontSize(14)
+            ctx.setTextAlign('center')
+            ctx.fillText(DrawCanvas.replaceEmoji(data.user_name), halfX, yOffset);
+            yOffset += 15;  //元素高度
+
+            //  绘制评分
+            yOffset += 7;   //间距
+            ctx.setFillStyle('#999999')
+            ctx.setFontSize(11)
+            ctx.setTextAlign('right')
+            ctx.fillText(this.starLabel[data.star_num], halfX - 22, yOffset);
+            //  绘制五角星
+            for (let i = 0; i < 5; i++) {
+                let starImage = '../img/star-s-d.png';
+                if (i < data.star_num) {
+                    starImage = '../img/star-s-a.png';
+                }
+                ctx.drawImage(starImage, halfX - 18 + 4 + i * (12 + 4), yOffset, 12, 12)
+            }
+            yOffset += 12;  //元素高度
+
+            //  绘制分割线
+            yOffset += 15;  //间距
+            ctx.setFillStyle('#e8e8e8')
+            ctx.fillRect(20, yOffset, 280, 1)
+            yOffset += 1;  //元素高度
+            //  绘制商品图片
+            yOffset += 15;  //间距
+            ctx.drawImage(goodsImage.tempFilePath, halfX - 36.5, yOffset, 73, 73)
+            yOffset += 73;  //元素高度
+            //  绘制商品名称
+            yOffset += 15;  //间距
+            ctx.setFillStyle('#282828');
+            ctx.setFontSize(14);
+            ctx.setTextAlign('center');
+            let goodsName = this.evaluData.item_info.name;
+            let textHeight = DrawCanvas.drawText(ctx, goodsName.length > 38 ? goodsName.substr(0, 38) + '……' : goodsName, halfX, yOffset, 20);
+            yOffset += textHeight;  //元素高度
+            //  绘制商品评价
+            yOffset += 10;  //间距
+            ctx.setFillStyle('#464646');
+            ctx.setFontSize(13);
+            ctx.setTextAlign('center');
+            let commentContent = DrawCanvas.replaceEmoji(data.content);
+            DrawCanvas.drawText(ctx, commentContent.length > 58 ? commentContent.substr(0, 58) + '……' : commentContent, halfX, yOffset, 20);
+
+            //  绘制虚线
+            let bottomYOffset = 345;
+            DrawCanvas.drawLine(ctx, 0, bottomYOffset, 320, '#ececec', 2);
+            bottomYOffset += 2;//元素高度
+            //  绘制分享提示
+            bottomYOffset += 20;
+            ctx.setFillStyle('#464646');
+            ctx.setFontSize(12);
+            ctx.setTextAlign('left');
+            ctx.fillText('长按识别图形码，', 20, bottomYOffset);
+            ctx.fillText('去看看他的体验分享', 20, bottomYOffset + 20);
+            ctx.drawImage('../img/icon-xcx.png', 320 - 20 - 45, bottomYOffset - 5, 45, 45)
+
+            ctx.draw();
+            wx.hideLoading();
+        }
+
+        onLoad() {
+        }
+
+        onShareAppMessage() {
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+            }
+        }
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+    .shareRedPack-page {
+        .main {
+            flex: 1;
+            .bg {
+                position: absolute;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .box {
+                position: absolute;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+                padding: unit(40, rpx) unit(92, rpx);
+                padding: unit(20, rpx) unit(92, rpx);
+                z-index: 1;
+                color: #FFF;
+                .photo {
+                    width: unit(147, rpx);
+                    height: unit(147, rpx);
+                }
+                .info {
+                    font-size: unit(28, rpx);
+                    margin-top: unit(120, rpx);
+                    margin-top: unit(20, rpx);
+                    .amount {
+                        font-size: unit(64, rpx);
+                        font-size: unit(60, rpx);
+                    }
+                }
+                .desc {
+                    margin: unit(30, rpx) 0 unit(156, rpx);
+                    margin: unit(10, rpx) 0 unit(156, rpx);
+                    font-size: unit(78, rpx);
+                    font-size: unit(68, rpx);
+                    line-height: unit(88, rpx);
+                }
+                .button {
+                    width: unit(560, rpx);
+                    height: unit(94, rpx);
+                    background: transparent;
+                    border: 0;
+                    padding: 0;
+                    margin: unit(30, rpx) 0;
+                    &:after {
+                        display: none;
+                    }
+                    .img {
+                        width: unit(560, rpx);
+                        height: unit(94, rpx);
+                    }
+                }
+                .share-canvas {
+                }
+            }
+        }
+    }
+</style>
