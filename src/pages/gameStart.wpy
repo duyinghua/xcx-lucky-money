@@ -1,0 +1,136 @@
+<template>
+    <view class="gameStart-page container">
+        <view class="main">
+            <view class="title">
+                <view class="bz-left">
+                    <image class="img" mode="widthFix" src="../img/bz-left.png"></image>
+                </view>
+                <view class="tit">
+                    <view class="index">第一题</view>
+                    <view class="desc">89%好友通过此题</view>
+                </view>
+                <view class="bz-right">
+                    <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
+                </view>
+            </view>
+            <view class="question ">随着生活水平提高，我在家里养了哪些动物？</view><!--no-pic-->
+            <!-- <view class="picture">
+                 <image class="img" src="https://pic3.zhimg.com/v2-69f941cb6fbb05db45009734631bd28e_400x224.jpg"></image>
+             </view>-->
+            <view class="answer">
+                <view class="li ">猫主子</view>
+                <view class="li yes">够咋</view>
+                <view class="li">蜥蜴</view>
+                <view class="li no">以上都有</view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
+
+    export default class GameStart extends wepy.page {
+        config = {
+            navigationBarBackgroundColor: '#CC4242',
+            backgroundColor: '#CC4242',
+        }
+        data = {}
+
+        methods = {}
+
+
+        onLoad() {
+        }
+
+        onShareAppMessage() {
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+            }
+        }
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+    .gameStart-page {
+        background-color: #CC4242;
+        color: #FFF;
+        .main {
+            padding: 0 unit(96, rpx);
+            flex: 1;
+            background: url('http://redpackagelite.static.immocha.com/wxlite/answer-bg.jpg') no-repeat center top / cover;
+            .title {
+                margin-top: unit(40, rpx);
+                display: flex;
+                .bz-left {
+                    flex: 1;
+                    width: unit(100, rpx);
+                    .img {
+                        width: unit(88, rpx);
+                        float: right;
+                    }
+                }
+                .bz-right {
+                    flex: 1;
+                    width: unit(100, rpx);
+                    .img {
+                        float: left;
+                        width: unit(90, rpx);
+                    }
+                }
+                .tit {
+                    text-align: center;
+                    margin: 0 unit(20, rpx);
+                    .index {
+                        font-size: unit(48, rpx);
+                        font-weight: bold;
+                    }
+                    .desc {
+                        font-size: unit(26, rpx);
+                        color: #D67373;
+                    }
+                }
+            }
+            .question {
+                margin-top: unit(56, rpx);
+                font-size: unit(32, rpx);
+                &.no-pic {
+                    margin: unit(160, rpx) 0;
+                }
+            }
+            .picture {
+                margin: unit(36, rpx) auto 0;
+                width: unit(558, rpx);
+                height: unit(336, rpx);
+                background: #CC4242;
+                .img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+            .answer {
+                margin-top: unit(50, rpx);
+                font-size: unit(36, rpx);
+                font-weight: bold;
+                .li {
+                    text-align: center;
+                    line-height: unit(108, rpx);
+                    margin: unit(10, rpx) auto 0;
+                    width: unit(568, rpx);
+                    height: unit(95, rpx);
+                    background: url(http://redpackagelite.static.immocha.com/wxlite/btn-or.png) no-repeat center center / cover;
+                    &.yes {
+                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-yes.png) no-repeat center center / cover;
+                    }
+                    &.no {
+                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-no.png) no-repeat center center / cover;
+                    }
+                }
+            }
+
+        }
+    }
+</style>

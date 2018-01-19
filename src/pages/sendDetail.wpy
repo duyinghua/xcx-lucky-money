@@ -1,15 +1,15 @@
 <template>
     <view class="sendDetail-page container">
         <view class="amount-area">
-            ￥1888.88
+            ￥{{totalFee}}
         </view>
         <view class="desc">
             <view class="txt">
-                共
-                <view class="red">1888.88</view>
-                元,已被
-                <view class="red">3</view>
+                已被
+                <view class="red">{{totalCount}}</view>
                 位好友领取
+                <view class="red">{{totalFee}}</view>
+                元
             </view>
             <view class="explain">
                 <image class="icon" src="../img/icon-wh.png"></image>
@@ -17,18 +17,18 @@
             </view>
         </view>
         <view class="list">
-            <view class="li" wx:for="1111">
+            <view class="li" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{item.index}}">
                 <view class="photo">
-                    <image class="img" mode="widthFix" src="../img/demo-photo.png"></image>
+                    <image class="img" mode="widthFix" src="{{item.headPicURL}}"></image>
                 </view>
                 <view class="info">
                     <view class="row">
-                        <view class="name">只阿斯蒂芬</view>
-                        <view class="amount">￥4444.44</view>
+                        <view class="name">{{item.userName}}</view>
+                        <view class="amount">￥{{item.receiveFee}}</view>
                     </view>
                     <view class="row">
-                        <view class="level">亲密度55%</view>
-                        <view class="datetime">1月15日 10:18</view>
+                        <view class="level">亲密度{{item.correctCount}}%</view>
+                        <view class="datetime">{{item.createTime}}</view>
                     </view>
                 </view>
             </view>
@@ -37,14 +37,123 @@
 </template>
 <script>
     import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
 
     export default class SendDetail extends wepy.page {
+        config = {
+            backgroundColor: '#CD3434',
+            backgroundTextStyle: 'light',
+            navigationBarTitleText: '冲顶超人',
+            enablePullDownRefresh: true,
+        }
         data = {
-            curTab: 1
+            id: 0,
+            totalFee: 0,
+            totalCount: 0,
+            detailList: []
         }
         methods = {}
 
-        onLoad() {
+        async getSendDetail(init) {
+            if (init) {
+                this.detailList = [];
+            }
+            let res = await http.post(apis.sendDetailList, {
+                redPackageID: this.id,
+                beginIndex: this.detailList.length
+            })
+            res = {
+                _ok: 1,
+                "code": 0,
+                "totalFee": 6.0,
+                "totalCount": 4,
+                "detailList": [{
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                }, {
+                    "paperID": 1,
+                    "userID": 2702847,
+                    "userName": "背叛了曾经",
+                    "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    "correctCount": 5,
+                    "receiveFee": 2,
+                    "createTime": "2018-01-19 00:00:00"
+                },]
+            }
+            if (res._ok) {
+                this.totalFee = Number(res.totalFee).toFixed(2);
+                this.totalCount = res.totalCount;
+                this.detailList = this.detailList.concat(res.detailList);
+                this.$apply();
+            }
+            init && wx.stopPullDownRefresh();
+        }
+
+        onLoad(e) {
+            this.id = e.id;
+            this.getSendDetail(true);
+        }
+
+        onPullDownRefresh() {
+            this.getSendDetail(true);
+        }
+
+        onReachBottom() {
+            this.getSendDetail();
         }
 
     }
@@ -101,6 +210,7 @@
                     border-radius: unit(6, rpx);
                     background: #EEE;
                     margin-right: unit(26, rpx);
+                    overflow: hidden;
                     .img {
                         width: unit(100, rpx);
                         height: 0;
@@ -125,11 +235,11 @@
                             font-weight: bold;
                         }
                         .level {
-                            color: #DEDEDE;
+                            color: #A5A5A5;
                             font-size: unit(24, rpx);
                         }
                         .datetime {
-                            color: #DEDEDE;
+                            color: #A5A5A5;
                             font-size: unit(24, rpx);
                         }
                     }

@@ -8,6 +8,8 @@ class Login {
             return;
         }
         let loginRes = await wepy.login()
+        // console.log(loginRes.code)
+        // return;
         if (loginRes.code) {
             wx.getUserInfo({
                 async success(wxUserRes) {

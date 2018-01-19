@@ -8,27 +8,26 @@
             <view class="overview">
                 <view class="item">
                     <view class="label">金额(元)</view>
-                    <view class="value">18888.8</view>
+                    <view class="value">{{sendTotalFee}}</view>
                 </view>
                 <view class="item">
                     <view class="label">数量(个)</view>
-                    <view class="value">50</view>
+                    <view class="value">{{sendTotalCount}}</view>
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="1111" @tap="sendDetail">
+                <view class="li" wx:for="{{sendList}}" wx:for-item="item" wx:key="{{item.id}}" @tap="sendDetail({{item.id}})">
                     <view class="label">金额(元)</view>
                     <view class="l1">
-                        <view class="left">18888.8</view>
-                        <view class="right">5道题</view>
+                        <view class="amount">{{item.redPackageFee}}</view>
+                        <view class="right">
+                            <view class="num">{{item.questionCount}}道题</view>
+                            <view class="level">{{item.passRate}}%答对率</view>
+                        </view>
                     </view>
                     <view class="l2">
-                        <view class="left">派发中</view>
-                        <view class="right">55%通过率</view>
-                    </view>
-                    <view class="l3">
-                        <view class="left">2018-02-06</view>
-                        <view class="right">15人参与</view>
+                        <view class="left">{{item.createTime}}</view>
+                        <view class="right">{{item.userCount}}人参与</view>
                     </view>
                 </view>
             </view>
@@ -37,17 +36,17 @@
             <view class="overview">
                 <view class="item">
                     <view class="label">金额(元)</view>
-                    <view class="value">18888.8</view>
+                    <view class="value">{{receiveTotalFee}}</view>
                 </view>
                 <view class="item">
                     <view class="label">数量(个)</view>
-                    <view class="value">50</view>
+                    <view class="value">{{receiveTotalCount}}</view>
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="1111">
-                    <view class="amount">￥8.88</view>
-                    <view class="date">2018-02-06</view>
+                <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
+                    <view class="amount">￥{{item.fee}}</view>
+                    <view class="date">{{item.createTime}}</view>
                 </view>
             </view>
         </view>
@@ -55,24 +54,198 @@
 </template>
 <script>
     import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
 
     export default class Record extends wepy.page {
+
+        config = {
+            navigationBarTitleText: '冲顶超人',
+            enablePullDownRefresh: true,
+        }
         data = {
-            curTab: 1
+            curTab: 1,
+            sendTotalFee: 0,
+            sendTotalCount: 0,
+            sendList: [],
+            receiveTotalFee: 0,
+            receiveTotalCount: 0,
+            receiveList: []
         }
         methods = {
             tabHandler(num){
                 this.curTab = num;
                 this.$apply()
             },
-            sendDetail(){
+            sendDetail(id){
                 wx.navigateTo({
-                    url: 'sendDetail'
+                    url: 'sendDetail?id=' + id
                 })
             }
         }
 
+        async getSendList(init) {
+            if (init) {
+                this.sendList = [];
+            }
+            let res = await http.post(apis.sendList, {
+                cur_uid: 2702847,
+                beginIndex: this.sendList.length
+            })
+            res = {
+                _ok: 1,
+                "code": 0,
+                "totalFee": 10.0,
+                "totalCount": 12,
+                "sendList": [{
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 1,
+                    "redPackageFee": 88,
+                    "questionCount": 5,
+                    "authorUserID": 123,
+                    "userCount": 12,
+                    "passRate": 44,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "id": 2,
+                    "redPackageFee": 18,
+                    "questionCount": 25,
+                    "authorUserID": 1323,
+                    "userCount": 22,
+                    "passRate": 41,
+                    "createTime": "2018-01-02 12:00:00"
+                }]
+            }
+            if (res._ok) {
+                this.sendTotalFee = Number(res.totalFee).toFixed(2);
+                this.sendTotalCount = res.totalCount;
+                this.sendList = this.sendList.concat(res.sendList);
+                this.$apply();
+            }
+            init && wx.stopPullDownRefresh();
+        }
+
+        async getReceiveList(init) {
+            if (init) {
+                this.receiveList = [];
+            }
+            let res = await http.post(apis.sendList, {
+                cur_uid: 2702847,
+                beginIndex: this.receiveList.length
+            })
+            res = {
+                _ok: 1,
+                "code": 0,
+                "totalFee": 10.0,
+                "totalCount": 23,
+                "receiveList": [{
+                    "fee": 2.0,
+                    "createTime": "2018-01-02 12:00:00"
+                }, {
+                    "fee": 3.0,
+                    "createTime": "2018-01-02 12:00:00"
+                }]
+
+            }
+            if (res._ok) {
+                this.receiveTotalFee = Number(res.totalFee).toFixed(2);
+                this.receiveTotalCount = res.totalCount;
+                this.receiveList = this.receiveList.concat(res.receiveList);
+                this.$apply();
+            }
+            init && wx.stopPullDownRefresh();
+        }
+
         onLoad() {
+            this.getSendList();
+            this.getReceiveList();
+        }
+
+        onPullDownRefresh() {
+            if (this.curTab == 1) {
+                this.getSendList(true);
+            } else {
+                this.getReceiveList(true);
+            }
+        }
+
+        onReachBottom() {
+            if (this.curTab == 1) {
+                this.getSendList();
+            } else {
+                this.getReceiveList();
+            }
         }
 
     }
@@ -123,16 +296,16 @@
                     margin-bottom: unit(16, rpx);
                     padding: unit(26, rpx) unit(96, rpx);
                     .label {
-                        color: #DEDEDE;
+                        color: #BFBFBF;
                         font-size: unit(26, rpx);
                     }
                     .l1 {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        height: unit(40, rpx);
-                        margin-top: unit(12, rpx);
-                        .left {
+                        height: unit(70, rpx);
+                        margin-top: unit(10, rpx);
+                        .amount {
                             text-align: left;
                             color: #CD3434;
                             font-size: unit(36, rpx);
@@ -140,38 +313,29 @@
                         }
                         .right {
                             text-align: right;
-                            font-size: unit(26, rpx);
+                            .num {
+                                font-size: unit(26, rpx);
+                            }
+                            .level {
+                                font-size: unit(24, rpx);
+                                color: #BFBFBF;
+                            }
                         }
                     }
                     .l2 {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        height: unit(34, rpx);
-                        .left {
-                            text-align: left;
-                            font-size: unit(20, rpx);
-                        }
-                        .right {
-                            text-align: right;
-                            color: #DEDEDE;
-                            font-size: unit(24, rpx);
-                        }
-                    }
-                    .l3 {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-top: unit(16, rpx);
+                        margin-top: unit(10, rpx);
                         height: unit(24, rpx);
                         .left {
                             text-align: left;
-                            color: #DEDEDE;
+                            color: #BFBFBF;
                             font-size: unit(20, rpx);
                         }
                         .right {
                             text-align: right;
-                            color: #DEDEDE;
+                            color: #BFBFBF;
                             font-size: unit(20, rpx);
                         }
                     }
@@ -191,9 +355,10 @@
                     .amount {
                         color: #CD3434;
                         font-size: unit(36, rpx);
+                        font-weight: bold;
                     }
                     .date {
-                        color: #DEDEDE;
+                        color: #BFBFBF;
                         font-size: unit(24, rpx);
                     }
                 }

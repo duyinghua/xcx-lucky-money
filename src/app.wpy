@@ -23,6 +23,8 @@
                 'pages/createIssue',
                 'pages/sendDetail',
                 'pages/shareRedPack',
+                'pages/gameStart',
+                'pages/gameResult',
             ],
             window: {
                 backgroundTextStyle: 'dark',
@@ -79,7 +81,7 @@
 
         onLaunch() {
             wepy.$instance.globalData.userInfo = wx.getStorageSync('USER_INFO')
-//            login.doLogin()
+            login.doLogin()
         }
     }
 </script>

@@ -17,23 +17,23 @@
                             <image class="img" mode="aspectFit"
                                    src="https://pic3.zhimg.com/v2-69f941cb6fbb05db45009734631bd28e_400x224.jpg"></image>
                         </view>
-                        <view class="qsn">你种草的戴森、小米、松下、飞利浦值得买吗？ |​ 双11红黑榜第三弹</view>
-                        <view class="aws">
-                            <view class="li {{curAws==1?'cur':''}}" @tap="answerHandler(1)">
-                                <view class="txt">戴森</view>
-                                <view class="sub">设为正确</view>
+                        <textarea class="qsn-input" placeholder="输入问题" maxlength="35" value="你种草的戴森、小米、松下、飞利浦值得买吗？ |​ 双11红黑榜第三弹"></textarea>
+                        <view class="aws-input">
+                            <view class="li {{curAws==1?'cur':''}}">
+                                <input class="txt" placeholder="输入答案" maxlength="8" value="猫主子"/>
+                                <view class="sub" @tap="answerHandler(1)">设为正确</view>
                             </view>
-                            <view class="li {{curAws==2?'cur':''}}" @tap="answerHandler(2)">
-                                <view class="txt">小米</view>
-                                <view class="sub">设为正确</view>
+                            <view class="li {{curAws==2?'cur':''}}">
+                                <input class="txt" placeholder="输入答案" maxlength="8" value="狗主子"/>
+                                <view class="sub" @tap="answerHandler(2)">设为正确</view>
                             </view>
-                            <view class="li {{curAws==3?'cur':''}}" @tap="answerHandler(3)">
-                                <view class="txt">松下</view>
-                                <view class="sub">设为正确</view>
+                            <view class="li {{curAws==3?'cur':''}}">
+                                <input class="txt" placeholder="输入答案" maxlength="8" value="蜥蜴"/>
+                                <view class="sub" @tap="answerHandler(3)">设为正确</view>
                             </view>
-                            <view class="li {{curAws==4?'cur':''}}" @tap="answerHandler(4)">
-                                <view class="txt">飞利浦</view>
-                                <view class="sub">设为正确</view>
+                            <view class="li {{curAws==4?'cur':''}}">
+                                <input class="txt" placeholder="输入答案" maxlength="8" value="以上都是，以上都不是"/>
+                                <view class="sub" @tap="answerHandler(4)">设为正确</view>
                             </view>
                         </view>
                         <view class="buttons">
@@ -46,14 +46,20 @@
                             <image class="add-img" src="../img/picture-add.png"></image>
                             <text class="add-desc">添加照片</text>
                         </view>
-                        <view class="qsn-input">
-                            <input class="input" placeholder="输入问题" maxlength="35"/>
-                        </view>
+                        <textarea class="qsn-input" placeholder="输入问题" maxlength="35"></textarea>
                         <view class="aws-input">
-                            <input class="input right" placeholder="输入正确答案" placeholder-class="right" maxlength="8"/>
-                            <input class="input" placeholder="输入错误答案" maxlength="8"/>
-                            <input class="input" placeholder="输入错误答案" maxlength="8"/>
-                            <input class="input" placeholder="输入错误答案" maxlength="8"/>
+                            <view class="li cur">
+                                <input class="txt" placeholder="输入正确答案" maxlength="8"/>
+                            </view>
+                            <view class="li">
+                                <input class="txt" placeholder="输入错误答案" maxlength="8"/>
+                            </view>
+                            <view class="li">
+                                <input class="txt" placeholder="输入错误答案" maxlength="8"/>
+                            </view>
+                            <view class="li">
+                                <input class="txt" placeholder="输入错误答案" maxlength="8"/>
+                            </view>
                         </view>
                         <view class="buttons">
                             <button class="btn add-btn" @tap="addQuestion">确定</button>
@@ -264,11 +270,19 @@
                     font-size: unit(26, rpx);
                 }
             }
-            .qsn {
+            .qsn-input {
                 font-size: 16px;
-                margin-top: unit(50, rpx);
+                margin-top: unit(20, rpx);
+                width: 100%;
+                height: unit(90, rpx);
+                line-height: unit(45, rpx);
+                padding: unit(20, rpx) 0;
+                border-bottom: 1px solid #DEDEDE;
+                .textarea-placeholder {
+                    color: #DEDEDE;
+                }
             }
-            .aws {
+            .aws-input {
                 margin-top: unit(40, rpx);
                 .li {
                     display: flex;
@@ -280,8 +294,6 @@
                         font-size: 14px;
                         flex: 1;
                         width: 200px;
-                        display: flex;
-                        align-items: flex-end;
                     }
                     .sub {
                         font-size: 12px;
@@ -299,35 +311,10 @@
                         .sub {
                             color: #F49A51;
                         }
+                        .input-placeholder {
+                            color: #F49A51;
+                        }
                     }
-                }
-            }
-            .qsn-input {
-                margin-top: unit(16, rpx);
-                .input {
-                    font-size: 16px;
-                    border-bottom: 1px solid #DEDEDE;
-                    height: unit(70, rpx);
-                    line-height: unit(70, rpx);
-                }
-                .input-placeholder {
-                    color: #DEDEDE;
-                }
-            }
-            .aws-input {
-                margin-top: unit(40, rpx);
-                .input {
-                    font-size: 16px;
-                    border-bottom: 1px solid #DEDEDE;
-                    height: unit(70, rpx);
-                    line-height: unit(70, rpx);
-                    margin-top: unit(16, rpx);
-                }
-                .input-placeholder {
-                    color: #DEDEDE;
-                }
-                .right {
-                    color: #F49A51;
                 }
             }
             .buttons {

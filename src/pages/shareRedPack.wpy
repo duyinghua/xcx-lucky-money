@@ -1,26 +1,23 @@
 <template>
     <view class="shareRedPack-page container">
-        <view class="main">
-            <image class="bg" mode="aspectFill" src="../img/share-bg.jpg"></image>
-            <view class="box">
-                <image class="photo" src="../img/demo-share.png"></image>
-                <view class="info">
-                    1个答题红包
-                    <view class="amount">￥88</view>
-                </view>
-                <view class="desc">
-                    <view>第一名</view>
-                    <view>回答正确</view>
-                    <view>独享一半红包！</view>
-                </view>
-                <button class="button" open-type="share">
-                    <image class="img" src="../img/share-friend.png"></image>
-                </button>
-                <button class="button" @tap="shareTimeline">
-                    <image class="img" src="../img/share-timeline.png"></image>
-                </button>
-                <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
+        <view class="main" style="background: url('../img/question-bg.jpg') no-repeat center top / cover">
+            <image class="photo" src="../img/demo-share.png"></image>
+            <view class="info">
+                1个答题红包
+                <view class="amount">￥88</view>
             </view>
+            <view class="desc">
+                <view>第一名</view>
+                <view>回答正确</view>
+                <view>独享一半红包！</view>
+            </view>
+            <button class="button" open-type="share">
+                <image class="img" src="../img/share-friend.png"></image>
+            </button>
+            <button class="button" @tap="shareTimeline">
+                <image class="img" src="../img/share-timeline.png"></image>
+            </button>
+            <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
         </view>
     </view>
 </template>
@@ -35,12 +32,15 @@
         config = {
             navigationBarTitleText: '冲顶超人'
         }
-        data = {}
+        data = {
+            wxToken: ''
+        }
 
         methods = {
             shareTimeline(data){
-                this.clearCanvas();
-                this.drawShare(data);
+//                this.clearCanvas();
+//                this.drawShare(data);
+                this.getQrCode()
             }
         }
 
@@ -142,7 +142,27 @@
             wx.hideLoading();
         }
 
+        async getWxToken() {
+            let res = await http.post(apis.wxToken, {cur_uid: 2702847})
+            if (res._ok) {
+                this.wxToken = res._result;
+            }
+        }
+
+        async getQrCode() {
+            let res = await http.post(apis.wxQrCode + '6_cyVsGuKq4VfhjpwYZ5zBEkK6tNV88MChC3dljbfxAEMiD6vFwXuZFIHHFXWllvA4VElC6BhJrnTnjXlVRj50ENYRqJ8aSLrr4uen8gssWBJJ8HQ59vCwKIdxaTLQX3Wzk2tNhcQM7iUz-qKTIDNjAJAAVF', {
+                scene: 'dyh123',
+                page: 'pages/goodsDetail',//gameStart/gameStart
+                width: 430
+            }, true)
+            if (res._ok) {
+                console.log(res);
+            }
+        }
+
         onLoad() {
+            this.getWxToken();
+
         }
 
         onShareAppMessage() {
@@ -158,61 +178,50 @@
     .shareRedPack-page {
         .main {
             flex: 1;
-            .bg {
-                position: absolute;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 100%;
+            position: relative;
+            box-sizing: border-box;
+            padding: unit(40, rpx) unit(92, rpx);
+            padding: unit(20, rpx) unit(92, rpx);
+            z-index: 1;
+            color: #FFF;
+            .photo {
+                width: unit(147, rpx);
+                height: unit(147, rpx);
             }
-            .box {
-                position: absolute;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 100%;
-                box-sizing: border-box;
-                padding: unit(40, rpx) unit(92, rpx);
-                padding: unit(20, rpx) unit(92, rpx);
-                z-index: 1;
-                color: #FFF;
-                .photo {
-                    width: unit(147, rpx);
-                    height: unit(147, rpx);
+            .info {
+                font-size: unit(28, rpx);
+                margin-top: unit(120, rpx);
+                margin-top: unit(20, rpx);
+                .amount {
+                    font-size: unit(64, rpx);
+                    font-size: unit(60, rpx);
                 }
-                .info {
-                    font-size: unit(28, rpx);
-                    margin-top: unit(120, rpx);
-                    margin-top: unit(20, rpx);
-                    .amount {
-                        font-size: unit(64, rpx);
-                        font-size: unit(60, rpx);
-                    }
+            }
+            .desc {
+                margin: unit(30, rpx) 0 unit(156, rpx);
+                margin: unit(10, rpx) 0 unit(156, rpx);
+                font-size: unit(78, rpx);
+                font-size: unit(68, rpx);
+                line-height: unit(88, rpx);
+            }
+            .button {
+                width: unit(560, rpx);
+                height: unit(94, rpx);
+                background: transparent;
+                border: 0;
+                padding: 0;
+                margin: unit(30, rpx) 0;
+                &:after {
+                    display: none;
                 }
-                .desc {
-                    margin: unit(30, rpx) 0 unit(156, rpx);
-                    margin: unit(10, rpx) 0 unit(156, rpx);
-                    font-size: unit(78, rpx);
-                    font-size: unit(68, rpx);
-                    line-height: unit(88, rpx);
-                }
-                .button {
+                .img {
                     width: unit(560, rpx);
                     height: unit(94, rpx);
-                    background: transparent;
-                    border: 0;
-                    padding: 0;
-                    margin: unit(30, rpx) 0;
-                    &:after {
-                        display: none;
-                    }
-                    .img {
-                        width: unit(560, rpx);
-                        height: unit(94, rpx);
-                    }
                 }
-                .share-canvas {
-                }
+            }
+            .share-canvas {
+                position: absolute;
+                top: -9999px;
             }
         }
     }

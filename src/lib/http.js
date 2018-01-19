@@ -38,7 +38,8 @@ export default class HTTP {
             if (userInfo) {
                 authInfo = {
                     accountId: userInfo.accountId,
-                    uid: userInfo.uid
+                    uid: userInfo.uid,
+                    cur_uid: userInfo.uid,
                 }
             }
             if (req.method === 'POST') {
@@ -52,6 +53,7 @@ export default class HTTP {
         const res = await wepy.request(req)
         wepy.hideLoading()
         if (res.statusCode === 200) {
+            // console.log(res.data)
             let result = Object.assign({_result: res.data.data}, {_code: res.data.code});
             //如果接口返回result直接是一个对象或数组，则直接暴露到最外层使用（数组也可以）；普通string、number、bool基本类型则使用时候要从_result中取得
             if (typeof res.data.data == 'object') {
@@ -76,7 +78,7 @@ export default class HTTP {
                             wepy.$instance.globalData.userInfo = '';
                             wx.setStorageSync('USER_INFO', '');
                             let login = require('./login.js');
-                            login.doLogin(async () => {
+                            login.doLogin(async() => {
                                 /*let pages = getCurrentPages();
                                  let page = pages[pages.length - 1];
                                  let options = [];

@@ -1,0 +1,291 @@
+<template>
+    <view class="gameResult-page container">
+        <view class="main">
+            <view class="title">冲顶成功</view>
+            <view class="amount">获得
+                <text class="value">88.88</text>
+                元红包
+            </view>
+            <view class="result" style="background: url('http://redpackagelite.static.immocha.com/wxlite/result-1.png') no-repeat center top / cover">
+                <view class="score">
+                    <text class="value">75</text>
+                    <text class="unit">分</text>
+                </view>
+                <view class="remark">还需要对他多多了解</view>
+                <view class="left-photo">
+                    <image class="photo" src="../img/demo-photo.png"></image>
+                </view>
+                <view class="right-photo">
+                    <image class="photo" src="../img/demo-photo.png"></image>
+                </view>
+            </view>
+            <view class="ctrl "><!--ctrl2-->
+                <view class="li">
+                    <image class="icon" src="../img/icon-tixian.png"></image>
+                    提现
+                </view>
+                <view class="li">
+                    <image class="icon" src="../img/icon-hongbao.png"></image>
+                    我要出题
+                </view>
+                <view class="li">
+                    <image class="icon" src="../img/icon-fenxiang.png"></image>
+                    分享
+                </view>
+            </view>
+        </view>
+        <view class="desc">
+            共
+            <text class="b">1888.88</text>
+            元，已被
+            <text class="b">3</text>
+            位好友领取
+        </view>
+        <view class="list">
+            <view class="li" wx:for="1111">
+                <view class="photo">
+                    <image class="img" mode="widthFix" src="../img/demo-photo.png"></image>
+                </view>
+                <view class="info">
+                    <view class="row">
+                        <view class="name">只阿斯蒂芬</view>
+                        <view class="amount">￥4444.44</view>
+                    </view>
+                    <view class="row">
+                        <view class="level">亲密度55%</view>
+                        <view class="datetime">1月15日 10:18</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="banner">
+            <image class="revive" mode="widthFix" src="../img/revive.png"></image>
+            <view class="txt">分享获得复活卡</view>
+            <button class="button">分享</button>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
+
+
+    export default class GameResult extends wepy.page {
+        config = {
+            navigationBarBackgroundColor: '#CC4242',
+            backgroundColor: '#CC4242',
+        }
+        data = {}
+
+        methods = {}
+
+
+        onLoad() {
+        }
+
+        onShareAppMessage() {
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+            }
+        }
+    }
+</script>
+
+<style lang="less" rel="stylesheet/less">
+    .gameResult-page {
+        background-color: #CC4242;
+        color: #FFF;
+        .main {
+            height: unit(980, rpx);
+            background: url('http://redpackagelite.static.immocha.com/wxlite/answer-bg.jpg') no-repeat center top / cover;
+            .title {
+                text-align: center;
+                margin-top: unit(60, rpx);
+                height: unit(60, rpx);
+                font-size: unit(48, rpx);
+                font-weight: bold;
+            }
+            .amount {
+                text-align: center;
+                margin-top: unit(20, rpx);
+                font-size: unit(36, rpx);
+                .value {
+                    font-weight: bold;
+                }
+            }
+            .result {
+                padding: 1px 0;
+                box-sizing: border-box;
+                position: relative;
+                width: unit(495, rpx);
+                height: unit(600, rpx);
+                margin: unit(50, rpx) auto;
+                .score {
+                    margin-top: unit(316, rpx);
+                    text-align: center;
+                    font-size: 0;
+                    .value {
+                        font-size: unit(95, rpx);
+                        text-shadow: 0 2px 1px #EDB141;
+                    }
+                    .unit {
+                        font-size: unit(40, rpx);
+                    }
+                }
+                .remark {
+                    margin-top: unit(44, rpx);
+                    text-align: center;
+                    font-size: unit(28, rpx);
+                }
+                .left-photo {
+                    position: absolute;
+                    top: unit(318, rpx);
+                    left: unit(-58, rpx);
+                    width: unit(138, rpx);
+                    height: unit(138, rpx);
+                    background: url('http://redpackagelite.static.immocha.com/wxlite/result-photo.png') no-repeat center center / cover;
+                }
+                .right-photo {
+                    position: absolute;
+                    top: unit(318, rpx);
+                    right: unit(-58, rpx);
+                    width: unit(138, rpx);
+                    height: unit(138, rpx);
+                    background: url('http://redpackagelite.static.immocha.com/wxlite/result-photo.png') no-repeat center center / cover;
+                }
+                .photo {
+                    display: block;
+                    margin: unit(5, rpx) auto;
+                    width: unit(116, rpx);
+                    height: unit(116, rpx);
+                }
+            }
+            .ctrl {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: unit(30, rpx);
+                margin: unit(50, rpx) unit(96, rpx) 0;
+                .li {
+                    display: flex;
+                    align-items: center;
+                    .icon {
+                        width: unit(32, rpx);
+                        height: unit(32, rpx);
+                        margin-right: unit(8, rpx);
+                    }
+                }
+                &.ctrl2 {
+                    margin: unit(50, rpx) unit(186, rpx) 0;
+                }
+            }
+        }
+        .desc {
+            font-size: unit(26, rpx);
+            padding: 0 unit(30, rpx);
+            height: unit(68, rpx);
+            line-height: unit(64, rpx);
+            box-shadow: 0 -1px 2px #B61010;
+            b {
+                font-weight: bold;
+            }
+        }
+        .list {
+            .li {
+                display: flex;
+                align-items: center;
+                background: #C33939;
+                margin-bottom: unit(16, rpx);
+                padding: unit(26, rpx) unit(32, rpx);
+                .photo {
+                    width: unit(100, rpx);
+                    height: unit(100, rpx);
+                    border-radius: unit(6, rpx);
+                    background: #EEE;
+                    margin-right: unit(26, rpx);
+                    .img {
+                        width: unit(100, rpx);
+                        height: 0;
+                    }
+                }
+                .info {
+                    flex: 1;
+                    width: unit(200, rpx);
+                    .row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: unit(12, rpx);
+                        &:first-child {
+                            margin-top: 0;
+                        }
+                        .name {
+                            font-size: unit(26, rpx);
+                        }
+                        .amount {
+                            font-size: unit(28, rpx);
+                            font-weight: bold;
+                        }
+                        .level {
+                            color: #EED1D1;
+                            font-size: unit(24, rpx);
+                        }
+                        .datetime {
+                            color: #EED1D1;
+                            font-size: unit(24, rpx);
+                        }
+                    }
+
+                }
+                &:first-child {
+                    .amount {
+                        color: #FFB411;
+                    }
+                }
+            }
+        }
+        .banner {
+            position: fixed;
+            width: 100%;
+            height: unit(117, rpx);
+            left: 0;
+            bottom: 0;
+            z-index: 1;
+            background: #F49A51;
+            display: flex;
+            align-items: center;
+            padding: 0 unit(30, rpx);
+            box-sizing: border-box;
+            .revive {
+                display: block;
+                width: unit(78, rpx);
+                height: 0;
+                margin-right: unit(20, rpx);
+            }
+            .txt {
+                font-size: unit(28, rpx);
+                width: unit(350, rpx);
+                flex: 1;
+            }
+            .button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: unit(188, rpx);
+                height: unit(56, rpx);
+                text-align: center;
+                color: #CE2838;
+                background: #FFFFFF;
+                font-size: unit(32, rpx);
+                border-radius: unit(56, rpx);
+                margin: 0;
+                padding: 0;
+                border: 1px solid #CE2838;
+            }
+
+        }
+    }
+</style>

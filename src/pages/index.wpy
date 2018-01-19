@@ -14,10 +14,11 @@
                     <view class="label">红包(元)</view>
                     <input class="input" placeholder="输入金额"/>
                 </view>
-                <view class="tip">24小时内未被领取，则红包原路退回</view>
+                <view class="tip">优先使用余额 ￥5.23</view>
                 <button class="begin-button" @tap="gameStart">开始出题</button>
             </view>
         </view>
+        <view class="tip">24小时内未被领取，则红包原路退回</view>
     </view>
 </template>
 
@@ -139,6 +140,12 @@
                 }
             }
 
+        }
+        .tip {
+            margin-top: unit(50, rpx);
+            color: #BFBFBF;
+            font-size: unit(26, rpx);
+            text-align: center;
         }
     }
 </style>
