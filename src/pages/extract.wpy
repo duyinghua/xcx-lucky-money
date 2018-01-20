@@ -21,7 +21,7 @@
                     <text class="span">提现到微信钱包，</text>
                     <text class="span red">全部提现</text>
                 </view>
-                <button class="withdraw-button" @tap="withdraw">提现</button>
+                <button plain="true" class="withdraw-button" @tap="withdraw">提现</button>
             </view>
         </view>
         <view class="tip">1-5个工作日到账</view>

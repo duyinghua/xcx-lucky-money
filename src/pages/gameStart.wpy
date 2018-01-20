@@ -14,14 +14,14 @@
                 </view>
             </view>
             <view class="question ">随着生活水平提高，我在家里养了哪些动物？</view><!--no-pic-->
-            <!-- <view class="picture">
-                 <image class="img" src="https://pic3.zhimg.com/v2-69f941cb6fbb05db45009734631bd28e_400x224.jpg"></image>
-             </view>-->
+            <view class="picture">
+                <image class="img" src="https://pic3.zhimg.com/v2-69f941cb6fbb05db45009734631bd28e_400x224.jpg"></image>
+            </view>
             <view class="answer">
-                <view class="li ">猫主子</view>
-                <view class="li yes">够咋</view>
-                <view class="li">蜥蜴</view>
-                <view class="li no">以上都有</view>
+                <view class="li " @tap="answer({{1}})">猫主子</view>
+                <view class="li yes" @tap="answer({{2}})">够咋</view>
+                <view class="li" @tap="answer({{3}})">蜥蜴</view>
+                <view class="li no" @tap="answer({{4}})">以上都有</view>
             </view>
         </view>
     </view>

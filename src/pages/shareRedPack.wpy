@@ -11,10 +11,10 @@
                 <view>回答正确</view>
                 <view>独享一半红包！</view>
             </view>
-            <button class="button" open-type="share">
+            <button plain="true" class="button" open-type="share">
                 <image class="img" src="../img/share-friend.png"></image>
             </button>
-            <button class="button" @tap="shareTimeline">
+            <button plain="true" class="button" @tap="shareTimeline">
                 <image class="img" src="../img/share-timeline.png"></image>
             </button>
             <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>

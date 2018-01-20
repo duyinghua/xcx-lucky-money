@@ -15,7 +15,7 @@
                     <input class="input" placeholder="输入金额"/>
                 </view>
                 <view class="tip">优先使用余额 ￥5.23</view>
-                <button class="begin-button" @tap="gameStart">开始出题</button>
+                <button plain="true" class="begin-button" @tap="gameStart">开始出题</button>
             </view>
         </view>
         <view class="tip">24小时内未被领取，则红包原路退回</view>

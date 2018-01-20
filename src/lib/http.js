@@ -2,33 +2,30 @@ import wepy from 'wepy'
 // import login from './login.js'
 
 export default class HTTP {
-    static get(url, params, externalApi) {
-        return this.request('GET', url, params, externalApi)
+    static get(url, params, externalApi, showLoading) {
+        return this.request('GET', url, params, externalApi, showLoading)
     }
 
-    static put(url, params, externalApi) {
-        return this.request('PUT', url, params, externalApi)
+    static put(url, params, externalApi, showLoading) {
+        return this.request('PUT', url, params, externalApi, showLoading)
     }
 
-    static post(url, params, externalApi) {
-        return this.request('POST', url, params, externalApi)
+    static post(url, params, externalApi, showLoading) {
+        return this.request('POST', url, params, externalApi, showLoading)
     }
 
-    static patch(url, params, externalApi) {
-        return this.request('PATCH', url, params, externalApi)
+    static patch(url, params, externalApi, showLoading) {
+        return this.request('PATCH', url, params, externalApi, showLoading)
     }
 
-    static del(url, params, externalApi) {
-        return this.request('DELETE', url, params, externalApi)
+    static del(url, params, externalApi, showLoading) {
+        return this.request('DELETE', url, params, externalApi, showLoading)
     }
 
-    static async request(method, url, params, externalApi) {
+    static async request(method, url, params = {}, externalApi = false, showLoading = true) {
         const req = {
             method: method,
             url: url
-        }
-        if (typeof params != 'object') {
-            params = {};
         }
         if (externalApi) {
             req.data = params
@@ -49,9 +46,9 @@ export default class HTTP {
             params = {...params, ...authInfo}
             req.data = {data: JSON.stringify(params)};
         }
-        wepy.showLoading({title: '加载中'})
+        showLoading && wepy.showLoading({title: '加载中'})
         const res = await wepy.request(req)
-        wepy.hideLoading()
+        showLoading && wepy.hideLoading()
         if (res.statusCode === 200) {
             // console.log(res.data)
             let result = Object.assign({_result: res.data.data}, {_code: res.data.code});

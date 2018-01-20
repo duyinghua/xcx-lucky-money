@@ -61,7 +61,7 @@
         <view class="banner">
             <image class="revive" mode="widthFix" src="../img/revive.png"></image>
             <view class="txt">分享获得复活卡</view>
-            <button class="button">分享</button>
+            <button plain="true" class="button">分享</button>
         </view>
     </view>
 </template>
