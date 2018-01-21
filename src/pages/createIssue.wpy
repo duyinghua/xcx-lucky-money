@@ -13,14 +13,14 @@
             <scroll-view class="scroll-view" scroll-y="true">
                 <view class="scroll-cont">
                     <view class="iss-list" animation="{{animationData}}">
-                        <view class="item" wx:for="{{issueList}}" wx:for-index="issue_index" wx:key="issue_{{issue_index}}" wx:if="{{issue_index==curIssIndex}}">
+                        <view class="item">
                             <view hidden="{{curTab!=1}}">
                                 <view class="picture">
                                     <image class="img" mode="aspectFit"
                                            src="{{issueList[curIssIndex].question.picURL}}"></image>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea class="input" placeholder="输入问题" maxlength="35" value="{{issueList[curIssIndex].question.content}}" bindinput="questionInput"></textarea>
+                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35" value="{{issueList[curIssIndex].question.content}}" bindinput="questionInput"></textarea>
                                 </view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item" wx:for-index="a_index" wx:key="{{item.id}}">
@@ -30,21 +30,21 @@
                                 </view>
                                 <view class="buttons">
                                     <button plain="true" class="btn change-btn" @tap="changeQuestion">换一题</button>
-                                    <button plain="true" class="btn confirm-btn {{!issueList[curIssIndex].setRight?'disabled':''}}" disabled="{{!issueList[curIssIndex].setRight}}" @tap="confirmQuestion">
+                                    <button plain="true" class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}" disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
                                         确认
                                     </button>
                                 </view>
                             </view>
                             <view hidden="{{curTab!=2}}">
                                 <view class="picture" @tap="uploadImage">
-                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" src="{{issueDiy.question.picURL}}"></image>
+                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFit" src="{{issueDiy.question.picURL}}"></image>
                                     <block wx:else>
                                         <image class="add-img" src="../img/picture-add.png"></image>
                                         <text class="add-desc">添加照片</text>
                                     </block>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea class="input" placeholder="输入问题" maxlength="35" value="{{issueDiy.question.content}}" bindinput="questionInput"></textarea>
+                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35" value="{{issueDiy.question.content}}" bindinput="questionInput"></textarea>
                                 </view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}" wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
@@ -52,7 +52,9 @@
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn add-btn" @tap="confirmQuestion">确定</button>
+                                    <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}" disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
+                                        确定
+                                    </button>
                                 </view>
                             </view>
                         </view>
@@ -67,43 +69,46 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+
     import qiniuUploader from '../lib/qiniu/qiniuUploader.js'
+
 
     export default class CreateIssue extends wepy.page {
         data = {
             id: 0,
             curTab: 1,
-            issueList: [{
-                "question": {
-                    "id": 1,
-                    "content": "我最喜欢那个英雄?",
-                    "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
-                    authorUserID: '333'
-                },
-                "answerList": [{
-                    "id": 1,
-                    "content": '德玛西亚之力',
-                    "isRight": 1
-                }, {
-                    "id": 2,
-                    "content": '孙悟空',
-                    "isRight": 0
-                }, {
-                    "id": 3,
-                    "content": '慎',
-                    "isRight": 0
-                }, {
-                    "id": 4,
-                    "content": '捶石',
-                    "isRight": 0
-                }]
-            }],
-            curIssIndex: 1,
+            issueList: [/*{
+             "question": {
+             "id": 1,
+             "content": "我最喜欢那个英雄?",
+             "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
+             authorUserID: '333'
+             },
+             "answerList": [{
+             "id": 1,
+             "content": '德玛西亚之力',
+             "isRight": 1
+             }, {
+             "id": 2,
+             "content": '孙悟空',
+             "isRight": 0
+             }, {
+             "id": 3,
+             "content": '慎',
+             "isRight": 0
+             }, {
+             "id": 4,
+             "content": '捶石',
+             "isRight": 0
+             }]
+             }*/],
+            curIssIndex: 0,
+            lastQuestionId: 0,
             issueDiy: {
                 question: {
                     content: '',
                     picURL: '',
-                    authorUserID: wepy.$instance.globalData.userInfo.uid
+                    authorUserID: wepy.$instance.globalData.userInfo.id
                 },
                 answerList: [{
                     content: '',
@@ -117,8 +122,10 @@
                 }, {
                     content: '',
                     isRight: 0
-                }]
+                }],
+                complete: false
             },
+            hideTextarea: false,
             animationData: {},
             uptoken: ''
         }
@@ -142,20 +149,27 @@
                 this.$apply()
             },
             questionInput(e){
-                let content = e.detail.value || ''
+                let content = e.detail.value.trim() || ''
+                let issue;
                 if (this.curTab == 1) {
-                    this.issueList[this.curIssIndex].question.content = content;
+                    issue = this.issueList[this.curIssIndex];
                 } else {
-                    this.issueDiy.question.content = content;
+                    issue = this.issueDiy;
                 }
+                issue.question.content = content;
+                issue.complete = !this.checkIssue(issue);
+                this.$apply()
             },
             answerInput(index, e){
-                let content = e.detail.value || ''
+                let content = e.detail.value.trim() || ''
+                let issue;
                 if (this.curTab == 1) {
-                    this.issueList[this.curIssIndex].answerList[index].content = content;
+                    issue = this.issueList[this.curIssIndex];
                 } else {
-                    this.issueDiy.answerList[index].content = content;
+                    issue = this.issueDiy;
                 }
+                issue.answerList[index].content = content;
+                issue.complete = !this.checkIssue(issue);
                 this.$apply()
             },
             setAnswer(num){
@@ -166,7 +180,7 @@
                         item.isRight = 0;
                     }
                 })
-                this.issueList[this.curIssIndex].setRight = true;
+                this.issueList[this.curIssIndex].complete = !this.checkIssue(this.issueList[this.curIssIndex]);
                 this.$apply()
             },
             async changeQuestion(){
@@ -176,20 +190,16 @@
                 }
             },
             confirmQuestion: utils.debounce(async() => {
-                let animation = wx.createAnimation({
-                    duration: 300,
-                })
-                animation.scale(0, 0).step();
-                this.animationData = animation.export();
-                this.$apply();
-                setTimeout(function () {
-                    animation.scale(1, 1).step();
-                    this.animationData = animation.export();
-                    this.$apply();
-                }.bind(this), 300)
                 let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
+                let msg = this.checkIssue(curIssue);
+                if (msg) {
+                    wx.showModal({
+                        content: msg,
+                        showCancel: false
+                    });
+                    return;
+                }
                 let commitIssue = await this.commitIssue(curIssue);
-
                 if (!commitIssue) {
                     return;
                 }
@@ -200,15 +210,12 @@
                     this.addQuestion()
                 } else {
                     wx.showModal({
-                        title: '小提示',
                         content: '没过瘾？你还可以多出几道题刁难大家哟',
                         cancelText: '增加1题',
                         confirmText: '完成出题',
                         success: res => {
                             if (res.confirm) {
-                                wx.navigateTo({
-                                    url: 'shareRedPack'
-                                })
+                                this.finishQuestion();
                             } else {
                                 this.addQuestion()
                             }
@@ -231,7 +238,7 @@
                         }, {
                             region: 'ECN',
                             uploadURL: 'https://up.qbox.me',
-                            domain: 'redpackagelite.static.immocha.com/',
+                            domain: 'http://redpackagelite.static.immocha.com/',
                             uptoken: this.uptoken, // 由其他程序生成七牛 uptoken
                         });
                     }
@@ -239,13 +246,25 @@
             }
 
         }
+        /*
+         * 获取未完成红包历史题目
+         * */
+        async incompleteRedPack() {
+            let res = await http.post(apis.incompleteRedPack, {});
+            if (res._ok) {
+                this.issueList = res.qaList;
+            }
+        }
 
+        /*
+         * diy问题对象清空
+         * */
         clearIssueDiy() {
             this.issueDiy = {
                 question: {
                     content: '',
                     picURL: '',
-                    authorUserID: wepy.$instance.globalData.userInfo.uid
+                    authorUserID: wepy.$instance.globalData.userInfo.id
                 },
                 answerList: [{
                     content: '',
@@ -259,12 +278,30 @@
                 }, {
                     content: '',
                     isRight: 0
-                }]
+                }],
+                complete: false
             }
             this.$apply();
         }
 
+        /*
+         * 增加一题
+         * */
         async addQuestion() {
+            //切题动画
+            let animation = wx.createAnimation({
+                duration: 300,
+            })
+            animation.scale(0, 1).step();
+            this.animationData = animation.export();
+            this.hideTextarea = true;
+            this.$apply();
+            setTimeout(function () {
+                animation.scale(1, 1).step();
+                this.animationData = animation.export();
+                this.hideTextarea = false;
+                this.$apply();
+            }.bind(this), 300);
 
             this.curTab = 1;
             this.curIssIndex++;
@@ -273,47 +310,84 @@
             this.$apply();
         }
 
+        /*
+         * 获得一个推荐问题
+         * */
         async getNewIssue() {
             let newIss;
             let res = await http.post(apis.recommendQuestion, {
-                questionID: 0
+                questionID: this.lastQuestionId
             }, false, false);
-            res = {
-                _ok: 1,
-                "code": 0,
-                "question": {
-                    "id": 1,
-                    "content": "渴了怎么办?" + parseInt(Math.random() * 1e5),
-                    "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
-                    authorUserID: '333'
-                },
-                "answerList": [{
-                    "id": 1,
-                    "content": '喝水' + parseInt(Math.random() * 1e5),
-                    "isRight": 0
-                }, {
-                    "id": 2,
-                    "content": '喝崂山牌的可口可乐' + parseInt(Math.random() * 1e5),
-                    "isRight": 0
-                }, {
-                    "id": 3,
-                    "content": '忍' + parseInt(Math.random() * 1e5),
-                    "isRight": 0
-                }, {
-                    "id": 4,
-                    "content": '困了饿了喝香飘飘' + parseInt(Math.random() * 1e5),
-                    "isRight": 0
-                }]
-            }
+            /*res = {
+             _ok: 1,
+             "code": 0,
+             "question": {
+             "id": 1,
+             "content": "渴了怎么办?" + parseInt(Math.random() * 1e5),
+             "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
+             authorUserID: '333'
+             },
+             "answerList": [{
+             "id": 1,
+             "content": '喝水' + parseInt(Math.random() * 1e5),
+             "isRight": 0
+             }, {
+             "id": 2,
+             "content": '喝崂山牌的可口可乐' + parseInt(Math.random() * 1e5),
+             "isRight": 0
+             }, {
+             "id": 3,
+             "content": '忍' + parseInt(Math.random() * 1e5),
+             "isRight": 0
+             }, {
+             "id": 4,
+             "content": '困了饿了喝香飘飘' + parseInt(Math.random() * 1e5),
+             "isRight": 0
+             }]
+             }*/
             if (res._ok) {
-                let setRight = res.answerList.some(item=> {
-                    return item.isRight;
-                })
-                newIss = {question: res.question, answerList: res.answerList, setRight: setRight}
+                if (res.question) {
+                    this.lastQuestionId = res.question.id;
+                    let complete = !this.checkIssue({question: res.question, answerList: res.answerList});
+                    newIss = {question: res.question, answerList: res.answerList, complete: complete}
+                } else {
+                    wx.showModal({
+                        content: '已经没有可推荐的题目了，请出自定义题目吧',
+                        showCancel: false
+                    });
+                }
             }
             return newIss;
         }
 
+        /*
+         * 检测问题是否完整
+         * */
+        checkIssue(curIssue) {
+            if (!curIssue.question.content.trim()) {
+                return '请填写问题';
+            }
+            let setRight = false;
+            let checkAnswer = curIssue.answerList.some(item=> {
+                if (!item.content.trim()) {
+                    return true;
+                }
+                if (!setRight && item.isRight) {
+                    setRight = true;
+                }
+            })
+            if (checkAnswer) {
+                return '请完整填写全部答案';
+            }
+            if (!setRight) {
+                return '请设置一个正确答案';
+            }
+            return '';
+        }
+
+        /*
+         * 提交问题
+         * */
         async commitIssue(curIssue) {
             let res = await http.post(apis.commitQuestion, {
                 redPackageID: this.id,
@@ -328,6 +402,20 @@
             }
         }
 
+        /*
+         * 出完所有题了
+         * */
+        async finishQuestion() {
+            let res = await http.post(apis.finishQuestion, {
+                redPackageID: this.id
+            })
+            if (res._ok) {
+                wx.navigateTo({
+                    url: 'shareRedPack'
+                })
+            }
+        }
+
         async getUptoken() {
             let res = await http.post(apis.qiniuToken)
             if (res._ok) {
@@ -338,6 +426,7 @@
         async onLoad(e) {
             this.id = e.id;
             if (e.recover) {
+                await this.incompleteRedPack();
             } else {
                 let newIss = await this.getNewIssue();
                 this.issueList.push(newIss);
@@ -348,7 +437,14 @@
         onShow() {
             this.getUptoken();
         }
-
+        onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`
+            }
+        }
     }
 
 </script>
@@ -359,7 +455,7 @@
             font-size: 0;
             width: unit(550, rpx);
             height: unit(54, rpx);
-            margin: unit(50, rpx) auto;
+            margin: unit(26, rpx) auto;
             overflow-x: hidden;
             .li {
                 display: inline-block;
@@ -467,10 +563,11 @@
             }
             .qsn-input {
                 margin-top: unit(40, rpx);
-                width: 100%;
                 border-bottom: 1px solid #DEDEDE;
                 .input {
                     font-size: 16px;
+                    width: 100%;
+                    box-sizing: border-box;
                     height: unit(120, rpx);
                     line-height: unit(45, rpx);
                 }
@@ -535,16 +632,15 @@
                     &.confirm-btn {
                         color: #FFF;
                         background: #CD3434;
-                        &.disabled {
-                            border-color: #DEDEDE;
-                            background: #DEDEDE;
-                        }
                     }
-
                     &.add-btn {
                         width: 100%;
                         color: #FFF;
                         background: #CD3434;
+                    }
+                    &.disabled {
+                        border-color: #DEDEDE;
+                        background: #DEDEDE;
                     }
                 }
 

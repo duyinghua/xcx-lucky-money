@@ -16,7 +16,7 @@
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="{{sendList}}" wx:for-item="item" wx:key="{{item.id}}" @tap="sendDetail({{item.id}})">
+                <view class="li" wx:for="{{sendList}}" wx:for-item="item" wx:for-index="index" wx:key="send_{{index}}" @tap="sendDetail({{item.id}})">
                     <view class="label">金额(元)</view>
                     <view class="l1">
                         <view class="amount">{{item.redPackageFee}}</view>
@@ -44,7 +44,7 @@
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
+                <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index" wx:key="receive_{{index}}">
                     <view class="amount">￥{{item.fee}}</view>
                     <view class="date">{{item.createTime}}</view>
                 </view>
@@ -58,10 +58,9 @@
     import utils from '../lib/utils.js'
 
     export default class Record extends wepy.page {
-
         config = {
             navigationBarTitleText: '冲顶超人',
-            enablePullDownRefresh: true,
+            enablePullDownRefresh: true
         }
         data = {
             curTab: 1,
@@ -89,9 +88,8 @@
                 this.sendList = [];
             }
             let res = await http.post(apis.sendList, {
-                cur_uid: 2702847,
                 beginIndex: this.sendList.length
-            })
+            });
             res = {
                 _ok: 1,
                 "code": 0,
@@ -200,10 +198,9 @@
             if (init) {
                 this.receiveList = [];
             }
-            let res = await http.post(apis.sendList, {
-                cur_uid: 2702847,
+            let res = await http.post(apis.receiveList, {
                 beginIndex: this.receiveList.length
-            })
+            });
             res = {
                 _ok: 1,
                 "code": 0,
@@ -247,7 +244,14 @@
                 this.getReceiveList();
             }
         }
-
+        onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`
+            }
+        }
     }
 
 </script>

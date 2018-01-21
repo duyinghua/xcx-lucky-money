@@ -13,10 +13,10 @@
                 </view>
                 <view class="remark">还需要对他多多了解</view>
                 <view class="left-photo">
-                    <image class="photo" src="../img/demo-photo.png"></image>
+                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
                 </view>
                 <view class="right-photo">
-                    <image class="photo" src="../img/demo-photo.png"></image>
+                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
                 </view>
             </view>
             <view class="ctrl "><!--ctrl2-->
@@ -44,7 +44,7 @@
         <view class="list">
             <view class="li" wx:for="1111">
                 <view class="photo">
-                    <image class="img" mode="widthFix" src="../img/demo-photo.png"></image>
+                    <image class="img" mode="widthFix" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
                 </view>
                 <view class="info">
                     <view class="row">
@@ -71,31 +71,41 @@
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
 
-
     export default class GameResult extends wepy.page {
         config = {
             navigationBarBackgroundColor: '#CC4242',
             backgroundColor: '#CC4242',
         }
-        data = {}
+        data = {
+            questionId: 0
+        }
 
         methods = {}
 
-
-        onLoad() {
+        onLoad(e) {
+            this.questionId = e.questionId;
         }
 
         onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.appName,
                 path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`,
+                success: async()=> {
+                    let res = await http.post(apis.relive, {
+                        questionID: this.questionId
+                    });
+                }
             }
         }
+
     }
 </script>
 
 <style lang="less" rel="stylesheet/less">
     .gameResult-page {
+        padding-bottom: unit(117, rpx);;
         background-color: #CC4242;
         color: #FFF;
         .main {
@@ -161,6 +171,7 @@
                     margin: unit(5, rpx) auto;
                     width: unit(116, rpx);
                     height: unit(116, rpx);
+                    border-radius: unit(116, rpx);
                 }
             }
             .ctrl {
@@ -206,9 +217,10 @@
                     border-radius: unit(6, rpx);
                     background: #EEE;
                     margin-right: unit(26, rpx);
+                    overflow: hidden;
                     .img {
-                        width: unit(100, rpx);
-                        height: 0;
+                        width: 100%;
+                        height: 100%;
                     }
                 }
                 .info {

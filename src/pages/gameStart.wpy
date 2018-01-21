@@ -6,22 +6,38 @@
                     <image class="img" mode="widthFix" src="../img/bz-left.png"></image>
                 </view>
                 <view class="tit">
-                    <view class="index">第一题</view>
+                    <view class="index">第{{curIssTitle}}题</view>
                     <view class="desc">89%好友通过此题</view>
                 </view>
                 <view class="bz-right">
                     <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
                 </view>
             </view>
-            <view class="question ">随着生活水平提高，我在家里养了哪些动物？</view><!--no-pic-->
-            <view class="picture">
-                <image class="img" src="https://pic3.zhimg.com/v2-69f941cb6fbb05db45009734631bd28e_400x224.jpg"></image>
+            <view class="question {{!issueList[curIssIndex].question.picURL?'no-pic':''}}">
+                {{issueList[curIssIndex].question.content}}
+            </view>
+            <view class="picture" hidden="{{!issueList[curIssIndex].question.picURL}}">
+                <image mode="aspectFit" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
             </view>
             <view class="answer">
-                <view class="li " @tap="answer({{1}})">猫主子</view>
-                <view class="li yes" @tap="answer({{2}})">够咋</view>
-                <view class="li" @tap="answer({{3}})">蜥蜴</view>
-                <view class="li no" @tap="answer({{4}})">以上都有</view>
+                <view class="li {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}" wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
+                      wx:key="answer_{{answer_i}}" @tap="answerHandler({{answer_i}})">
+                    {{answer.content}}
+                </view>
+            </view>
+            <view class="redpack" hidden="{{redpackHide}}" animation="{{redpackAnimation}}">
+                <image class="img" src="../img/hongbao.png"></image>
+                <view class="amount">
+                    <view>红包</view>
+                    <view>+0.02元</view>
+                </view>
+            </view>
+            <view class="mask" wx:if="{{!hideMask}}" @tap="closeMask">
+                <view class="card">
+                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
+                    <view class="name">{{'什么值得买'}}</view>
+                    <view class="desc">发出的年终亲密大考验</view>
+                </view>
             </view>
         </view>
     </view>
@@ -31,24 +47,168 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+    import numberZh from '../lib/number_zh.js'
 
     export default class GameStart extends wepy.page {
         config = {
             navigationBarBackgroundColor: '#CC4242',
             backgroundColor: '#CC4242',
         }
-        data = {}
+        data = {
+            id: 0,
+            hideMask: false,
+            redpackHide: true,
+            redpackAnimation: {},
+            issueList: [],
+            curIssIndex: 0,
+            delayAnswer: 0.6,
+            canAnswer: false //延迟答题，防止误点
+        }
+        computed = {
+            curIssTitle(){
+                return numberZh(this.curIssIndex + 1);
+            }
+        }
+        methods = {
+            closeMask(){
+                this.hideMask = true;
+                this.$apply();
+            },
+            async answerHandler(index){
+                let curIssue = this.issueList[this.curIssIndex];
+                let curAnswer = curIssue.answerList[index];
+                if (curIssue.answered || !this.canAnswer) {
+                    return;
+                }
+                curIssue.answered = true;
+                curAnswer.myAnswer = curAnswer.isRight ? 1 : 2;
+                this.$apply();
+                if (curAnswer.isRight) {
+                    //todo ajax 获取金额
+                    //获取小红包动画
+                    let animation = wx.createAnimation({
+                        timingFunction: 'ease-out',
+                        duration: 300,
+                    })
+                    this.redpackHide = false;
+                    this.$apply();
+                    animation.opacity(1).translate('-50%', -100).step();
+                    this.redpackAnimation = animation.export();
+                    this.$apply();
+                    await utils.sleep(2);
+                    this.redpackHide = true;
+                    animation = wx.createAnimation({
+                        duration: 0,
+                    })
+                    animation.opacity(0).translate('-50%', 0).step();
+                    this.redpackAnimation = animation.export();
+                    this.$apply();
+                    //下一题
+                    if (this.curIssIndex == this.issueList.length - 1) {
+                        //冲顶成功！
+                        wx.redirectTo({
+                            url: `gameResult?id=${this.id}`
+                        })
+                    } else {
+                        this.canAnswer = false;
+                        this.curIssIndex++;
+                        this.$apply();
+                        await utils.sleep(this.delayAnswer);
+                        this.canAnswer = true;
+                    }
+                } else {
+                    //todo ajax 答题失败应该告知服务器
+                    await utils.sleep(0.8);
+                    wx.redirectTo({
+                        url: `gameResult?id=${this.id}&questionId=${curIssue.question.id}`
+                    })
+                }
 
-        methods = {}
+            }
+        }
 
+        async getQuestionList() {
+            let res = await http.post(apis.questionList, {
+                redPackageID: this.id
+            });
+            res = Object.assign({
+                _ok: 1,
+                "code": 0
+            }, [{
+                "question": {
+                    "id": 1,
+                    "content": '我最喜欢吃的水果是什么',
+                    "authorUserID": 123,
+                    "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
+                },
+                "answerList": [{
+                    "id": 1,
+                    "content": '樱桃',
+                    "isRight": 0
+                }, {
+                    "id": 2,
+                    "content": '黄桃',
+                    "isRight": 0
+                }, {
+                    "id": 3,
+                    "content": '荔枝',
+                    "isRight": 0
+                }, {
+                    "id": 4,
+                    "content": '山竹',
+                    "isRight": 1
+                }]
+            }, {
+                "question": {
+                    "id": 11,
+                    "content": '我最喜欢什么样的宠物',
+                    "authorUserID": 123,
+                    "picURL": ''
+                },
+                "answerList": [{
+                    "id": 11,
+                    "content": '好看的',
+                    "isRight": 0
+                }, {
+                    "id": 12,
+                    "content": '好养的',
+                    "isRight": 1
+                }, {
+                    "id": 13,
+                    "content": '啥也不喜欢',
+                    "isRight": 0
+                }, {
+                    "id": 14,
+                    "content": '不知道',
+                    "isRight": 0
+                }]
+            }])
+            res.length = 2;
+            if (res._ok) {
+                this.issueList = res;
+                this.$apply();
+            }
+        }
 
-        onLoad() {
+        onLoad(e) {
+            let scene = decodeURIComponent(e.scene);
+            scene = JSON.parse(scene);
+            this.id = e.id || scene.id;
+            //todo ajax 应该先判断这个人能否答题，如果已经答过，应该去结果页
+            this.getQuestionList();
+        }
+
+        async onShow() {
+            await  utils.sleep(this.delayAnswer);
+            this.canAnswer = true;
         }
 
         onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.appName,
                 path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`
             }
         }
     }
@@ -130,7 +290,72 @@
                     }
                 }
             }
-
+            .redpack {
+                position: absolute;
+                left: 50%;
+                top: unit(534, rpx);
+                opacity: 0;
+                transform: translate(-50%, 0);
+                width: unit(327, rpx);
+                height: unit(380, rpx);
+                color: #FFFFFF;
+                .img {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+                .amount {
+                    position: absolute;
+                    top: unit(200, rpx);
+                    left: 0;
+                    width: 100%;
+                    font-size: unit(40, rpx);
+                    text-align: center;
+                }
+            }
+            .mask {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .card {
+                    width: unit(420, rpx);
+                    height: unit(368, rpx);
+                    border-radius: unit(16, rpx);
+                    background: #CC4242;
+                    color: #FFFFFF;
+                    text-align: center;
+                    padding: 0 unit(40, rpx);
+                    box-sizing: border-box;
+                    transform: translateY(-36%);
+                    .photo {
+                        margin-top: unit(68, rpx);
+                        width: unit(88, rpx);
+                        height: unit(88, rpx);
+                        border-radius: unit(92, rpx);
+                        border: unit(2, rpx) solid #A71919;
+                    }
+                    .name {
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        font-size: unit(32, rpx);
+                        font-weight: bold;
+                        margin-top: unit(10, rpx);
+                    }
+                    .desc {
+                        font-size: unit(26, rpx);
+                        margin-top: unit(30, rpx);
+                    }
+                }
+            }
         }
     }
 </style>

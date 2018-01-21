@@ -31,13 +31,19 @@ export default class HTTP {
             req.data = params
         } else {
             let reqHeader = {}, authInfo = {};
-            const userInfo = wepy.$instance.globalData.userInfo
-            if (userInfo) {
-                authInfo = {
-                    accountId: userInfo.accountId,
-                    uid: userInfo.uid,
-                    cur_uid: userInfo.uid,
+            let userInfo = wepy.$instance.globalData.userInfo
+            if (!userInfo && !params.iv) {
+                let login = require('./login.js');
+                let loginRes = await login.doLogin();
+                if (loginRes) {
+                    userInfo = wepy.$instance.globalData.userInfo
+                } else {
+                    return {};
                 }
+            }
+            authInfo = {
+                tToken: userInfo.tToken,
+                cur_uid: userInfo.id,
             }
             if (req.method === 'POST') {
                 reqHeader['content-type'] = 'application/x-www-form-urlencoded'
@@ -54,49 +60,48 @@ export default class HTTP {
             let result = Object.assign({_result: res.data.data}, {_code: res.data.code});
             //如果接口返回result直接是一个对象或数组，则直接暴露到最外层使用（数组也可以）；普通string、number、bool基本类型则使用时候要从_result中取得
             if (typeof res.data.data == 'object') {
-                result = Object.assign(result, res.data.data)
+                result = Object.assign(result, res.data.data);
+                if (res.data.data instanceof Array) {
+                    result.length = res.data.data.length;
+                }
             }
             let statusCode = res.data.code;
             if (statusCode == 0) {
                 result._ok = true;
-            } else if (statusCode == -3) {
-                wx.showModal({
-                    title: '提示',
-                    content: '服务器异常，请稍后重试',
-                    showCancel: false
-                })
-            } else if (statusCode == 120 || statusCode == 40004) {// 未登录或登录过期
+            } else if (statusCode == 12) {// 未登录或登录过期
                 wx.showModal({
                     title: '提示',
                     content: '登录信息已过期，请重新登录后重试',
                     showCancel: false,
-                    success: res => {
+                    success: async(res) => {
                         if (res.confirm) {
                             wepy.$instance.globalData.userInfo = '';
                             wx.setStorageSync('USER_INFO', '');
-                            let login = require('./login.js');
-                            login.doLogin(async() => {
-                                /*let pages = getCurrentPages();
-                                 let page = pages[pages.length - 1];
-                                 let options = [];
-                                 for (let key in page.options) {
-                                 options.push(`${key}=${page.options[key]}`)
-                                 }
-                                 wx.reLaunch({
-                                 url: page.route.replace('pages/', '') + (options.length ? ('?' + options.join('&')) : '')
-                                 })*/
-                                wx.showToast({
-                                    title: '重新登录成功'
-                                });
+                            let pages = getCurrentPages();
+                            let page = pages[pages.length - 1];
+                            let options = [];
+                            for (let key in page.options) {
+                                options.push(`${key}=${page.options[key]}`)
+                            }
+                            wx.reLaunch({
+                                url: page.route.replace('pages/', '') + (options.length ? ('?' + options.join('&')) : '')
                             })
                         }
                     }
+                })
+            } else {
+                wx.showModal({
+                    content: typeof res.data.data == 'string' ? res.data.data : '服务器异常',
+                    showCancel: false
                 })
             }
             console.log('response::', result);
             return result;
         } else {
             console.error(method, url, params, res)
+            let result = res;
+            result._ok = false;
+            return result;
         }
     }
 }

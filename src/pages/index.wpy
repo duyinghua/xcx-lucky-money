@@ -9,13 +9,17 @@
         <view class="begin-box">
             <image class="bg" src="../img/begin-bg.png"></image>
             <view class="box">
-                <image class="photo" src="../img/demo-photo.png"></image>
+                <view class="photo">
+                    <image class="img" src="{{headPhoto}}"></image>
+                </view>
                 <view class="input-box">
                     <view class="label">红包(元)</view>
-                    <input class="input" placeholder="输入金额"/>
+                    <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput" bindblur="amountBlur"/>
                 </view>
-                <view class="tip">优先使用余额 ￥5.23</view>
-                <button plain="true" class="begin-button" @tap="gameStart">开始出题</button>
+                <view class="tip">优先使用余额 ￥{{balance}}</view>
+                <button plain="true" class="begin-button {{(incomplete||!amountAbs)?'disabled':''}}" disabled="{{(incomplete||!amountAbs)}}" @tap="gameStart">
+                    开始出题
+                </button>
             </view>
         </view>
         <view class="tip">24小时内未被领取，则红包原路退回</view>
@@ -27,30 +31,154 @@
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
 
-
     export default class Index extends wepy.page {
         config = {
             navigationBarTitleText: '冲顶超人'
         }
-        data = {}
-
-
+        data = {
+            headPhoto: wepy.$instance.globalData.userInfo.headPicURL,
+            amount: '',
+            balance: 0,
+            incomplete: true
+        }
+        computed = {
+            amountAbs(){
+                let abs = Number(this.amount);
+                return isNaN(abs) ? '' : abs;
+            }
+        }
         methods = {
-            gameStart(){
-                wx.navigateTo({
-                    url: 'createIssue'
+            amountInput(e){
+                this.amount = e.detail.value.trim() || '';
+                this.$apply();
+            },
+            amountBlur(e){
+                let value = e.detail.value.trim() || '';
+                value = parseFloat(value);
+                if (isNaN(value)) {
+                    value = '';
+                } else {
+                    value = value.toFixed(2);
+                }
+                this.amount = value;
+                this.$apply();
+            },
+            async gameStart(){
+                let amount = this.amount - this.balance;
+                if (amount > 0) {
+                    this.recharge(amount);
+                } else {
+                    this.buyRedPackage(this.amount);
+                }
+            }
+        }
+
+        async getBalance() {
+            let res = await http.post(apis.balanceInfo, {});
+            if (res._ok) {
+                this.balance = Number(res.balance || 0).toFixed(2);
+                this.$apply();
+            }
+        }
+
+        async recharge(amount) {
+            let res = await http.post(apis.recharge, {
+                chargePrice: amount
+            });
+            res = {
+                _ok: 1,
+                "orderID": 21212121,
+                "orderNO": "LITE21212121",
+                "weixinpayParamLite": {
+                    "appId": "wx2421b1c4370ec43b", //公众号名称，由商户传入
+                    "timeStamp": " 1395712654", //时间戳，自1970年以来的秒数
+                    "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
+                    "package": "prepay_id=u802345jgfjsdfgsdg888",
+                    "signType": "MD5", //微信签名方式：
+                    "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+                }
+            }
+            if (res._ok) {
+                let payParam = res.weixinpayParamLite;
+                wx.requestPayment({
+                    'timeStamp': payParam.timeStamp,
+                    'nonceStr': payParam.nonceStr,
+                    'package': payParam.package,
+                    'signType': payParam.signType,
+                    'paySign': payParam.paySign,
+                    success: async(res) => {
+                        let rrr = await http.post(apis.rechargeResult, {
+                            orderID: res.orderID
+                        });
+                        if (rrr._ok) {
+                            if (rrr.payStatus == 10) {
+                                this.buyRedPackage();
+                            }
+                        }
+                    },
+                    fail: function (res) {
+                        if (res.errMsg == 'requestPayment:fail cancel') {
+                            wx.showToast({
+                                title: '支付已取消',
+                                icon: 'none'
+                            })
+                        } else {
+                            wx.showModal({
+                                content: '支付失败，请重试',
+                                showCancel: false,
+                            });
+                        }
+                    }
                 })
             }
         }
 
-        onLoad() {
+        async buyRedPackage() {
+            let res = await http.post(apis.buyRedPack, {
+                redPackagePrice: this.amount
+            });
+            if (res._ok) {
+                let id = res._result;
+                wx.navigateTo({
+                    url: 'createIssue?id=' + id
+                })
+            }
         }
 
+        async incompleteRedPack() {
+            let res = await http.post(apis.incompleteRedPack, {});
+            if (res._ok) {
+                if (res.redPackageID) {
+                    this.incomplete = true;
+                    wx.showModal({
+                        content: '你有一个未完成红包，需要先完成出题',
+                        confirmText: '继续出题',
+                        showCancel: false,
+                        success: res => {
+                            if (res.confirm) {
+                                wx.navigateTo({
+                                    url: 'createIssue?recover=1&&id=' + res.redPackageID
+                                })
+                            }
+                        }
+                    })
+                } else {
+                    this.incomplete = false;
+                }
+            }
+        }
+
+        onShow() {
+            this.getBalance();
+            this.incompleteRedPack();
+        }
 
         onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.appName,
                 path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`
             }
         }
     }
@@ -102,6 +230,12 @@
                     width: unit(126, rpx);
                     height: unit(126, rpx);
                     margin: unit(12, rpx) auto;
+                    overflow: hidden;
+                    border-radius: unit(126, rpx);;
+                    .img {
+                        width: 100%;
+                        height: 100%;
+                    }
                 }
                 .input-box {
                     display: flex;
@@ -137,6 +271,9 @@
                     text-align: center;
                     color: #FFF;
                     font-size: unit(32, rpx);
+                    &.disabled {
+                        background: #DEDEDE;
+                    }
                 }
             }
 

@@ -6,7 +6,7 @@
                 <view class="balance-box">
                     <view class="label">账户余额</view>
                     <view class="balance">
-                        <text>0.00</text>
+                        <text>{{balance}}</text>
                         <text class="unit">元</text>
                     </view>
                 </view>
@@ -14,14 +14,16 @@
                     <view class="label">提现金额</view>
                     <view class="withdraw-input">
                         <view class="icon">￥</view>
-                        <input class="input" value="888.88"/>
+                        <input class="input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="amountInput" bindblur="amountBlur"/>
                     </view>
                 </view>
                 <view class="tip">
                     <text class="span">提现到微信钱包，</text>
-                    <text class="span red">全部提现</text>
+                    <text class="span red" @tap="allBalance">全部提现</text>
                 </view>
-                <button plain="true" class="withdraw-button" @tap="withdraw">提现</button>
+                <button plain="true" class="withdraw-button {{!amountAbs?'disabled':''}}" disabled="{{!amountAbs}}" @tap="withdraw">
+                    提现
+                </button>
             </view>
         </view>
         <view class="tip">1-5个工作日到账</view>
@@ -29,13 +31,62 @@
 </template>
 <script>
     import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+    import utils from '../lib/utils.js'
 
     export default class Extract extends wepy.page {
-        methods = {}
-
-        onLoad() {
+        data = {
+            balance: 0,
+            amount: ''
+        }
+        computed = {
+            amountAbs(){
+                let abs = Number(this.amount);
+                return isNaN(abs) ? '' : abs;
+            }
+        }
+        methods = {
+            allBalance(){
+                this.amount = this.balance;
+                this.$apply();
+            },
+            amountInput(e){
+                this.amount = e.detail.value.trim() || '';
+                this.$apply();
+            },
+            amountBlur(e){
+                let value = e.detail.value.trim() || '';
+                value = parseFloat(value);
+                if (isNaN(value)) {
+                    value = '';
+                } else {
+                    value = value.toFixed(2);
+                }
+                this.amount = value;
+                this.$apply();
+            },
         }
 
+        async getBalance() {
+            let res = await http.post(apis.balanceInfo, {});
+            if (res._ok) {
+                this.balance = Number(res.balance || 0).toFixed(2);
+                this.$apply();
+            }
+        }
+
+        onShow() {
+            this.getBalance();
+        }
+
+        onShareAppMessage() {
+            let rand = parseInt(Math.random() * 3) + 1;
+            return {
+                title: wepy.$instance.globalData.appName,
+                path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`
+            }
+        }
     }
 
 </script>
@@ -100,6 +151,9 @@
                             line-height: unit(66, rpx);
                             box-sizing: border-box;
                         }
+                        .input-placeholder {
+                            color: #DEDEDE;
+                        }
                     }
                 }
                 .tip {
@@ -123,6 +177,9 @@
                     text-align: center;
                     color: #FFF;
                     font-size: unit(32, rpx);
+                    &.disabled {
+                        background: #DEDEDE;
+                    }
                 }
             }
 
