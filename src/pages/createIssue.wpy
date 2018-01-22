@@ -2,7 +2,9 @@
     <view class="createIssue-page container">
         <scroll-view class="iss-index" scroll-x="true">
             <view class="li" wx:for="{{indexs}}" wx:for-item="index_item" wx:for-index="index_i" wx:key="{{index_i}}">
-                <view class="num {{index_item<curIssIndex?'prev':''}} {{index_item==curIssIndex?'cur':''}}">{{index_item+1}}</view>
+                <view class="num {{index_item<curIssIndex?'prev':''}} {{index_item==curIssIndex?'cur':''}}">
+                    {{index_item + 1}}
+                </view>
             </view>
         </scroll-view>
         <view class="tab">
@@ -20,39 +22,53 @@
                                            src="{{issueList[curIssIndex].question.picURL}}"></image>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35" value="{{issueList[curIssIndex].question.content}}" bindinput="questionInput"></textarea>
+                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
+                                              value="{{issueList[curIssIndex].question.content}}"
+                                              bindinput="questionInput"></textarea>
                                 </view>
                                 <view class="aws-input">
-                                    <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item" wx:for-index="a_index" wx:key="{{item.id}}">
-                                        <input class="txt" placeholder="输入答案" maxlength="12" value="{{item.content}}" bindinput="answerInput({{a_index}})"/>
+                                    <view class="li {{item.isRight?'cur':''}}"
+                                          wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
+                                          wx:for-index="a_index" wx:key="{{item.id}}">
+                                        <input class="txt" placeholder="输入答案" maxlength="12" value="{{item.content}}"
+                                               bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
                                 </view>
                                 <view class="buttons">
                                     <button plain="true" class="btn change-btn" @tap="changeQuestion">换一题</button>
-                                    <button plain="true" class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}" disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
+                                    <button plain="true"
+                                            class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}"
+                                            disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
                                         确认
                                     </button>
                                 </view>
                             </view>
                             <view hidden="{{curTab!=2}}">
                                 <view class="picture" @tap="uploadImage">
-                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFit" src="{{issueDiy.question.picURL}}"></image>
+                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFit"
+                                           src="{{issueDiy.question.picURL}}"></image>
                                     <block wx:else>
                                         <image class="add-img" src="../img/picture-add.png"></image>
                                         <text class="add-desc">添加照片</text>
                                     </block>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35" value="{{issueDiy.question.content}}" bindinput="questionInput"></textarea>
+                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
+                                              value="{{issueDiy.question.content}}"
+                                              bindinput="questionInput"></textarea>
                                 </view>
                                 <view class="aws-input">
-                                    <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}" wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
-                                        <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}" maxlength="12" value="{{item.content}}" bindinput="answerInput({{a_index}})"/>
+                                    <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}"
+                                          wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
+                                        <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
+                                               maxlength="12" value="{{item.content}}"
+                                               bindinput="answerInput({{a_index}})"/>
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}" disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
+                                    <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}"
+                                            disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
                                         确定
                                     </button>
                                 </view>
@@ -103,7 +119,6 @@
              }]
              }*/],
             curIssIndex: 0,
-            lastQuestionId: 0,
             issueDiy: {
                 question: {
                     content: '',
@@ -127,6 +142,7 @@
             },
             hideTextarea: false,
             animationData: {},
+            noRecommend: false,
             uptoken: ''
         }
         computed = {
@@ -136,7 +152,7 @@
                     return res;
                 } else {
                     let diff = this.curIssIndex - 4;
-                    return res.map(item=> {
+                    return res.map(item => {
                         return item + diff;
                     });
                 }
@@ -156,9 +172,11 @@
                 } else {
                     issue = this.issueDiy;
                 }
-                issue.question.content = content;
-                issue.complete = !this.checkIssue(issue);
-                this.$apply()
+                if (issue) {
+                    issue.question.content = content;
+                    issue.complete = !this.checkIssue(issue);
+                    this.$apply()
+                }
             },
             answerInput(index, e){
                 let content = e.detail.value.trim() || ''
@@ -173,7 +191,7 @@
                 this.$apply()
             },
             setAnswer(num){
-                this.issueList[this.curIssIndex].answerList.forEach((item, i)=> {
+                this.issueList[this.curIssIndex].answerList.forEach((item, i) => {
                     if (i == num) {
                         item.isRight = 1;
                     } else {
@@ -184,12 +202,15 @@
                 this.$apply()
             },
             async changeQuestion(){
-                let newIss = await this.getNewIssue();
-                if (newIss) {
-                    this.issueList[this.issueList.length - 1] = newIss;
+                if (!this.noRecommend) {
+                    let newIss = await this.getNewIssue();
+                    if (newIss) {
+                        this.issueList[this.issueList.length - 1] = newIss;
+                    }
                 }
+
             },
-            confirmQuestion: utils.debounce(async() => {
+            confirmQuestion: utils.debounce(async () => {
                 let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
                 let msg = this.checkIssue(curIssue);
                 if (msg) {
@@ -227,7 +248,7 @@
             uploadImage(){
                 wx.chooseImage({
                     count: 1,
-                    success: res=> {
+                    success: res => {
                         let filePath = res.tempFilePaths[0];
                         qiniuUploader.upload(filePath, (res) => {
                             // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
@@ -316,7 +337,7 @@
         async getNewIssue() {
             let newIss;
             let res = await http.post(apis.recommendQuestion, {
-                questionID: this.lastQuestionId
+                questionID: this.issueList.length ? (this.issueList[this.issueList.length - 1].question.id || 0) : 0
             }, false, false);
             /*res = {
              _ok: 1,
@@ -347,13 +368,17 @@
              }*/
             if (res._ok) {
                 if (res.question) {
-                    this.lastQuestionId = res.question.id;
                     let complete = !this.checkIssue({question: res.question, answerList: res.answerList});
                     newIss = {question: res.question, answerList: res.answerList, complete: complete}
                 } else {
+                    this.noRecommend = true;
                     wx.showModal({
                         content: '已经没有可推荐的题目了，请出自定义题目吧',
-                        showCancel: false
+                        showCancel: false,
+                        success: () => {
+                            this.curTab = 2;
+                            this.$apply();
+                        }
                     });
                 }
             }
@@ -368,7 +393,7 @@
                 return '请填写问题';
             }
             let setRight = false;
-            let checkAnswer = curIssue.answerList.some(item=> {
+            let checkAnswer = curIssue.answerList.some(item => {
                 if (!item.content.trim()) {
                     return true;
                 }
@@ -396,6 +421,7 @@
             }, false, false);
             return true;
             if (res._ok) {
+                this.issueList[this.issueList.length - 1].question.id = res.questionID;
                 return true;
             } else {
                 return false;
@@ -411,7 +437,7 @@
             })
             if (res._ok) {
                 wx.navigateTo({
-                    url: 'shareRedPack'
+                    url: `shareRedPack?amount=${res.totalFee}&count=${res.questionCount}`
                 })
             }
         }
@@ -427,16 +453,18 @@
             this.id = e.id;
             if (e.recover) {
                 await this.incompleteRedPack();
-            } else {
-                let newIss = await this.getNewIssue();
-                this.issueList.push(newIss);
+                this.curIssIndex = this.issueList.length
             }
+            let newIss = await this.getNewIssue();
+            this.issueList.push(newIss);
             this.$apply();
+            console.log('出题啦~~~~')
         }
 
         onShow() {
             this.getUptoken();
         }
+
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {

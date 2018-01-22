@@ -14,10 +14,12 @@
                 </view>
                 <view class="input-box">
                     <view class="label">红包(元)</view>
-                    <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput" bindblur="amountBlur"/>
+                    <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
+                           bindblur="amountBlur"/>
                 </view>
                 <view class="tip">优先使用余额 ￥{{balance}}</view>
-                <button plain="true" class="begin-button {{(incomplete||!amountAbs)?'disabled':''}}" disabled="{{(incomplete||!amountAbs)}}" @tap="gameStart">
+                <button plain="true" class="begin-button {{(incomplete||!amountAbs)?'disabled':''}}"
+                        disabled="{{(incomplete||!amountAbs)}}" @tap="gameStart">
                     开始出题
                 </button>
             </view>
@@ -33,7 +35,8 @@
 
     export default class Index extends wepy.page {
         config = {
-            navigationBarTitleText: '冲顶超人'
+            navigationBarTitleText: '冲顶超人',
+            enablePullDownRefresh: true
         }
         data = {
             headPhoto: wepy.$instance.globalData.userInfo.headPicURL,
@@ -85,19 +88,6 @@
             let res = await http.post(apis.recharge, {
                 chargePrice: amount
             });
-            res = {
-                _ok: 1,
-                "orderID": 21212121,
-                "orderNO": "LITE21212121",
-                "weixinpayParamLite": {
-                    "appId": "wx2421b1c4370ec43b", //公众号名称，由商户传入
-                    "timeStamp": " 1395712654", //时间戳，自1970年以来的秒数
-                    "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
-                    "package": "prepay_id=u802345jgfjsdfgsdg888",
-                    "signType": "MD5", //微信签名方式：
-                    "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
-                }
-            }
             if (res._ok) {
                 let payParam = res.weixinpayParamLite;
                 wx.requestPayment({
@@ -106,7 +96,7 @@
                     'package': payParam.package,
                     'signType': payParam.signType,
                     'paySign': payParam.paySign,
-                    success: async(res) => {
+                    success: async (res) => {
                         let rrr = await http.post(apis.rechargeResult, {
                             orderID: res.orderID
                         });
@@ -154,8 +144,8 @@
                         content: '你有一个未完成红包，需要先完成出题',
                         confirmText: '继续出题',
                         showCancel: false,
-                        success: res => {
-                            if (res.confirm) {
+                        success: wres => {
+                            if (wres.confirm) {
                                 wx.navigateTo({
                                     url: 'createIssue?recover=1&&id=' + res.redPackageID
                                 })
@@ -169,6 +159,11 @@
         }
 
         onShow() {
+            this.getBalance();
+            this.incompleteRedPack();
+        }
+
+        onPullDownRefresh() {
             this.getBalance();
             this.incompleteRedPack();
         }

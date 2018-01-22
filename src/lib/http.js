@@ -43,7 +43,7 @@ export default class HTTP {
             }
             authInfo = {
                 tToken: userInfo.tToken,
-                cur_uid: userInfo.id,
+                cur_uid: userInfo.id,//2702847//
             }
             if (req.method === 'POST') {
                 reqHeader['content-type'] = 'application/x-www-form-urlencoded'

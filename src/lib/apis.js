@@ -7,8 +7,8 @@ const config = {
 
 export default {
     login: `${config.apiHost}/wap/redpackagelite/user/login`,
-    wxToken: `${config.apiHost}/wap/redpackagelite/access/token`,//wx token
-    wxQrCode: `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=`,
+    // wxToken: `${config.apiHost}/wap/redpackagelite/access/token`,//wx token
+    wxQrCode: `${config.apiHost}/wap/redpackagelite/share/qrcode`,
     qiniuToken: `${config.apiHost}/open/qiniu/token/redpackagelite?data=%7B%22cur_uid%22%3A3254493%7D`,///open/qiniu/wap/image/token?data=%7B%22cur_uid%22%3A3254493%7D
 
     //我的
@@ -25,6 +25,8 @@ export default {
     commitQuestion: `${config.apiHost}/wap/redpackagelite/qa/save`,//保存问答
     finishQuestion: `${config.apiHost}/wap/redpackagelite/qa/finish`,//完成出题
     //答题
-    questionList: `${config.apiHost}/wap/redpackagelite/next/qalist`,//答题列表
+    questionList: `${config.apiHost}/wap/redpackagelite/qalist`,//答题列表
+    gameResult: `${config.apiHost}/wap/redpackagelite/result`,//答题结束
+
     relive: `${config.apiHost}/wap/redpackagelite/share/callback`,//分享复活
 }

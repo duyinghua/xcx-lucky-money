@@ -141,28 +141,22 @@
             wx.hideLoading();
         }
 
-        async getWxToken() {
-            let res = await http.post(apis.wxToken, {cur_uid: 2702847})
-            if (res._ok) {
-                this.wxToken = res._result;
-            }
-        }
 
         async getQrCode() {
-            let res = await http.post(apis.wxQrCode + '6_cyVsGuKq4VfhjpwYZ5zBEkK6tNV88MChC3dljbfxAEMiD6vFwXuZFIHHFXWllvA4VElC6BhJrnTnjXlVRj50ENYRqJ8aSLrr4uen8gssWBJJ8HQ59vCwKIdxaTLQX3Wzk2tNhcQM7iUz-qKTIDNjAJAAVF', {
+            let res = await http.post(apis.wxQrCode, {
                 scene: 'dyh123',
                 page: 'pages/goodsDetail',//gameStart/gameStart
                 width: 430
-            }, true)
+            })
             if (res._ok) {
                 console.log(res);
             }
         }
 
         onLoad() {
-            this.getWxToken();
-
+            this.getQrCode()
         }
+
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {

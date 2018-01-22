@@ -27,7 +27,7 @@
                         <view class="amount">￥{{item.receiveFee}}</view>
                     </view>
                     <view class="row">
-                        <view class="level">亲密度{{item.correctCount}}%</view>
+                        <view class="level">亲密度{{item.intimacy}}%</view>
                         <view class="datetime">{{item.createTime}}</view>
                     </view>
                 </view>
@@ -73,6 +73,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 56,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -81,6 +82,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -89,6 +91,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -97,6 +100,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -105,6 +109,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -113,6 +118,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -121,6 +127,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"
@@ -129,6 +136,7 @@
                     "userID": 2702847,
                     "userName": "背叛了曾经",
                     "headPicURL": "http://q.qlogo.cn/qqapp/100423987/E60FAFCE26762E95DE410BCDCA4CC0D4/100",
+                    intimacy: 21,
                     "correctCount": 5,
                     "receiveFee": 2,
                     "createTime": "2018-01-19 00:00:00"

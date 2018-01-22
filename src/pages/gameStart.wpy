@@ -20,7 +20,8 @@
                 <image mode="aspectFit" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
             </view>
             <view class="answer">
-                <view class="li {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}" wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
+                <view class="li {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}"
+                      wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
                       wx:key="answer_{{answer_i}}" @tap="answerHandler({{answer_i}})">
                     {{answer.content}}
                 </view>
@@ -29,13 +30,14 @@
                 <image class="img" src="../img/hongbao.png"></image>
                 <view class="amount">
                     <view>红包</view>
-                    <view>+0.02元</view>
+                    <view>0.02元</view>
                 </view>
             </view>
             <view class="mask" wx:if="{{!hideMask}}" @tap="closeMask">
                 <view class="card">
-                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
-                    <view class="name">{{'什么值得买'}}</view>
+                    <image class="photo"
+                           src="{{userPhoto}}"></image>
+                    <view class="name">{{userName}}</view>
                     <view class="desc">发出的年终亲密大考验</view>
                 </view>
             </view>
@@ -60,6 +62,8 @@
             redpackHide: true,
             redpackAnimation: {},
             issueList: [],
+            userName: '',
+            userPhoto: '',
             curIssIndex: 0,
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
@@ -131,68 +135,75 @@
             let res = await http.post(apis.questionList, {
                 redPackageID: this.id
             });
-            res = Object.assign({
+            res = {
                 _ok: 1,
-                "code": 0
-            }, [{
-                "question": {
-                    "id": 1,
-                    "content": '我最喜欢吃的水果是什么',
-                    "authorUserID": 123,
-                    "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
-                },
-                "answerList": [{
-                    "id": 1,
-                    "content": '樱桃',
-                    "isRight": 0
+                "code": 0,
+                "userName": "王骆",
+                "headPicURL": "https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0",
+                qaList: [{
+                    "question": {
+                        "id": 1,
+                        "content": '我最喜欢吃的水果是什么',
+                        "authorUserID": 123,
+                        "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
+                    },
+                    "answerList": [{
+                        "id": 1,
+                        "content": '樱桃',
+                        "isRight": 0
+                    }, {
+                        "id": 2,
+                        "content": '黄桃',
+                        "isRight": 0
+                    }, {
+                        "id": 3,
+                        "content": '荔枝',
+                        "isRight": 0
+                    }, {
+                        "id": 4,
+                        "content": '山竹',
+                        "isRight": 1
+                    }]
                 }, {
-                    "id": 2,
-                    "content": '黄桃',
-                    "isRight": 0
-                }, {
-                    "id": 3,
-                    "content": '荔枝',
-                    "isRight": 0
-                }, {
-                    "id": 4,
-                    "content": '山竹',
-                    "isRight": 1
+                    "question": {
+                        "id": 11,
+                        "content": '我最喜欢什么样的宠物',
+                        "authorUserID": 123,
+                        "picURL": ''
+                    },
+                    "answerList": [{
+                        "id": 11,
+                        "content": '好看的',
+                        "isRight": 0
+                    }, {
+                        "id": 12,
+                        "content": '好养的',
+                        "isRight": 1
+                    }, {
+                        "id": 13,
+                        "content": '啥也不喜欢',
+                        "isRight": 0
+                    }, {
+                        "id": 14,
+                        "content": '不知道',
+                        "isRight": 0
+                    }]
                 }]
-            }, {
-                "question": {
-                    "id": 11,
-                    "content": '我最喜欢什么样的宠物',
-                    "authorUserID": 123,
-                    "picURL": ''
-                },
-                "answerList": [{
-                    "id": 11,
-                    "content": '好看的',
-                    "isRight": 0
-                }, {
-                    "id": 12,
-                    "content": '好养的',
-                    "isRight": 1
-                }, {
-                    "id": 13,
-                    "content": '啥也不喜欢',
-                    "isRight": 0
-                }, {
-                    "id": 14,
-                    "content": '不知道',
-                    "isRight": 0
-                }]
-            }])
-            res.length = 2;
+            }
             if (res._ok) {
-                this.issueList = res;
+                this.userName = res.userName;
+                this.userPhoto = res.headPicURL;
+                this.issueList = res.qaList;
                 this.$apply();
             }
         }
 
         onLoad(e) {
-            let scene = decodeURIComponent(e.scene);
-            scene = JSON.parse(scene);
+            let scene = {};
+            if (e.scene) {
+                let scene = decodeURIComponent(e.scene);
+                scene = JSON.parse(scene);
+            }
             this.id = e.id || scene.id;
             //todo ajax 应该先判断这个人能否答题，如果已经答过，应该去结果页
             this.getQuestionList();
@@ -298,7 +309,7 @@
                 transform: translate(-50%, 0);
                 width: unit(327, rpx);
                 height: unit(380, rpx);
-                color: #FFFFFF;
+                color: #FFF;
                 .img {
                     position: absolute;
                     left: 0;
@@ -330,7 +341,7 @@
                     height: unit(368, rpx);
                     border-radius: unit(16, rpx);
                     background: #CC4242;
-                    color: #FFFFFF;
+                    color: #FFF;
                     text-align: center;
                     padding: 0 unit(40, rpx);
                     box-sizing: border-box;

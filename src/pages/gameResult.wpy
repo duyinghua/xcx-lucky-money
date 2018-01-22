@@ -3,20 +3,23 @@
         <view class="main">
             <view class="title">冲顶成功</view>
             <view class="amount">获得
-                <text class="value">88.88</text>
+                <text class="value">{{myInfo.receiveFee}}</text>
                 元红包
             </view>
-            <view class="result" style="background: url('http://redpackagelite.static.immocha.com/wxlite/result-1.png') no-repeat center top / cover">
+            <view class="result"
+                  style="background: url('http://redpackagelite.static.immocha.com/wxlite/result-1.png') no-repeat center top / cover">
                 <view class="score">
                     <text class="value">75</text>
                     <text class="unit">分</text>
                 </view>
                 <view class="remark">还需要对他多多了解</view>
                 <view class="left-photo">
-                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
+                    <image class="photo"
+                           src="{{myInfo.userHeadPic}}"></image>
                 </view>
                 <view class="right-photo">
-                    <image class="photo" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
+                    <image class="photo"
+                           src="{{authorInfo.userHeadPic}}"></image>
                 </view>
             </view>
             <view class="ctrl "><!--ctrl2-->
@@ -36,24 +39,25 @@
         </view>
         <view class="desc">
             共
-            <text class="b">1888.88</text>
+            <text class="b">{{totalFee}}</text>
             元，已被
-            <text class="b">3</text>
+            <text class="b">{{totalCount}}</text>
             位好友领取
         </view>
         <view class="list">
-            <view class="li" wx:for="1111">
+            <view class="li" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
                 <view class="photo">
-                    <image class="img" mode="widthFix" src="https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0"></image>
+                    <image class="img" mode="widthFix"
+                           src="{{item.headPicURL}}"></image>
                 </view>
                 <view class="info">
                     <view class="row">
-                        <view class="name">只阿斯蒂芬</view>
-                        <view class="amount">￥4444.44</view>
+                        <view class="name">{{item.userName}}</view>
+                        <view class="amount">￥{{item.receiveFee}}</view>
                     </view>
                     <view class="row">
-                        <view class="level">亲密度55%</view>
-                        <view class="datetime">1月15日 10:18</view>
+                        <view class="level">亲密度{{item.intimacy}}%</view>
+                        <view class="datetime">{{item.createTime}}</view>
                     </view>
                 </view>
             </view>
@@ -77,13 +81,64 @@
             backgroundColor: '#CC4242',
         }
         data = {
-            questionId: 0
+            id: 0,
+            questionId: 0,
+            myInfo: {},
+            authorInfo: {},
+            totalFee: 0,
+            totalCount: 0,
+            detailList: []
         }
 
         methods = {}
 
+
+        async getResult() {
+            let res = await http.post(apis.gameResult, {
+                redPackageID: this.id,
+                questionID: this.questionId
+            })
+            res = {
+                _ok: 1,
+                "code": 0,
+                "myModel": {
+                    "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+                    "userName": '',
+                    "intimacy": '88',
+                    "receiveFee": 888,
+                },
+                "authorModel": {
+                    "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+                    "userName": '',
+                },
+                "detailModel": {
+                    "totalFee": 10.0,
+                    "totalCount": 12,
+                    "detailList": [{
+                        "userID": 2702847,
+                        "userName": '黄老板',
+                        "headPicURL": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+                        "intimacy": '26',
+                        "correctCount": 3,
+                        "receiveFee": 20.0,
+                        "createTime": "2018-01-02 12:00:00"
+                    }]
+                }
+            }
+            if (res._ok) {
+                this.myInfo = res.myModel;
+                this.authorInfo = res.authorModel;
+                this.totalFee = res.detailModel.totalFee;
+                this.totalCount = res.detailModel.totalCount;
+                this.detailList = res.detailModel.detailList;
+                this.$apply();
+            }
+        }
+
         onLoad(e) {
+            this.id = e.id;
             this.questionId = e.questionId;
+            this.getResult();
         }
 
         onShareAppMessage() {
@@ -92,7 +147,7 @@
                 title: wepy.$instance.globalData.appName,
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`,
-                success: async()=> {
+                success: async () => {
                     let res = await http.post(apis.relive, {
                         questionID: this.questionId
                     });
@@ -290,7 +345,7 @@
                 height: unit(56, rpx);
                 text-align: center;
                 color: #CE2838;
-                background: #FFFFFF;
+                background: #FFF;
                 font-size: unit(32, rpx);
                 border-radius: unit(56, rpx);
                 margin: 0;

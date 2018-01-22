@@ -14,14 +14,16 @@
                     <view class="label">提现金额</view>
                     <view class="withdraw-input">
                         <view class="icon">￥</view>
-                        <input class="input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="amountInput" bindblur="amountBlur"/>
+                        <input class="input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="amountInput"
+                               bindblur="amountBlur"/>
                     </view>
                 </view>
                 <view class="tip">
                     <text class="span">提现到微信钱包，</text>
                     <text class="span red" @tap="allBalance">全部提现</text>
                 </view>
-                <button plain="true" class="withdraw-button {{!amountAbs?'disabled':''}}" disabled="{{!amountAbs}}" @tap="withdraw">
+                <button plain="true" class="withdraw-button {{!amountAbs?'disabled':''}}" disabled="{{!amountAbs}}"
+                        @tap="withdraw">
                     提现
                 </button>
             </view>
@@ -35,6 +37,10 @@
     import utils from '../lib/utils.js'
 
     export default class Extract extends wepy.page {
+        config = {
+            navigationBarTitleText: '冲顶超人',
+            enablePullDownRefresh: true
+        }
         data = {
             balance: 0,
             amount: ''
@@ -76,6 +82,10 @@
         }
 
         onShow() {
+            this.getBalance();
+        }
+
+        onPullDownRefresh() {
             this.getBalance();
         }
 
