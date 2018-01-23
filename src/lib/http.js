@@ -73,7 +73,7 @@ export default class HTTP {
                     title: '提示',
                     content: '登录信息已过期，请重新登录后重试',
                     showCancel: false,
-                    success: async(res) => {
+                    success: async (res) => {
                         if (res.confirm) {
                             wepy.$instance.globalData.userInfo = '';
                             wx.setStorageSync('USER_INFO', '');
@@ -98,6 +98,10 @@ export default class HTTP {
             console.log('response::', result);
             return result;
         } else {
+            // wx.showModal({
+            //     content: '对不起，网络异常，请稍后再试',
+            //     showCancel: false
+            // })
             console.error(method, url, params, res)
             let result = res;
             result._ok = false;

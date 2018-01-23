@@ -1,5 +1,5 @@
 <template>
-    <view class="gameStart-page container">
+    <view class="repackStart-page container">
         <view class="main">
             <view class="title">
                 <view class="bz-left">
@@ -7,7 +7,7 @@
                 </view>
                 <view class="tit">
                     <view class="index">第{{curIssTitle}}题</view>
-                    <view class="desc">89%好友通过此题</view>
+                    <view class="desc">{{issueList[curIssIndex].question.passRate}}%好友通过此题</view>
                 </view>
                 <view class="bz-right">
                     <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
@@ -20,9 +20,10 @@
                 <image mode="aspectFit" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
             </view>
             <view class="answer">
-                <view class="li {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}"
-                      wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
-                      wx:key="answer_{{answer_i}}" @tap="answerHandler({{answer_i}})">
+                <view
+                    class="li {{answer.content.length>11?'font-s':''}} {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}"
+                    wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
+                    wx:key="answer_{{answer_i}}" @tap="answerHandler({{answer_i}})">
                     {{answer.content}}
                 </view>
             </view>
@@ -30,7 +31,7 @@
                 <image class="img" src="../img/hongbao.png"></image>
                 <view class="amount">
                     <view>红包</view>
-                    <view>0.02元</view>
+                    <view>{{amountLite}}元</view>
                 </view>
             </view>
             <view class="mask" wx:if="{{!hideMask}}" @tap="closeMask">
@@ -59,12 +60,14 @@
         data = {
             id: 0,
             hideMask: false,
+            amountLite: 0,
             redpackHide: true,
             redpackAnimation: {},
             issueList: [],
             userName: '',
             userPhoto: '',
             curIssIndex: 0,
+            latestWrongQuestionID: 0,
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
         }
@@ -84,50 +87,60 @@
                 if (curIssue.answered || !this.canAnswer) {
                     return;
                 }
-                curIssue.answered = true;
-                curAnswer.myAnswer = curAnswer.isRight ? 1 : 2;
-                this.$apply();
-                if (curAnswer.isRight) {
-                    //todo ajax 获取金额
-                    //获取小红包动画
-                    let animation = wx.createAnimation({
-                        timingFunction: 'ease-out',
-                        duration: 300,
-                    })
-                    this.redpackHide = false;
+                let isRight = await this.answerQuestion(curIssue.question.id, curAnswer.id);
+                if (isRight) {
+                    curIssue.answered = true; // 已答
+                    curAnswer.myAnswer = isRight;
                     this.$apply();
-                    animation.opacity(1).translate('-50%', -100).step();
-                    this.redpackAnimation = animation.export();
-                    this.$apply();
-                    await utils.sleep(2);
-                    this.redpackHide = true;
-                    animation = wx.createAnimation({
-                        duration: 0,
-                    })
-                    animation.opacity(0).translate('-50%', 0).step();
-                    this.redpackAnimation = animation.export();
-                    this.$apply();
-                    //下一题
-                    if (this.curIssIndex == this.issueList.length - 1) {
-                        //冲顶成功！
-                        wx.redirectTo({
-                            url: `gameResult?id=${this.id}`
+                    if (isRight === 1) {
+                        //获取小红包动画
+                        let animation = wx.createAnimation({
+                            timingFunction: 'ease-out',
+                            duration: 300,
                         })
-                    } else {
-                        this.canAnswer = false;
-                        this.curIssIndex++;
+                        this.redpackHide = false;
                         this.$apply();
-                        await utils.sleep(this.delayAnswer);
-                        this.canAnswer = true;
+                        animation.opacity(1).translate('-50%', -100).step();
+                        this.redpackAnimation = animation.export();
+                        this.$apply();
+                        await utils.sleep(2);
+                        this.redpackHide = true;
+                        animation = wx.createAnimation({
+                            duration: 0,
+                        })
+                        animation.opacity(0).translate('-50%', 0).step();
+                        this.redpackAnimation = animation.export();
+                        this.$apply();
+                        //下一题
+                        this.amountLite = 0;
+                        if (this.curIssIndex == this.issueList.length - 1) {
+                            //冲顶成功！
+                            wx.redirectTo({
+                                url: `gameResult?id=${this.id}`
+                            })
+                        } else {
+                            this.canAnswer = false;
+                            this.curIssIndex++;
+                            this.$apply();
+                            await utils.sleep(this.delayAnswer);
+                            this.canAnswer = true;
+                        }
+                    } else {
+                        await utils.sleep(0.8);
+                        wx.redirectTo({
+                            url: `gameResult?id=${this.id}`//&questionId=${curIssue.question.id}
+                        })
                     }
-                } else {
-                    //todo ajax 答题失败应该告知服务器
-                    await utils.sleep(0.8);
-                    wx.redirectTo({
-                        url: `gameResult?id=${this.id}&questionId=${curIssue.question.id}`
-                    })
                 }
+            }
+        }
 
+        async canIAnswer() {
+            let res = await http.post(apis.canIAnswer, {
+                redPackageID: this.id
+            });
+            if (res._ok) {
+                return res._result;
             }
         }
 
@@ -135,84 +148,146 @@
             let res = await http.post(apis.questionList, {
                 redPackageID: this.id
             });
-            res = {
-                _ok: 1,
-                "code": 0,
-                "userName": "王骆",
-                "headPicURL": "https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0",
-                qaList: [{
-                    "question": {
-                        "id": 1,
-                        "content": '我最喜欢吃的水果是什么',
-                        "authorUserID": 123,
-                        "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
-                    },
-                    "answerList": [{
-                        "id": 1,
-                        "content": '樱桃',
-                        "isRight": 0
-                    }, {
-                        "id": 2,
-                        "content": '黄桃',
-                        "isRight": 0
-                    }, {
-                        "id": 3,
-                        "content": '荔枝',
-                        "isRight": 0
-                    }, {
-                        "id": 4,
-                        "content": '山竹',
-                        "isRight": 1
-                    }]
-                }, {
-                    "question": {
-                        "id": 11,
-                        "content": '我最喜欢什么样的宠物',
-                        "authorUserID": 123,
-                        "picURL": ''
-                    },
-                    "answerList": [{
-                        "id": 11,
-                        "content": '好看的',
-                        "isRight": 0
-                    }, {
-                        "id": 12,
-                        "content": '好养的',
-                        "isRight": 1
-                    }, {
-                        "id": 13,
-                        "content": '啥也不喜欢',
-                        "isRight": 0
-                    }, {
-                        "id": 14,
-                        "content": '不知道',
-                        "isRight": 0
-                    }]
-                }]
-            }
+            /*res = {
+             _ok: 1,
+             "code": 0,
+             "userName": "王骆",
+             "headPicURL": "https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0",
+             qaList: [{
+             "question": {
+             "id": 1,
+             "content": '我最喜欢吃的水果是什么',
+             "authorUserID": 123,
+             "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
+             },
+             "answerList": [{
+             "id": 1,
+             "content": '樱桃',
+             "isRight": 0
+             }, {
+             "id": 2,
+             "content": '黄桃',
+             "isRight": 0
+             }, {
+             "id": 3,
+             "content": '荔枝',
+             "isRight": 0
+             }, {
+             "id": 4,
+             "content": '山竹',
+             "isRight": 1
+             }]
+             }, {
+             "question": {
+             "id": 11,
+             "content": '我最喜欢什么样的宠物',
+             "authorUserID": 123,
+             "picURL": ''
+             },
+             "answerList": [{
+             "id": 11,
+             "content": '好看的',
+             "isRight": 0
+             }, {
+             "id": 12,
+             "content": '好养的',
+             "isRight": 1
+             }, {
+             "id": 13,
+             "content": '啥也不喜欢',
+             "isRight": 0
+             }, {
+             "id": 14,
+             "content": '不知道',
+             "isRight": 0
+             }]
+             }]
+             }*/
             if (res._ok) {
+
                 this.userName = res.userName;
                 this.userPhoto = res.headPicURL;
                 this.issueList = res.qaList;
+
+                if (res.lastQuestionID) { //恢复答题现场
+                    this.issueList.some((item, idx) => {
+                        if (item.question.id == res.lastQuestionID) {
+                            this.curIssIndex = idx;
+                            return true;
+                        }
+                    });
+                }
                 this.$apply();
             }
         }
 
-        onLoad(e) {
-            let scene = {};
-            if (e.scene) {
-                let scene = decodeURIComponent(e.scene);
-                scene = JSON.parse(scene);
+        async answerQuestion(qid, aid) {
+            let res = await http.post(apis.answerQuestion, {
+                redPackageID: this.id,
+                questionID: qid,
+                answerID: aid,
+                isConsumeCard: this.latestWrongQuestionID == qid ? 1 : 0
+            });
+            if (res._ok) {
+                this.amountLite = res.fee ? Number(res.fee).toFixed(2) : 0;
+                return res.isRight ? 1 : 2;
+            } else {
+                return null;
             }
-            this.id = e.id || scene.id;
-            //todo ajax 应该先判断这个人能否答题，如果已经答过，应该去结果页
+        }
+
+        async onLoad(e) {
+            let scene = e.scene ? decodeURIComponent(e.scene) : 0;
+            this.id = e.id || scene;
+
+            //  先判断这个人能否答题，如果已经答过，去结果页。
+            // 1 红包不存在 2不能自问自答 3只能用复活卡才能继续答题 4你已经领取过红包啦
+            let canRes = await this.canIAnswer();
+            if (canRes.statusCode === 0) {
+                this.canAnswer = true;
+            } else if (canRes.statusCode === 2) {
+                this.canAnswer = false;
+                wx.showModal({
+                    content: '把自己的红包留给别人吧~',
+                    showCancel: false,
+                    success: () => {
+                        wx.redirectTo({
+                            url: `index`
+                        })
+                    }
+                })
+            } else if (canRes.statusCode === 3) {
+                let res = await http.post(apis.servivecard, {
+                    redPackageID: this.id,
+                });
+                if (res._ok && ~res._result.indexOf(canRes.latestWrongQuestionID)) {
+                    this.canAnswer = true;
+                    this.latestWrongQuestionID = canRes.latestWrongQuestionID
+                } else {
+                    wx.showModal({
+                        content: '你已经参与过这个红包了哦~',
+                        showCancel: false,
+                        success: () => {
+                            wx.redirectTo({
+                                url: `gameResult?id=${this.id}`
+                            })
+                        }
+                    })
+                }
+            } else if (canRes.statusCode === 4) {
+                wx.showModal({
+                    content: '你已经参与过这个红包了哦~',
+                    showCancel: false,
+                    success: () => {
+                        wx.redirectTo({
+                            url: `gameResult?id=${this.id}`
+                        })
+                    }
+                })
+            }
             this.getQuestionList();
         }
 
-        async onShow() {
-            await  utils.sleep(this.delayAnswer);
-            this.canAnswer = true;
-        }
 
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
@@ -226,7 +301,7 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
-    .gameStart-page {
+    .repackStart-page {
         background-color: #CC4242;
         color: #FFF;
         .main {
@@ -298,6 +373,9 @@
                     }
                     &.no {
                         background: url(http://redpackagelite.static.immocha.com/wxlite/btn-no.png) no-repeat center center / cover;
+                    }
+                    &.font-s {
+                        font-size: unit(28, rpx);
                     }
                 }
             }

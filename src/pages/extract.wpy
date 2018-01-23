@@ -71,6 +71,19 @@
                 this.amount = value;
                 this.$apply();
             },
+            async withdraw(){
+                let res = await http.post(apis.withdraw, {
+                    withdrawPrice: this.amount
+                });
+                if (res._ok) {
+                    this.balance = Number(res.balance || 0).toFixed(2);
+                    this.$apply();
+                    wx.showToast({
+                        title: '提现成功',
+                        icon: 'success'
+                    })
+                }
+            }
         }
 
         async getBalance() {

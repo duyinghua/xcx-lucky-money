@@ -16,7 +16,8 @@
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="{{sendList}}" wx:for-item="item" wx:for-index="index" wx:key="send_{{index}}" @tap="sendDetail({{item.id}})">
+                <view class="li" wx:for="{{sendList}}" wx:for-item="item" wx:for-index="index" wx:key="send_{{index}}"
+                      @tap="sendDetail({{item.id}})">
                     <view class="label">金额(元)</view>
                     <view class="l1">
                         <view class="amount">{{item.redPackageFee}}</view>
@@ -44,7 +45,8 @@
                 </view>
             </view>
             <view class="list">
-                <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index" wx:key="receive_{{index}}">
+                <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index"
+                      wx:key="receive_{{index}}">
                     <view class="amount">￥{{item.fee}}</view>
                     <view class="date">{{item.createTime}}</view>
                 </view>
@@ -67,9 +69,11 @@
             sendTotalFee: 0,
             sendTotalCount: 0,
             sendList: [],
+            isLastSend: false,
             receiveTotalFee: 0,
             receiveTotalCount: 0,
-            receiveList: []
+            receiveList: [],
+            isLastReceive: false
         }
         methods = {
             tabHandler(num){
@@ -86,110 +90,24 @@
         async getSendList(init) {
             if (init) {
                 this.sendList = [];
+                this.isLastSend = false;
             }
-            let res = await http.post(apis.sendList, {
-                beginIndex: this.sendList.length
-            });
-            res = {
-                _ok: 1,
-                "code": 0,
-                "totalFee": 10.0,
-                "totalCount": 12,
-                "sendList": [{
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 1,
-                    "redPackageFee": 88,
-                    "questionCount": 5,
-                    "authorUserID": 123,
-                    "userCount": 12,
-                    "passRate": 44,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "id": 2,
-                    "redPackageFee": 18,
-                    "questionCount": 25,
-                    "authorUserID": 1323,
-                    "userCount": 22,
-                    "passRate": 41,
-                    "createTime": "2018-01-02 12:00:00"
-                }]
-            }
-            if (res._ok) {
-                this.sendTotalFee = Number(res.totalFee).toFixed(2);
-                this.sendTotalCount = res.totalCount;
-                this.sendList = this.sendList.concat(res.sendList);
-                this.$apply();
+            if (!this.isLastSend) {
+                let res = await http.post(apis.sendList, {
+                    beginIndex: this.sendList.length
+                });
+                if (res._ok) {
+                    if (init) {
+                        this.sendTotalFee = isNaN(res.totalFee) ? '0.00' : Number(res.totalFee).toFixed(2);
+                        this.sendTotalCount = res.totalCount;
+                    }
+                    if (res.sendList.length) {
+                        this.sendList = this.sendList.concat(res.sendList);
+                    } else {
+                        this.isLastSend = true;
+                    }
+                    this.$apply();
+                }
             }
             init && wx.stopPullDownRefresh();
         }
@@ -197,36 +115,31 @@
         async getReceiveList(init) {
             if (init) {
                 this.receiveList = [];
+                this.isLastReceive = false;
             }
-            let res = await http.post(apis.receiveList, {
-                beginIndex: this.receiveList.length
-            });
-            res = {
-                _ok: 1,
-                "code": 0,
-                "totalFee": 10.0,
-                "totalCount": 23,
-                "receiveList": [{
-                    "fee": 2.0,
-                    "createTime": "2018-01-02 12:00:00"
-                }, {
-                    "fee": 3.0,
-                    "createTime": "2018-01-02 12:00:00"
-                }]
-
-            }
-            if (res._ok) {
-                this.receiveTotalFee = Number(res.totalFee).toFixed(2);
-                this.receiveTotalCount = res.totalCount;
-                this.receiveList = this.receiveList.concat(res.receiveList);
-                this.$apply();
+            if (!this.isLastReceive) {
+                let res = await http.post(apis.receiveList, {
+                    beginIndex: this.receiveList.length
+                });
+                if (res._ok) {
+                    if (init) {
+                        this.receiveTotalFee = isNaN(res.totalFee) ? '0.00' : Number(res.totalFee).toFixed(2);
+                        this.receiveTotalCount = res.totalCount;
+                    }
+                    if (res.receiveList.length) {
+                        this.receiveList = this.receiveList.concat(res.receiveList);
+                    } else {
+                        this.isLastReceive = true;
+                    }
+                    this.$apply();
+                }
             }
             init && wx.stopPullDownRefresh();
         }
 
         onLoad() {
-            this.getSendList();
-            this.getReceiveList();
+            this.getSendList(true);
+            this.getReceiveList(true);
         }
 
         onPullDownRefresh() {
@@ -244,6 +157,7 @@
                 this.getReceiveList();
             }
         }
+
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {

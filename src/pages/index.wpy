@@ -17,7 +17,7 @@
                     <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
                            bindblur="amountBlur"/>
                 </view>
-                <view class="tip">优先使用余额 ￥{{balance}}</view>
+                <view class="tip">需支付￥{{serviceFee}}手续费</view>
                 <button plain="true" class="begin-button {{(incomplete||!amountAbs)?'disabled':''}}"
                         disabled="{{(incomplete||!amountAbs)}}" @tap="gameStart">
                     开始出题
@@ -32,6 +32,7 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+    import wxRequestPayment from '../lib/wxRequestPayment.js'
 
     export default class Index extends wepy.page {
         config = {
@@ -41,10 +42,18 @@
         data = {
             headPhoto: wepy.$instance.globalData.userInfo.headPicURL,
             amount: '',
-            balance: 0,
             incomplete: true
         }
         computed = {
+            serviceFee(){
+                let res = 0;
+                if (this.amount) {
+                    let abs = Number(this.amount);
+                    let amount = isNaN(abs) ? '' : abs;
+                    res = Math.ceil(amount) / 100;
+                }
+                return Number(res).toFixed(2);
+            },
             amountAbs(){
                 let abs = Number(this.amount);
                 return isNaN(abs) ? '' : abs;
@@ -67,12 +76,9 @@
                 this.$apply();
             },
             async gameStart(){
-                let amount = this.amount - this.balance;
-                if (amount > 0) {
-                    this.recharge(amount);
-                } else {
-                    this.buyRedPackage(this.amount);
-                }
+                let amount = +this.amount + +this.serviceFee;
+                this.recharge(amount);
+                this.buyRedPackage();
             }
         }
 
@@ -89,37 +95,10 @@
                 chargePrice: amount
             });
             if (res._ok) {
-                let payParam = res.weixinpayParamLite;
-                wx.requestPayment({
-                    'timeStamp': payParam.timeStamp,
-                    'nonceStr': payParam.nonceStr,
-                    'package': payParam.package,
-                    'signType': payParam.signType,
-                    'paySign': payParam.paySign,
-                    success: async (res) => {
-                        let rrr = await http.post(apis.rechargeResult, {
-                            orderID: res.orderID
-                        });
-                        if (rrr._ok) {
-                            if (rrr.payStatus == 10) {
-                                this.buyRedPackage();
-                            }
-                        }
-                    },
-                    fail: function (res) {
-                        if (res.errMsg == 'requestPayment:fail cancel') {
-                            wx.showToast({
-                                title: '支付已取消',
-                                icon: 'none'
-                            })
-                        } else {
-                            wx.showModal({
-                                content: '支付失败，请重试',
-                                showCancel: false,
-                            });
-                        }
-                    }
-                })
+                let payParam = res.weixinpayParamLite || {};
+                wxRequestPayment(payParam, async () => {
+                    this.buyRedPackage();
+                });
             }
         }
 
@@ -159,12 +138,11 @@
         }
 
         onShow() {
-            this.getBalance();
+//            this.getBalance();
             this.incompleteRedPack();
         }
 
         onPullDownRefresh() {
-            this.getBalance();
             this.incompleteRedPack();
         }
 

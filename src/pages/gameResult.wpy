@@ -1,40 +1,40 @@
 <template>
-    <view class="gameResult-page container">
+    <view class="gameResult-page container {{serviveCard.leftServiveTime?'banner-padding':''}}">
         <view class="main">
-            <view class="title">冲顶成功</view>
+            <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
             <view class="amount">获得
                 <text class="value">{{myInfo.receiveFee}}</text>
                 元红包
             </view>
             <view class="result"
-                  style="background: url('http://redpackagelite.static.immocha.com/wxlite/result-1.png') no-repeat center top / cover">
+                  style="{{intimacyPicture}}">
                 <view class="score">
-                    <text class="value">75</text>
+                    <text class="value">{{myInfo.intimacy}}</text>
                     <text class="unit">分</text>
                 </view>
-                <view class="remark">还需要对他多多了解</view>
+                <view class="remark">{{myInfo.intimacy_des}}</view>
                 <view class="left-photo">
                     <image class="photo"
-                           src="{{myInfo.userHeadPic}}"></image>
+                           src="{{myInfo.headPicURL}}"></image>
                 </view>
                 <view class="right-photo">
                     <image class="photo"
                            src="{{authorInfo.userHeadPic}}"></image>
                 </view>
             </view>
-            <view class="ctrl "><!--ctrl2-->
-                <view class="li">
+            <view class="ctrl {{serviveCard.shared===1?'':'ctrl2'}}">
+                <button plain="true" class="li" @tap="extractHandler">
                     <image class="icon" src="../img/icon-tixian.png"></image>
                     提现
-                </view>
-                <view class="li">
+                </button>
+                <button plain="true" class="li" @tap="createHandler">
                     <image class="icon" src="../img/icon-hongbao.png"></image>
                     我要出题
-                </view>
-                <view class="li">
+                </button>
+                <button plain="true" class="li" open-type="share" wx:if="{{serviveCard.shared===1}}">
                     <image class="icon" src="../img/icon-fenxiang.png"></image>
                     分享
-                </view>
+                </button>
             </view>
         </view>
         <view class="desc">
@@ -62,10 +62,16 @@
                 </view>
             </view>
         </view>
-        <view class="banner">
+        <view class="banner" wx:if="{{serviveCard.leftServiveTime}}">
             <image class="revive" mode="widthFix" src="../img/revive.png"></image>
-            <view class="txt">分享获得复活卡</view>
-            <button plain="true" class="button">分享</button>
+            <block wx:if="{{serviveCard.shared===0}}">
+                <view class="txt">分享获得复活卡</view>
+                <button plain="true" class="button" open-type="share">分享</button>
+            </block>
+            <block wx:elif="{{serviveCard.shared===1}}">
+                <view class="txt">购买复活卡(最多{{serviveCard.leftServiveTime}}次)</view>
+                <button plain="true" class="button" @tap="buyServiveCard">1元购买</button>
+            </block>
         </view>
     </view>
 </template>
@@ -74,6 +80,7 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+    import wxRequestPayment from '../lib/wxRequestPayment.js'
 
     export default class GameResult extends wepy.page {
         config = {
@@ -82,62 +89,116 @@
         }
         data = {
             id: 0,
-            questionId: 0,
             myInfo: {},
             authorInfo: {},
             totalFee: 0,
             totalCount: 0,
-            detailList: []
+            detailList: [],
+            serviveCard: {}
         }
+        computed = {
+            intimacyPicture(){
+                if (this.myInfo.intimacy < 30) {
+                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-5.png) no-repeat center top / cover';
+                }
+                if (this.myInfo.intimacy < 55) {
+                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-4.png) no-repeat center top / cover';
+                }
+                if (this.myInfo.intimacy < 80) {
+                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-3.png) no-repeat center top / cover';
+                }
+                if (this.myInfo.intimacy < 99) {
+                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-2.png) no-repeat center top / cover';
+                }
+                if (this.myInfo.intimacy == 100) {
+                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-1.png) no-repeat center top / cover';
+                }
+                return '';
+            }
+        }
+        methods = {
+            extractHandler(){
+                wx.switchTab({
+                    url: 'extract'
+                })
+            },
+            createHandler(){
+                wx.switchTab({
+                    url: 'index'
+                })
+            },
+            saveImage(){
 
-        methods = {}
-
+            },
+            async buyServiveCard() {
+                let res = await http.post(apis.reliveRecharge, {
+                    redPackageID: this.id,
+                })
+                if (res._ok) {
+                    let payParam = res.weixinpayParamLite || {};
+                    wxRequestPayment(payParam, async () => {
+                        this.relive();
+                    });
+                }
+            }
+        }
 
         async getResult() {
             let res = await http.post(apis.gameResult, {
-                redPackageID: this.id,
-                questionID: this.questionId
+                redPackageID: this.id
             })
-            res = {
-                _ok: 1,
-                "code": 0,
-                "myModel": {
-                    "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-                    "userName": '',
-                    "intimacy": '88',
-                    "receiveFee": 888,
-                },
-                "authorModel": {
-                    "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-                    "userName": '',
-                },
-                "detailModel": {
-                    "totalFee": 10.0,
-                    "totalCount": 12,
-                    "detailList": [{
-                        "userID": 2702847,
-                        "userName": '黄老板',
-                        "headPicURL": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-                        "intimacy": '26',
-                        "correctCount": 3,
-                        "receiveFee": 20.0,
-                        "createTime": "2018-01-02 12:00:00"
-                    }]
-                }
-            }
+            /*res = {
+             _ok: 1,
+             "code": 0,
+             "myModel": {
+             "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+             "userName": '',
+             "intimacy": '88',
+             "receiveFee": 888,
+             },
+             "authorModel": {
+             "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+             "userName": '',
+             },
+             "detailModel": {
+             "totalFee": 10.0,
+             "totalCount": 12,
+             "detailList": [{
+             "userID": 2702847,
+             "userName": '黄老板',
+             "headPicURL": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
+             "intimacy": '26',
+             "correctCount": 3,
+             "receiveFee": 20.0,
+             "createTime": "2018-01-02 12:00:00"
+             }]
+             }
+             }*/
             if (res._ok) {
                 this.myInfo = res.myModel;
                 this.authorInfo = res.authorModel;
-                this.totalFee = res.detailModel.totalFee;
-                this.totalCount = res.detailModel.totalCount;
-                this.detailList = res.detailModel.detailList;
+                this.totalFee = isNaN(res.detailMap.totalFee) ? '0.00' : Number(res.detailMap.totalFee).toFixed(2);
+                this.totalCount = res.detailMap.totalCount;
+                this.detailList = res.detailMap.detailList;
+                this.serviveCard = res.serviveCard;
                 this.$apply();
             }
         }
 
+        relive(msg) {
+            wx.showToast({
+                title: msg || '已复活',
+                icon: 'success',
+                success: () => {
+                    wx.redirectTo({
+                        url: `repackStart?id=${this.id}`
+                    })
+                }
+            })
+        }
+
         onLoad(e) {
             this.id = e.id;
-            this.questionId = e.questionId;
             this.getResult();
         }
 
@@ -148,9 +209,15 @@
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`,
                 success: async () => {
-                    let res = await http.post(apis.relive, {
-                        questionID: this.questionId
-                    });
+                    if (this.serviveCard.shared === 0) {
+                        let res = await http.post(apis.relive, {
+                            redPackageID: this.id,
+                        });
+                        if (res._ok) {
+                            this.relive();
+                        }
+                    }
+
                 }
             }
         }
@@ -160,9 +227,11 @@
 
 <style lang="less" rel="stylesheet/less">
     .gameResult-page {
-        padding-bottom: unit(117, rpx);;
         background-color: #CC4242;
         color: #FFF;
+        &.banner-padding {
+            padding-bottom: unit(117, rpx);
+        }
         .main {
             height: unit(980, rpx);
             background: url('http://redpackagelite.static.immocha.com/wxlite/answer-bg.jpg') no-repeat center top / cover;
@@ -233,11 +302,15 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                font-size: unit(30, rpx);
                 margin: unit(50, rpx) unit(96, rpx) 0;
                 .li {
                     display: flex;
                     align-items: center;
+                    margin: 0;
+                    padding: 0;
+                    font-size: unit(30, rpx);
+                    color: #FFF;
+                    line-height: normal;
                     .icon {
                         width: unit(32, rpx);
                         height: unit(32, rpx);
@@ -266,6 +339,9 @@
                 background: #C33939;
                 margin-bottom: unit(16, rpx);
                 padding: unit(26, rpx) unit(32, rpx);
+                &:last-child {
+                    margin-bottom: 0;
+                }
                 .photo {
                     width: unit(100, rpx);
                     height: unit(100, rpx);

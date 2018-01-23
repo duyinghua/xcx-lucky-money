@@ -1,9 +1,10 @@
 <template>
     <view class="createIssue-page container">
         <scroll-view class="iss-index" scroll-x="true">
-            <view class="li" wx:for="{{indexs}}" wx:for-item="index_item" wx:for-index="index_i" wx:key="{{index_i}}">
-                <view class="num {{index_item<curIssIndex?'prev':''}} {{index_item==curIssIndex?'cur':''}}">
-                    {{index_item + 1}}
+            <view class="li" wx:for="{{indexs}}" wx:for-index="index_i" wx:key="{{index_i}}">
+                <view class="num {{index_i<curIssIndex?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
+                      @tap="changeIndex({{index_i}})">
+                    {{index_i + 1}}
                 </view>
             </view>
         </scroll-view>
@@ -30,7 +31,8 @@
                                     <view class="li {{item.isRight?'cur':''}}"
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
-                                        <input class="txt" placeholder="输入答案" maxlength="12" value="{{item.content}}"
+                                        <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
+                                               maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
@@ -58,14 +60,18 @@
                                               value="{{issueDiy.question.content}}"
                                               bindinput="questionInput"></textarea>
                                 </view>
+
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}"
                                           wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
                                         <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
-                                               maxlength="12" value="{{item.content}}"
+                                               maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
+                                        <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
                                 </view>
+
+
                                 <view class="buttons">
                                     <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}"
                                             disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
@@ -143,7 +149,8 @@
             hideTextarea: false,
             animationData: {},
             noRecommend: false,
-            uptoken: ''
+            uptoken: '',
+            lastRecommendId: 0
         }
         computed = {
             indexs(){
@@ -151,14 +158,20 @@
                 if (this.curIssIndex < 4) {
                     return res;
                 } else {
-                    let diff = this.curIssIndex - 4;
-                    return res.map(item => {
-                        return item + diff;
-                    });
+                    /*let diff = this.curIssIndex - 4;
+                     return res.map(item => {
+                     return item + diff;
+                     });*/
+                    return this.issueList;
                 }
             }
         }
         methods = {
+            changeIndex(index){
+                this.curIssIndex = index;
+                this.curTab = 1;
+                this.$apply()
+            },
             tabHandler(num){
                 this.curTab = num;
 
@@ -191,14 +204,21 @@
                 this.$apply()
             },
             setAnswer(num){
-                this.issueList[this.curIssIndex].answerList.forEach((item, i) => {
+                let issue;
+                if (this.curTab == 1) {
+                    issue = this.issueList[this.curIssIndex];
+                } else {
+                    issue = this.issueDiy;
+                }
+                issue.answerList.forEach((item, i) => {
                     if (i == num) {
                         item.isRight = 1;
                     } else {
                         item.isRight = 0;
                     }
                 })
-                this.issueList[this.curIssIndex].complete = !this.checkIssue(this.issueList[this.curIssIndex]);
+                issue.complete = !this.checkIssue(issue);
+                console.log(issue);
                 this.$apply()
             },
             async changeQuestion(){
@@ -335,39 +355,13 @@
          * 获得一个推荐问题
          * */
         async getNewIssue() {
-            let newIss;
+            let newIss = this.issueDiy;
             let res = await http.post(apis.recommendQuestion, {
-                questionID: this.issueList.length ? (this.issueList[this.issueList.length - 1].question.id || 0) : 0
+                questionID: this.lastRecommendId
             }, false, false);
-            /*res = {
-             _ok: 1,
-             "code": 0,
-             "question": {
-             "id": 1,
-             "content": "渴了怎么办?" + parseInt(Math.random() * 1e5),
-             "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
-             authorUserID: '333'
-             },
-             "answerList": [{
-             "id": 1,
-             "content": '喝水' + parseInt(Math.random() * 1e5),
-             "isRight": 0
-             }, {
-             "id": 2,
-             "content": '喝崂山牌的可口可乐' + parseInt(Math.random() * 1e5),
-             "isRight": 0
-             }, {
-             "id": 3,
-             "content": '忍' + parseInt(Math.random() * 1e5),
-             "isRight": 0
-             }, {
-             "id": 4,
-             "content": '困了饿了喝香飘飘' + parseInt(Math.random() * 1e5),
-             "isRight": 0
-             }]
-             }*/
             if (res._ok) {
                 if (res.question) {
+                    this.lastRecommendId = res.question.id;
                     let complete = !this.checkIssue({question: res.question, answerList: res.answerList});
                     newIss = {question: res.question, answerList: res.answerList, complete: complete}
                 } else {
@@ -414,14 +408,22 @@
          * 提交问题
          * */
         async commitIssue(curIssue) {
+            //按接口修改answer内字段
+            let answerList = [];
+            curIssue.answerList.forEach(item => {
+                answerList.push({
+                    id: item.id,
+                    content: item.content,
+                    rightFlag: item.isRight
+                })
+            });
             let res = await http.post(apis.commitQuestion, {
                 redPackageID: this.id,
                 questionStr: JSON.stringify(curIssue.question),
-                answerListStr: JSON.stringify(curIssue.answerList)
+                answerListStr: JSON.stringify(answerList)
             }, false, false);
-            return true;
             if (res._ok) {
-                this.issueList[this.issueList.length - 1].question.id = res.questionID;
+//                this.issueList[this.issueList.length - 1].question.id = res.questionID;
                 return true;
             } else {
                 return false;
@@ -436,8 +438,8 @@
                 redPackageID: this.id
             })
             if (res._ok) {
-                wx.navigateTo({
-                    url: `shareRedPack?amount=${res.totalFee}&count=${res.questionCount}`
+                wx.redirectTo({
+                    url: `shareRedPack?id=${this.id}&amount=${res.totalFee}&count=${res.questionCount}`
                 })
             }
         }
@@ -456,9 +458,8 @@
                 this.curIssIndex = this.issueList.length
             }
             let newIss = await this.getNewIssue();
-            this.issueList.push(newIss);
+            newIss && this.issueList.push(newIss);
             this.$apply();
-            console.log('出题啦~~~~')
         }
 
         onShow() {
@@ -486,8 +487,9 @@
             margin: unit(26, rpx) auto;
             overflow-x: hidden;
             .li {
+                position: relative;
                 display: inline-block;
-                margin-right: unit(70, rpx);
+                padding-right: unit(70, rpx);
                 &.cur {
                     color: #CD3434;
                     border-color: #CD3434;
@@ -497,8 +499,21 @@
                     background: #FFDBDB;
                     border-color: #FFDBDB;
                 }
+                &:after {
+                    content: '';
+                    display: block;
+                    position: absolute;
+                    left: unit(54, rpx);
+                    top: unit(26, rpx);
+                    height: unit(3, rpx);
+                    background: #BFBFBF;
+                    width: unit(70, rpx);
+                }
                 &:last-child {
-                    margin-right: 0;
+                    padding-right: 0;
+                    &:after {
+                        display: none;
+                    }
                 }
                 .num {
                     display: flex;

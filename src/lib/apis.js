@@ -16,6 +16,8 @@ export default {
     receiveList: `${config.apiHost}/wap/redpackagelite/receiveList`,//收取列表
     sendList: `${config.apiHost}/wap/redpackagelite/sendList`,//发送列表
     sendDetailList: `${config.apiHost}/wap/redpackagelite/detail`,//发送红包详情
+    withdraw: `${config.apiHost}/wap/redpackagelite/user/banlance/withdraw`,//提现
+
     //出题
     recharge: `${config.apiHost}/wap/redpackagelite/user/banlance/chargepay`,//支付
     rechargeResult: `${config.apiHost}/wap/redpackagelite/user/banlance/chargepay/result`,//支付结果
@@ -25,8 +27,14 @@ export default {
     commitQuestion: `${config.apiHost}/wap/redpackagelite/qa/save`,//保存问答
     finishQuestion: `${config.apiHost}/wap/redpackagelite/qa/finish`,//完成出题
     //答题
+    canIAnswer: `${config.apiHost}/wap/redpackagelite/check/cando`,//能否答题
     questionList: `${config.apiHost}/wap/redpackagelite/qalist`,//答题列表
+    answerQuestion: `${config.apiHost}/wap/redpackagelite/do/answer`,//答题
     gameResult: `${config.apiHost}/wap/redpackagelite/result`,//答题结束
-
+    //复活
     relive: `${config.apiHost}/wap/redpackagelite/share/callback`,//分享复活
+    reliveCheck: `${config.apiHost}/wap/redpackagelite/user/servivecard/info`,//复活卡查询
+    reliveRecharge: `${config.apiHost}/wap/redpackagelite/user/servivecard/chargepay`,//复活卡购买
+    servivecard: `${config.apiHost}/wap/redpackagelite/user/servivecard/info`,//复活卡查询
+
 }
