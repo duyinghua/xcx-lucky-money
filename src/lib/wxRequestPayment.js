@@ -7,14 +7,7 @@ let wxRequestPayment = function (payParam, cb) {
         'signType': payParam.signType,
         'paySign': payParam.paySign,
         success: async (res) => {
-            let rrr = await http.post(apis.rechargeResult, {
-                orderID: res.orderID
-            });
-            if (rrr._ok) {
-                if (rrr.payResult.payStatus == 10) {
-                    (typeof cb === 'function') && cb(res);
-                }
-            }
+            (typeof cb === 'function') && cb(res);
         },
         fail: function (res) {
             if (res.errMsg == 'requestPayment:fail cancel') {

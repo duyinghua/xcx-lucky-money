@@ -116,7 +116,7 @@
                         if (this.curIssIndex == this.issueList.length - 1) {
                             //冲顶成功！
                             wx.redirectTo({
-                                url: `gameResult?id=${this.id}`
+                                url: `redpackResult?id=${this.id}`
                             })
                         } else {
                             this.canAnswer = false;
@@ -128,7 +128,7 @@
                     } else {
                         await utils.sleep(0.8);
                         wx.redirectTo({
-                            url: `gameResult?id=${this.id}`//&questionId=${curIssue.question.id}
+                            url: `redpackResult?id=${this.id}`//&questionId=${curIssue.question.id}
                         })
                     }
                 }
@@ -269,7 +269,7 @@
                         showCancel: false,
                         success: () => {
                             wx.redirectTo({
-                                url: `gameResult?id=${this.id}`
+                                url: `redpackResult?id=${this.id}`
                             })
                         }
                     })
@@ -280,7 +280,7 @@
                     showCancel: false,
                     success: () => {
                         wx.redirectTo({
-                            url: `gameResult?id=${this.id}`
+                            url: `redpackResult?id=${this.id}`
                         })
                     }
                 })

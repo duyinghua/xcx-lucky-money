@@ -99,31 +99,7 @@
         data = {
             id: 0,
             curTab: 1,
-            issueList: [/*{
-             "question": {
-             "id": 1,
-             "content": "我最喜欢那个英雄?",
-             "picURL": "https://si.geilicdn.com/fxx_db42a6c9d-sz_1137216_ee1beae3-260e-4420-8b95-da426af59406.jpg?w=640&h=945",
-             authorUserID: '333'
-             },
-             "answerList": [{
-             "id": 1,
-             "content": '德玛西亚之力',
-             "isRight": 1
-             }, {
-             "id": 2,
-             "content": '孙悟空',
-             "isRight": 0
-             }, {
-             "id": 3,
-             "content": '慎',
-             "isRight": 0
-             }, {
-             "id": 4,
-             "content": '捶石',
-             "isRight": 0
-             }]
-             }*/],
+            issueList: [],
             curIssIndex: 0,
             issueDiy: {
                 question: {
@@ -168,9 +144,11 @@
         }
         methods = {
             changeIndex(index){
-                this.curIssIndex = index;
-                this.curTab = 1;
-                this.$apply()
+                if (index < this.issueList.length) {
+                    this.curIssIndex = index;
+                    this.curTab = 1;
+                    this.$apply()
+                }
             },
             tabHandler(num){
                 this.curTab = num;

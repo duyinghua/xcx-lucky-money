@@ -27,7 +27,7 @@
                 'pages/sendDetail',
                 'pages/shareRedPack',
                 'pages/redpackStart',
-                'pages/gameResult',
+                'pages/redpackResult',
             ],
             window: {
                 backgroundTextStyle: 'dark',

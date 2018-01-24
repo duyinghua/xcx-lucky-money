@@ -97,7 +97,14 @@
             if (res._ok) {
                 let payParam = res.weixinpayParamLite || {};
                 wxRequestPayment(payParam, async () => {
-                    this.buyRedPackage();
+                    let rrr = await http.post(apis.rechargeResult, {
+                        orderID: res.orderID
+                    });
+                    if (rrr._ok) {
+                        if (rrr.payResult.payStatus == 10) {
+                            this.buyRedPackage();
+                        }
+                    }
                 });
             }
         }

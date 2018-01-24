@@ -1,5 +1,5 @@
 <template>
-    <view class="gameResult-page container {{serviveCard.leftServiveTime?'banner-padding':''}}">
+    <view class="redpackResult-page container {{serviveCard.leftServiveTime?'banner-padding':''}}">
         <view class="main">
             <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
             <view class="amount">获得
@@ -137,14 +137,19 @@
                 if (res._ok) {
                     let payParam = res.weixinpayParamLite || {};
                     wxRequestPayment(payParam, async () => {
-                        this.relive();
+                        let res = await http.post(apis.servivecard, {
+                            redPackageID: this.id,
+                        });
+                        if (res._ok && ~res._result.length) {
+                            this.relive();
+                        }
                     });
                 }
             }
         }
 
         async getResult() {
-            let res = await http.post(apis.gameResult, {
+            let res = await http.post(apis.redpackResult, {
                 redPackageID: this.id
             })
             /*res = {
@@ -226,7 +231,7 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
-    .gameResult-page {
+    .redpackResult-page {
         background-color: #CC4242;
         color: #FFF;
         &.banner-padding {
