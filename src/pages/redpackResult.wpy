@@ -82,6 +82,7 @@
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
     import wxRequestPayment from '../lib/wxRequestPayment.js'
+    import DrawCanvas from '../lib/drawCanvas.js'
 
     export default class RedpackResult extends wepy.page {
         config = {
@@ -128,9 +129,6 @@
                     url: 'index'
                 })
             },
-            saveImage(){
-
-            },
             async buyServiveCard() {
                 let res = await http.post(apis.reliveRecharge, {
                     redPackageID: this.id,
@@ -153,33 +151,6 @@
             let res = await http.post(apis.redpackResult, {
                 redPackageID: this.id
             })
-            /*res = {
-             _ok: 1,
-             "code": 0,
-             "myModel": {
-             "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-             "userName": '',
-             "intimacy": '88',
-             "receiveFee": 888,
-             },
-             "authorModel": {
-             "userHeadPic": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-             "userName": '',
-             },
-             "detailModel": {
-             "totalFee": 10.0,
-             "totalCount": 12,
-             "detailList": [{
-             "userID": 2702847,
-             "userName": '黄老板',
-             "headPicURL": 'https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0',
-             "intimacy": '26',
-             "correctCount": 3,
-             "receiveFee": 20.0,
-             "createTime": "2018-01-02 12:00:00"
-             }]
-             }
-             }*/
             if (res._ok) {
                 this.myInfo = res.myModel;
                 this.authorInfo = res.authorModel;
@@ -203,9 +174,60 @@
             })
         }
 
+        clearCanvas() {
+            const ctx = wx.createCanvasContext('shareCanvas')
+            ctx.clearRect(0, 0, 320, 469);
+            ctx.draw();
+        }
+
+        async saveShareImage() {
+            wx.showLoading({
+                title: '图片生成中',
+                mask: true
+            })
+            const ctx = wx.createCanvasContext('shareCanvas')
+            let yOffset = 0;
+            const halfX = 160;
+            ctx.setTextBaseline('top')
+            //  绘制背景
+            ctx.drawImage('../img/share-intimacy.png', 0, 0, 750, 1334)
+            //  绘制题数
+            yOffset += 82;   //间距
+            ctx.setFillStyle('#ffffff')
+            ctx.setFontSize(16)//24 64
+            ctx.setTextAlign('center')
+            ctx.fillText(this.count + '道题', halfX, yOffset);
+            yOffset += 20;  //元素高度
+            //  绘制金额
+            yOffset += 4;   //间距
+            /*this.amount = '6.66'
+             ctx.setFillStyle('#ffffff');
+             let numberWidth = 40;
+             let amountWidth = this.amount.length * numberWidth + 24;
+             ctx.setTextAlign('left')
+             ctx.setFontSize(64)
+             ctx.fillText(this.amount, halfX - amountWidth / 2, yOffset);
+             ctx.setFontSize(24)
+             ctx.fillText('元', halfX - amountWidth / 2 + this.amount.length * numberWidth, yOffset + 40);*/
+            ctx.setFontSize(64)
+            ctx.fillText('￥' + this.amount, halfX, yOffset);
+            yOffset += 64;   //元素高度
+            //  绘制说明
+            yOffset += 15;   //间距
+            ctx.setFillStyle('#ffffff')
+            ctx.setFontSize(16)
+            ctx.setTextAlign('center')
+            ctx.fillText('第1名冲顶好友拿走一半奖金', halfX, yOffset);
+            yOffset += 20;  //元素高度
+
+            ctx.draw();
+            DrawCanvas.canvasToSave('shareCanvas');
+        }
+
         onLoad(e) {
             this.id = e.id;
             this.getResult();
+//            this.saveShareImage();
         }
 
         onShareAppMessage() {
@@ -233,6 +255,7 @@
 
 <style lang="less" rel="stylesheet/less">
     .redpackResult-page {
+        position: relative;
         background-color: #CC4242;
         color: #FFF;
         &.banner-padding {
@@ -437,6 +460,11 @@
 
         }
         .share-canvas {
+            position: absolute;
+            width: 750px;
+            height: 1334px;
+            top: -9999px;
+            /*top: 0;*/
         }
     }
 </style>

@@ -16,6 +16,7 @@
     import wepy from 'wepy'
     import 'wepy-async-function'
     import login from './lib/login.js'
+    import {http, apis} from './lib/inter.js'
 
     export default class extends wepy.app {
         config = {
@@ -63,6 +64,7 @@
         globalData = {
             appName: '冲顶超人',
             appid: 'wx7aa06bf425145c2c',
+            config: {},
             userInfo: null,
             pageData: {
                 goodsDetail: {
@@ -83,7 +85,15 @@
             this.use('promisify')
         }
 
+        async pullConfig() {
+            let res = await http.post(apis.config, {});
+            if (res._ok) {
+                wepy.$instance.globalData.config = res._result;
+            }
+        }
+
         onLaunch() {
+            this.pullConfig();
             wepy.$instance.globalData.userInfo = wx.getStorageSync('USER_INFO')
             login.doLogin()
         }

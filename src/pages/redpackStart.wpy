@@ -17,7 +17,7 @@
                 {{issueList[curIssIndex].question.content}}
             </view>
             <view class="picture" hidden="{{!issueList[curIssIndex].question.picURL}}">
-                <image mode="aspectFit" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
+                <image mode="aspectFill" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
             </view>
             <view class="answer">
                 <view

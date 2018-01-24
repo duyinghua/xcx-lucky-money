@@ -3,10 +3,10 @@
         <view class="list">
             <view class="item" wx:for="{{qaList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
                 <view class="title" @tap="showDesc({{index}})">
-                    <view class="text">{{item.que}}</view>
+                    <view class="text">{{item.name}}</view>
                     <image class="arrow {{item.isShow?'down':''}}" src="../img/arrow.png"></image>
                 </view>
-                <view class="desc" hidden="{{!item.isShow}}">{{item.ans}}</view>
+                <view class="desc" hidden="{{!item.isShow}}">{{item.content}}</view>
             </view>
         </view>
         <button plain="true" class="kefu" open-type="contact">
@@ -17,31 +17,11 @@
 </template>
 <script>
     import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
 
     export default class Qa extends wepy.page {
         data = {
-            qaList: [{
-                que: '冲顶超人怎么玩冲顶超人怎么玩冲顶超人怎么玩冲顶超人怎么玩冲顶超人怎么玩冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }, {
-                que: '冲顶超人怎么玩',
-                ans: '冲顶超人是一个好友之间的答题红包游戏，好友通过回答好友提出的问题，答对就能获取一定数额的红包第一名全部答对的用户可以获得一半的红包奖励。'
-            }]
+            qaList: []
         }
         methods = {
             showDesc(index) {
@@ -50,7 +30,16 @@
             }
         }
 
+        async getRules() {
+            let res = await http.post(apis.rules, {});
+            if (res._ok) {
+                this.qaList = res._result;
+                this.$apply();
+            }
+        }
+
         onLoad() {
+            this.getRules();
         }
 
     }

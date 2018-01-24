@@ -6,6 +6,9 @@ const config = {
 }
 
 export default {
+    config: `${config.apiHost}/wap/redpackagelite/config/param`,
+    rules: `${config.apiHost}/wap/redpackagelite/config/rules`,
+
     login: `${config.apiHost}/wap/redpackagelite/user/login`,
     // wxToken: `${config.apiHost}/wap/redpackagelite/access/token`,//wx token
     wxQrCode: `${config.apiHost}/wap/redpackagelite/share/qrcode`,

@@ -20,7 +20,7 @@
                     </view>
                 </view>
                 <view class="tip">
-                    <text class="span">最少提现2元，平台收取2%手续费</text>
+                    <text class="span">最少提现2元，平台收取{{feeRate * 100}}%手续费</text>
                 </view>
                 <button plain="true" class="withdraw-button {{!amountAbs?'disabled':''}}" disabled="{{!amountAbs}}"
                         @tap="withdraw">
@@ -45,7 +45,8 @@
         data = {
             balance: 0,
             amount: '',
-            withdrawNotes: ''
+            withdrawNotes: '',
+            feeRate: ''
         }
         computed = {
             amountAbs(){
@@ -107,6 +108,8 @@
 
         onShow() {
             this.getBalance();
+            this.feeRate = wepy.$instance.globalData.config.withdrawRate;
+            this.$apply();
         }
 
         onPullDownRefresh() {

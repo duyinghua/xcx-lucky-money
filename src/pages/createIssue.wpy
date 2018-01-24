@@ -19,7 +19,7 @@
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
                                 <view class="picture">
-                                    <image class="img" mode="aspectFit"
+                                    <image class="img" mode="aspectFill"
                                            src="{{issueList[curIssIndex].question.picURL}}"></image>
                                 </view>
                                 <view class="qsn-input">
@@ -51,7 +51,7 @@
                             </view>
                             <view hidden="{{curTab!=2}}">
                                 <view class="picture" @tap="uploadImage">
-                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFit"
+                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFill"
                                            src="{{issueDiy.question.picURL}}"></image>
                                     <block wx:else>
                                         <image class="add-img" src="../img/picture-add.png"></image>
@@ -258,6 +258,9 @@
                     if (newIss) {
                         this.issueList[this.issueList.length - 1] = newIss;
                         this.$apply();
+                        this.getWxPage().setData({
+                            issueList: this.issueList
+                        });
                     }
                 }
 
@@ -384,6 +387,9 @@
             newIss && this.issueList.push(newIss);
             this.issScrollLeft = 9999;
             this.$apply();
+            this.getWxPage().setData({
+                issueList: this.issueList
+            });
         }
 
         /*
@@ -503,6 +509,9 @@
             newIss && this.issueList.push(newIss);
             this.issScrollLeft = 9999;
             this.$apply();
+            this.getWxPage().setData({
+                issueList: this.issueList
+            });
             this.getUptoken();
         }
 
