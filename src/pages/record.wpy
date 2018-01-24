@@ -23,7 +23,7 @@
                         <view class="amount">{{item.redPackageFee}}</view>
                         <view class="right">
                             <view class="num">{{item.questionCount}}道题</view>
-                            <view class="level">{{item.passRate}}%答对率</view>
+                            <view class="level">{{item.correctRate}}%答对率</view>
                         </view>
                     </view>
                     <view class="l2">
@@ -102,6 +102,9 @@
                         this.sendTotalCount = res.totalCount;
                     }
                     if (res.sendList.length) {
+                        res.sendList.forEach(item => {
+                            item.redPackageFee = isNaN(item.redPackageFee) ? '0.00' : Number(item.redPackageFee).toFixed(2);
+                        })
                         this.sendList = this.sendList.concat(res.sendList);
                     } else {
                         this.isLastSend = true;
@@ -127,6 +130,9 @@
                         this.receiveTotalCount = res.totalCount;
                     }
                     if (res.receiveList.length) {
+                        res.receiveList.forEach(item => {
+                            item.fee = isNaN(item.fee) ? '0.00' : Number(item.fee).toFixed(2);
+                        })
                         this.receiveList = this.receiveList.concat(res.receiveList);
                     } else {
                         this.isLastReceive = true;

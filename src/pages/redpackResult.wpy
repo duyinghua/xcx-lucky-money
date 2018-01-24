@@ -82,7 +82,7 @@
     import utils from '../lib/utils.js'
     import wxRequestPayment from '../lib/wxRequestPayment.js'
 
-    export default class GameResult extends wepy.page {
+    export default class RedpackResult extends wepy.page {
         config = {
             navigationBarBackgroundColor: '#CC4242',
             backgroundColor: '#CC4242',
@@ -275,9 +275,9 @@
                     }
                 }
                 .remark {
-                    margin-top: unit(44, rpx);
+                    margin: unit(40, rpx) unit(40, rpx) 0;
                     text-align: center;
-                    font-size: unit(28, rpx);
+                    font-size: unit(32, rpx);
                 }
                 .left-photo {
                     position: absolute;

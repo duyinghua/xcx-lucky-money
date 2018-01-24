@@ -1,6 +1,6 @@
 <template>
     <view class="createIssue-page container">
-        <scroll-view class="iss-index" scroll-x="true">
+        <scroll-view class="iss-index" scroll-x="true" scroll-left="{{issScrollLeft}}">
             <view class="li" wx:for="{{indexs}}" wx:for-index="index_i" wx:key="{{index_i}}">
                 <view class="num {{index_i<curIssIndex?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
                       @tap="changeIndex({{index_i}})">
@@ -15,7 +15,7 @@
         <view class="content">
             <scroll-view class="scroll-view" scroll-y="true">
                 <view class="scroll-cont">
-                    <view class="iss-list" animation="{{animationData}}">
+                    <view class="iss-list">
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
                                 <view class="picture">
@@ -25,6 +25,7 @@
                                 <view class="qsn-input">
                                     <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
                                               value="{{issueList[curIssIndex].question.content}}"
+                                              disabled="{{cantInput}}" auto-height="true"
                                               bindinput="questionInput"></textarea>
                                 </view>
                                 <view class="aws-input">
@@ -32,14 +33,16 @@
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
                                         <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
-                                               maxlength="16" value="{{item.content}}"
+                                               maxlength="16" value="{{item.content}}" disabled="{{cantInput}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn change-btn" @tap="changeQuestion">换一题</button>
-                                    <button plain="true"
+                                    <button plain="true" class="btn change-btn" @tap="changeQuestion"
+                                            disabled="{{cantInput}}">换一题
+                                    </button>
+                                    <button plain="true" disabled="{{cantInput}}"
                                             class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}"
                                             disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
                                         确认
@@ -57,7 +60,7 @@
                                 </view>
                                 <view class="qsn-input">
                                     <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
-                                              value="{{issueDiy.question.content}}"
+                                              value="{{issueDiy.question.content}}" auto-height="true"
                                               bindinput="questionInput"></textarea>
                                 </view>
 
@@ -98,9 +101,11 @@
     export default class CreateIssue extends wepy.page {
         data = {
             id: 0,
+            recover: 0,
             curTab: 1,
             issueList: [],
             curIssIndex: 0,
+            issScrollLeft: 0,
             issueDiy: {
                 question: {
                     content: '',
@@ -109,7 +114,7 @@
                 },
                 answerList: [{
                     content: '',
-                    isRight: 1
+                    isRight: 0
                 }, {
                     content: '',
                     isRight: 0
@@ -126,8 +131,42 @@
             animationData: {},
             noRecommend: false,
             uptoken: '',
-            lastRecommendId: 0
+            lastRecommendId: 0,
+            cantInput: false,
         }
+
+        clearData() {
+            this.curTab = 1;
+            this.issueList = [];
+            this.curIssIndex = 0;
+            this.issScrollLeft = 0;
+            this.issueDiy = {
+                question: {
+                    content: '',
+                    picURL: '',
+                    authorUserID: wepy.$instance.globalData.userInfo.id
+                },
+                answerList: [{
+                    content: '',
+                    isRight: 0
+                }, {
+                    content: '',
+                    isRight: 0
+                }, {
+                    content: '',
+                    isRight: 0
+                }, {
+                    content: '',
+                    isRight: 0
+                }],
+                complete: false
+            };
+            this.noRecommend = false;
+            this.uptoken = '';
+            this.lastRecommendId = 0;
+            this.cantInput = false;
+        }
+
         computed = {
             indexs(){
                 let res = [0, 1, 2, 3, 4];
@@ -144,11 +183,12 @@
         }
         methods = {
             changeIndex(index){
-                if (index < this.issueList.length) {
+                if (index <= this.issueList.length - 1) {
                     this.curIssIndex = index;
                     this.curTab = 1;
-                    this.$apply()
+                    this.cantInput = (index != this.issueList.length - 1);
                 }
+                this.$apply();
             },
             tabHandler(num){
                 this.curTab = num;
@@ -182,6 +222,9 @@
                 this.$apply()
             },
             setAnswer(num){
+                if (this.cantInput) {
+                    return;
+                }
                 let issue;
                 if (this.curTab == 1) {
                     issue = this.issueList[this.curIssIndex];
@@ -197,13 +240,24 @@
                 })
                 issue.complete = !this.checkIssue(issue);
                 console.log(issue);
-                this.$apply()
+                this.$apply();
+                if (this.curTab == 1) {
+                    this.getWxPage().setData({
+                        issueList: this.issueList
+                    });
+                } else {
+                    this.getWxPage().setData({
+                        issueDiy: this.issueDiy
+                    });
+                }
+
             },
             async changeQuestion(){
                 if (!this.noRecommend) {
                     let newIss = await this.getNewIssue();
                     if (newIss) {
                         this.issueList[this.issueList.length - 1] = newIss;
+                        this.$apply();
                     }
                 }
 
@@ -308,24 +362,27 @@
          * */
         async addQuestion() {
             //切题动画
-            let animation = wx.createAnimation({
-                duration: 300,
-            })
-            animation.scale(0, 1).step();
-            this.animationData = animation.export();
-            this.hideTextarea = true;
-            this.$apply();
-            setTimeout(function () {
-                animation.scale(1, 1).step();
-                this.animationData = animation.export();
-                this.hideTextarea = false;
-                this.$apply();
-            }.bind(this), 300);
+            /*let animation = wx.createAnimation({
+             duration: 300,
+             })
+             animation.scale(0, 1).step();
+             this.animationData = animation.export();
+             this.hideTextarea = true;
+             this.$apply();
+             setTimeout(async () => {
+             animation.scale(1, 1).step();
+             this.animationData = animation.export();
+             this.$apply();
+             await utils.sleep(0.2);
+             this.hideTextarea = false;
+             this.$apply();
+             }, 300);*/
 
             this.curTab = 1;
             this.curIssIndex++;
             let newIss = await this.getNewIssue();
             newIss && this.issueList.push(newIss);
+            this.issScrollLeft = 9999;
             this.$apply();
         }
 
@@ -335,6 +392,7 @@
         async getNewIssue() {
             let newIss = this.issueDiy;
             let res = await http.post(apis.recommendQuestion, {
+                redPackageID: this.id,
                 questionID: this.lastRecommendId
             }, false, false);
             if (res._ok) {
@@ -395,8 +453,9 @@
                     rightFlag: item.isRight
                 })
             });
-            let res = await http.post(apis.commitQuestion, {
+            let res = await http.post(apis.commitQuestion, { //todo
                 redPackageID: this.id,
+                recQuestionID: curIssue.question.id || 0,
                 questionStr: JSON.stringify(curIssue.question),
                 answerListStr: JSON.stringify(answerList)
             }, false, false);
@@ -429,18 +488,21 @@
             }
         }
 
-        async onLoad(e) {
+        onLoad(e) {
+            this.clearData();
             this.id = e.id;
-            if (e.recover) {
+            this.recover = e.recover || 0;
+        }
+
+        async onShow() {
+            if (this.recover) {
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
             }
             let newIss = await this.getNewIssue();
             newIss && this.issueList.push(newIss);
+            this.issScrollLeft = 9999;
             this.$apply();
-        }
-
-        onShow() {
             this.getUptoken();
         }
 
@@ -585,12 +647,13 @@
             .qsn-input {
                 margin-top: unit(40, rpx);
                 border-bottom: 1px solid #DEDEDE;
+                padding: unit(20, rpx) 0;
                 .input {
                     font-size: 16px;
                     width: 100%;
                     box-sizing: border-box;
                     height: unit(120, rpx);
-                    line-height: unit(45, rpx);
+                    /*line-height: unit(45, rpx);*/
                 }
                 .textarea-placeholder {
                     color: #DEDEDE;

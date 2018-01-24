@@ -28,6 +28,7 @@
                 'pages/shareRedPack',
                 'pages/redpackStart',
                 'pages/redpackResult',
+                'pages/qa',
             ],
             window: {
                 backgroundTextStyle: 'dark',

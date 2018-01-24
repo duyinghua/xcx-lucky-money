@@ -113,7 +113,7 @@
             const halfX = 160;
             ctx.setTextBaseline('top')
             //  绘制背景
-            ctx.drawImage('../img/share-redpack.png', 0, 0, 320, 469)
+            ctx.drawImage('../img/share-redpack.jpg', 0, 0, 320, 469)
             //  绘制题数
             yOffset += 82;   //间距
             ctx.setFillStyle('#ffffff')
@@ -249,6 +249,7 @@
             box-sizing: border-box;
             color: #FFF;
             padding: 0 unit(96, rpx);
+            overflow: hidden;
             .title {
                 display: block;
                 width: unit(352, rpx);

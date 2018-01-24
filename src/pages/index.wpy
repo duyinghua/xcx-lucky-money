@@ -1,6 +1,6 @@
 <template>
     <view class="index-page container">
-        <view class="explain">
+        <view class="explain" @tap="explain">
             <view class="cont">
                 <image class="icon" src="../img/icon-wh.png"></image>
                 玩法说明
@@ -17,14 +17,18 @@
                     <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
                            bindblur="amountBlur"/>
                 </view>
-                <view class="tip">需支付￥{{serviceFee}}手续费</view>
-                <button plain="true" class="begin-button {{(incomplete||!amountAbs)?'disabled':''}}"
-                        disabled="{{(incomplete||!amountAbs)}}" @tap="gameStart">
+                <view class="tip">
+                    <text class="span">24小时内未被领取，则红包退回至</text>
+                    <text class="span red" @tap="account">余额</text>
+                </view>
+                <button plain="true" class="begin-button {{(incompleteId||!amountAbs)?'disabled':''}}"
+                        disabled="{{(incompleteId||!amountAbs)}}" @tap="gameStart">
                     开始出题
                 </button>
             </view>
         </view>
-        <view class="tip">24小时内未被领取，则红包原路退回</view>
+        <view class="tip"></view>
+        <view wx:if="{{incompleteId}}" class="continue" @tap="gameRestart">继续出题</view>
     </view>
 </template>
 
@@ -42,24 +46,35 @@
         data = {
             headPhoto: wepy.$instance.globalData.userInfo.headPicURL,
             amount: '',
-            incomplete: true
+            paying: false,
+            incompleteId: 0,
         }
         computed = {
-            serviceFee(){
-                let res = 0;
-                if (this.amount) {
-                    let abs = Number(this.amount);
-                    let amount = isNaN(abs) ? '' : abs;
-                    res = Math.ceil(amount) / 100;
-                }
-                return Number(res).toFixed(2);
-            },
+            /*serviceFee(){
+             let res = 0;
+             if (this.amount) {
+             let abs = Number(this.amount);
+             let amount = isNaN(abs) ? '' : abs;
+             res = Math.ceil(amount) / 100;
+             }
+             return Number(res).toFixed(2);
+             },*/
             amountAbs(){
                 let abs = Number(this.amount);
                 return isNaN(abs) ? '' : abs;
             }
         }
         methods = {
+            explain(){
+                wx.navigateTo({
+                    url: 'qa'
+                })
+            },
+            account(){
+                wx.switchTab({
+                    url: 'extract'
+                })
+            },
             amountInput(e){
                 this.amount = e.detail.value.trim() || '';
                 this.$apply();
@@ -76,9 +91,14 @@
                 this.$apply();
             },
             async gameStart(){
-                let amount = +this.amount + +this.serviceFee;
-                this.recharge(amount);
+                //todo
+//                this.recharge(this.amount);
                 this.buyRedPackage();
+            },
+            gameRestart(){
+                wx.navigateTo({
+                    url: 'createIssue?recover=1&&id=' + this.incompleteId
+                })
             }
         }
 
@@ -96,7 +116,9 @@
             });
             if (res._ok) {
                 let payParam = res.weixinpayParamLite || {};
-                wxRequestPayment(payParam, async () => {
+                this.paying = true;
+                let payRes = await wxRequestPayment(payParam);
+                if (payRes) {
                     let rrr = await http.post(apis.rechargeResult, {
                         orderID: res.orderID
                     });
@@ -105,7 +127,8 @@
                             this.buyRedPackage();
                         }
                     }
-                });
+                }
+                this.paying = false
             }
         }
 
@@ -125,11 +148,11 @@
             let res = await http.post(apis.incompleteRedPack, {});
             if (res._ok) {
                 if (res.redPackageID) {
-                    this.incomplete = true;
+                    this.incompleteId = res.redPackageID;
                     wx.showModal({
                         content: '你有一个未完成红包，需要先完成出题',
                         confirmText: '继续出题',
-                        showCancel: false,
+                        cancelText: '先等等',
                         success: wres => {
                             if (wres.confirm) {
                                 wx.navigateTo({
@@ -139,14 +162,17 @@
                         }
                     })
                 } else {
-                    this.incomplete = false;
+                    this.incompleteId = 0;
                 }
+                this.$apply();
             }
         }
 
         onShow() {
 //            this.getBalance();
-            this.incompleteRedPack();
+            if (!this.paying) {
+                this.incompleteRedPack();
+            }
         }
 
         onPullDownRefresh() {
@@ -238,9 +264,15 @@
                     }
                 }
                 .tip {
-                    color: #A5A5A5;
-                    font-size: unit(26, rpx);
                     text-align: center;
+                    font-size: 0;
+                    color: #A5A5A5;
+                    .span {
+                        font-size: unit(26, rpx);
+                    }
+                    .red {
+                        color: #CD3434;
+                    }
                 }
                 .begin-button {
                     margin-top: unit(38, rpx);
@@ -261,6 +293,12 @@
         .tip {
             margin-top: unit(50, rpx);
             color: #BFBFBF;
+            font-size: unit(26, rpx);
+            text-align: center;
+        }
+        .continue {
+            margin-top: unit(30, rpx);
+            color: #CD3434;
             font-size: unit(26, rpx);
             text-align: center;
         }

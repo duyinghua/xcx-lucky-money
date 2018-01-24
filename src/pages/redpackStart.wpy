@@ -52,7 +52,7 @@
     import utils from '../lib/utils.js'
     import numberZh from '../lib/number_zh.js'
 
-    export default class GameStart extends wepy.page {
+    export default class RedpackStart extends wepy.page {
         config = {
             navigationBarBackgroundColor: '#CC4242',
             backgroundColor: '#CC4242',
@@ -71,6 +71,21 @@
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
         }
+
+        clearData() {
+            this.hideMask = false;
+            this.amountLite = 0;
+            this.redpackHide = true;
+            this.redpackAnimation = {};
+            this.issueList = [];
+            this.userName = '';
+            this.userPhoto = '';
+            this.curIssIndex = 0;
+            this.latestWrongQuestionID = 0;
+            this.delayAnswer = 0.6;
+            this.canAnswer = false //延迟答题，防止误点
+        }
+
         computed = {
             curIssTitle(){
                 return numberZh(this.curIssIndex + 1);
@@ -237,6 +252,7 @@
         }
 
         async onLoad(e) {
+            this.clearData();
             let scene = e.scene ? decodeURIComponent(e.scene) : 0;
             this.id = e.id || scene;
 
@@ -365,14 +381,14 @@
                     text-align: center;
                     line-height: unit(108, rpx);
                     margin: unit(10, rpx) auto 0;
-                    width: unit(568, rpx);
-                    height: unit(95, rpx);
-                    background: url(http://redpackagelite.static.immocha.com/wxlite/btn-or.png) no-repeat center center / cover;
+                    width: unit(560, rpx);
+                    height: unit(100, rpx);
+                    background: url(http://redpackagelite.static.immocha.com/wxlite/btn-or-20180124.png) no-repeat center center / cover;
                     &.yes {
-                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-yes.png) no-repeat center center / cover;
+                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-yes-20180124.png) no-repeat center center / cover;
                     }
                     &.no {
-                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-no.png) no-repeat center center / cover;
+                        background: url(http://redpackagelite.static.immocha.com/wxlite/btn-no-20180124.png) no-repeat center center / cover;
                     }
                     &.font-s {
                         font-size: unit(28, rpx);

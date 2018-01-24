@@ -43,7 +43,7 @@ export default class HTTP {
             }
             authInfo = {
                 tToken: userInfo.tToken,
-                cur_uid: userInfo.id,//2702847//
+                cur_uid: userInfo.id,//2702847//todo
             }
             if (req.method === 'POST') {
                 reqHeader['content-type'] = 'application/x-www-form-urlencoded'
@@ -95,7 +95,7 @@ export default class HTTP {
                     showCancel: false
                 })
             }
-            console.log('response::', result);
+            console.log('url:param:response', url, params, result);
             return result;
         } else {
             // wx.showModal({

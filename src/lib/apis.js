@@ -12,15 +12,15 @@ export default {
     qiniuToken: `${config.apiHost}/open/qiniu/token/redpackagelite?data=%7B%22cur_uid%22%3A3254493%7D`,///open/qiniu/wap/image/token?data=%7B%22cur_uid%22%3A3254493%7D
 
     //我的
-    balanceInfo: `${config.apiHost}/wap/redpackagelite/user/banlance/info`,//余额信息
+    balanceInfo: `${config.apiHost}/wap/redpackagelite/user/balance/info`,//余额信息
     receiveList: `${config.apiHost}/wap/redpackagelite/receiveList`,//收取列表
     sendList: `${config.apiHost}/wap/redpackagelite/sendList`,//发送列表
     sendDetailList: `${config.apiHost}/wap/redpackagelite/detail`,//发送红包详情
-    withdraw: `${config.apiHost}/wap/redpackagelite/user/banlance/withdraw`,//提现
+    withdraw: `${config.apiHost}/wap/redpackagelite/user/balance/withdraw`,//提现
 
     //出题
-    recharge: `${config.apiHost}/wap/redpackagelite/user/banlance/chargepay`,//支付
-    rechargeResult: `${config.apiHost}/wap/redpackagelite/user/banlance/chargepay/result`,//支付结果
+    recharge: `${config.apiHost}/wap/redpackagelite/user/balance/chargepay`,//支付
+    rechargeResult: `${config.apiHost}/wap/redpackagelite/user/balance/chargepay/result`,//支付结果
     buyRedPack: `${config.apiHost}/wap/redpackagelite/publish`,//购买红包
     incompleteRedPack: `${config.apiHost}/wap/redpackagelite/qa/history`,//未完成红包恢复
     recommendQuestion: `${config.apiHost}/wap/redpackagelite/rec/qa`,//推荐问答
@@ -30,7 +30,7 @@ export default {
     canIAnswer: `${config.apiHost}/wap/redpackagelite/check/cando`,//能否答题
     questionList: `${config.apiHost}/wap/redpackagelite/qalist`,//答题列表
     answerQuestion: `${config.apiHost}/wap/redpackagelite/do/answer`,//答题
-    gameResult: `${config.apiHost}/wap/redpackagelite/result`,//答题结束
+    redpackResult: `${config.apiHost}/wap/redpackagelite/result`,//答题结束
     //复活
     relive: `${config.apiHost}/wap/redpackagelite/share/callback`,//分享复活
     reliveCheck: `${config.apiHost}/wap/redpackagelite/user/servivecard/info`,//复活卡查询

@@ -16,11 +16,11 @@
                         <view class="icon">￥</view>
                         <input class="input" type="digit" placeholder="0.00" value="{{amount}}" bindinput="amountInput"
                                bindblur="amountBlur"/>
+                        <view class="withdraw-all" @tap="allBalance">全部提现</view>
                     </view>
                 </view>
                 <view class="tip">
-                    <text class="span">提现到微信钱包，</text>
-                    <text class="span red" @tap="allBalance">全部提现</text>
+                    <text class="span">最少提现2元，平台收取2%手续费</text>
                 </view>
                 <button plain="true" class="withdraw-button {{!amountAbs?'disabled':''}}" disabled="{{!amountAbs}}"
                         @tap="withdraw">
@@ -29,6 +29,7 @@
             </view>
         </view>
         <view class="tip">1-5个工作日到账</view>
+        <view wx:if="{{withdrawNotes}}" class="wx-tip">{{withdrawNotes}}</view>
     </view>
 </template>
 <script>
@@ -43,7 +44,8 @@
         }
         data = {
             balance: 0,
-            amount: ''
+            amount: '',
+            withdrawNotes: ''
         }
         computed = {
             amountAbs(){
@@ -73,15 +75,24 @@
             },
             async withdraw(){
                 let res = await http.post(apis.withdraw, {
-                    withdrawPrice: this.amount
+                    withdrawPrice: Number(this.amount)
                 });
                 if (res._ok) {
                     this.balance = Number(res.balance || 0).toFixed(2);
+                    this.withdrawNotes = res.withdrawNotes;
                     this.$apply();
-                    wx.showToast({
-                        title: '提现成功',
-                        icon: 'success'
-                    })
+                    if (this.withdrawNotes) {
+                        wx.showToast({
+                            title: '申请成功',
+                            icon: 'success'
+                        })
+                    } else {
+                        wx.showModal({
+                            content: '提现失败',
+                            confirmText: '确定',
+                            showCancel: false
+                        })
+                    }
                 }
             }
         }
@@ -160,6 +171,7 @@
                         display: flex;
                         margin-top: unit(16, rpx);
                         border-bottom: 1px solid #DEDEDE;
+                        align-items: center;
                         .icon {
                             font-size: unit(48, rpx);
                             padding: unit(20, rpx) 0;
@@ -168,6 +180,7 @@
                             box-sizing: border-box;
                         }
                         .input {
+                            flex: 1;
                             font-size: unit(64, rpx);
                             padding: unit(8, rpx) 0;
                             height: unit(82, rpx);
@@ -176,6 +189,14 @@
                         }
                         .input-placeholder {
                             color: #DEDEDE;
+                        }
+                        .withdraw-all {
+                            width: unit(120, rpx);
+                            height: unit(40, rpx);
+                            line-height: unit(40, rpx);
+                            font-size: unit(26, rpx);
+                            color: #CD3434;
+                            text-align: right;
                         }
                     }
                 }
@@ -211,6 +232,16 @@
             color: #BFBFBF;
             text-align: center;
             font-size: unit(26, rpx);
+        }
+        .wx-tip {
+            position: absolute;
+            bottom: 0;
+            padding: unit(15, rpx) unit(30, rpx);
+            font-size: unit(26, rpx);
+            margin: unit(34, rpx);
+            border-radius: unit(10, rpx);
+            color: #FFF;
+            background: #EEB6B6;
         }
     }
 </style>

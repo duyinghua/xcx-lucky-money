@@ -1,7 +1,11 @@
 <template>
     <view class="sendDetail-page container">
         <view class="amount-area" @tap="shareRedPack">
-            ￥{{totalFee}}
+            <view>￥{{totalFee}}</view>
+            <view class="send-btn">
+                <image class="icon" src="../img/icon-fenxiang.png"></image>
+                分享
+            </view>
         </view>
         <view class="desc">
             <view class="txt">
@@ -11,7 +15,7 @@
                 <view class="red">{{totalFee}}</view>
                 元
             </view>
-            <view class="explain">
+            <view class="explain" tap="explain">
                 <image class="icon" src="../img/icon-wh.png"></image>
                 玩法说明
             </view>
@@ -55,8 +59,13 @@
             isLast: false
         }
         methods = {
+            explain(){
+                wx.navigateTo({
+                    url: 'qa'
+                })
+            },
             shareRedPack(){
-                wx.redirectTo({
+                wx.navigateTo({
                     url: `shareRedPack?id=${this.id}&amount=${this.totalFee}&count=${this.totalCount}`
                 })
             }
@@ -123,6 +132,20 @@
             color: #FFF;
             font-size: unit(64, rpx);
             font-weight: bold;
+            flex-direction: column;
+            .send-btn {
+                font-weight: normal;
+                color: #F2F2F2;
+                margin-top: unit(30, rpx);
+                font-size: unit(28, rpx);
+                display: flex;
+                align-items: center;
+                .icon {
+                    width: unit(32, rpx);
+                    height: unit(32, rpx);
+                    margin-right: unit(10, rpx);
+                }
+            }
         }
         .desc {
             display: flex;
