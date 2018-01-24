@@ -2,7 +2,7 @@
     <view class="createIssue-page container">
         <scroll-view class="iss-index" scroll-x="true" scroll-left="{{issScrollLeft}}">
             <view class="li" wx:for="{{indexs}}" wx:for-index="index_i" wx:key="{{index_i}}">
-                <view class="num {{index_i<curIssIndex?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
+                <view class="num {{index_i<issueList.length?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
                       @tap="changeIndex({{index_i}})">
                     {{index_i + 1}}
                 </view>
@@ -23,10 +23,7 @@
                                            src="{{issueList[curIssIndex].question.picURL}}"></image>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
-                                              value="{{issueList[curIssIndex].question.content}}"
-                                              disabled="{{cantInput}}" auto-height="true"
-                                              bindinput="questionInput"></textarea>
+                                    {{issueList[curIssIndex].question.content}}
                                 </view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}"
@@ -59,11 +56,12 @@
                                     </block>
                                 </view>
                                 <view class="qsn-input">
-                                    <textarea hidden="{{hideTextarea}}" class="input" placeholder="输入问题" maxlength="35"
-                                              value="{{issueDiy.question.content}}" auto-height="true"
-                                              bindinput="questionInput"></textarea>
+                                    <view class="qsn">
+                                        <input class="input" placeholder="输入问题" maxlength="35"
+                                               value="{{issueDiy.question.content}}"
+                                               bindinput="questionInput"/>
+                                    </view>
                                 </view>
-
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}"
                                           wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
@@ -73,8 +71,6 @@
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
                                 </view>
-
-
                                 <view class="buttons">
                                     <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}"
                                             disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
@@ -109,8 +105,7 @@
             issueDiy: {
                 question: {
                     content: '',
-                    picURL: '',
-                    authorUserID: wepy.$instance.globalData.userInfo.id
+                    picURL: ''
                 },
                 answerList: [{
                     content: '',
@@ -127,7 +122,6 @@
                 }],
                 complete: false
             },
-            hideTextarea: false,
             animationData: {},
             noRecommend: false,
             uptoken: '',
@@ -143,8 +137,7 @@
             this.issueDiy = {
                 question: {
                     content: '',
-                    picURL: '',
-                    authorUserID: wepy.$instance.globalData.userInfo.id
+                    picURL: ''
                 },
                 answerList: [{
                     content: '',
@@ -186,14 +179,22 @@
                 if (index <= this.issueList.length - 1) {
                     this.curIssIndex = index;
                     this.curTab = 1;
-                    this.cantInput = (index != this.issueList.length - 1);
+//                    this.cantInput = (index != this.issueList.length - 1);
                 }
                 this.$apply();
             },
             tabHandler(num){
                 this.curTab = num;
-
-                this.$apply()
+                if (this.curTab == 1) {
+                    this.issueList[this.issueList.length - 1] = this.lastRecIssue;
+                } else {
+                    this.lastRecIssue = this.issueList[this.issueList.length - 1];
+                    this.issueList[this.issueList.length - 1] = this.issueDiy;
+                }
+                this.$apply();
+                this.getWxPage().setData({
+                    issueList: this.issueList
+                });
             },
             questionInput(e){
                 let content = e.detail.value.trim() || ''
@@ -222,9 +223,9 @@
                 this.$apply()
             },
             setAnswer(num){
-                if (this.cantInput) {
-                    return;
-                }
+//                if (this.cantInput) {
+//                    return;
+//                }
                 let issue;
                 if (this.curTab == 1) {
                     issue = this.issueList[this.curIssIndex];
@@ -239,7 +240,6 @@
                     }
                 })
                 issue.complete = !this.checkIssue(issue);
-                console.log(issue);
                 this.$apply();
                 if (this.curTab == 1) {
                     this.getWxPage().setData({
@@ -339,12 +339,11 @@
             this.issueDiy = {
                 question: {
                     content: '',
-                    picURL: '',
-                    authorUserID: wepy.$instance.globalData.userInfo.id
+                    picURL: ''
                 },
                 answerList: [{
                     content: '',
-                    isRight: 1
+                    isRight: 0
                 }, {
                     content: '',
                     isRight: 0
@@ -388,6 +387,7 @@
             this.issScrollLeft = 9999;
             this.$apply();
             this.getWxPage().setData({
+                issScrollLeft: this.issScrollLeft,
                 issueList: this.issueList
             });
         }
@@ -461,12 +461,18 @@
             });
             let res = await http.post(apis.commitQuestion, { //todo
                 redPackageID: this.id,
-                recQuestionID: curIssue.question.id || 0,
-                questionStr: JSON.stringify(curIssue.question),
+                updateQuestionID: 0,
+                questionStr: JSON.stringify({
+                    updateQuestionID: curIssue.question.uninId || 0,
+                    recQuestionID: curIssue.question.id || 0,
+                    content: curIssue.question.content,
+                    picURL: curIssue.question.picURL,
+                    authorUserID: wepy.$instance.globalData.userInfo.id,
+                }),
                 answerListStr: JSON.stringify(answerList)
             }, false, false);
             if (res._ok) {
-//                this.issueList[this.issueList.length - 1].question.id = res.questionID;
+                this.issueList[this.issueList.length - 1].question.uninId = res.questionID;
                 return true;
             } else {
                 return false;
@@ -501,6 +507,7 @@
         }
 
         async onShow() {
+            console.log(wepy.$instance.globalData.userInfo.id);
             if (this.recover) {
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
@@ -510,6 +517,7 @@
             this.issScrollLeft = 9999;
             this.$apply();
             this.getWxPage().setData({
+                issScrollLeft: this.issScrollLeft,
                 issueList: this.issueList
             });
             this.getUptoken();
@@ -574,14 +582,15 @@
                     width: unit(54, rpx);
                     height: unit(54, rpx);
                     border-radius: unit(54, rpx);
-                    &.cur {
-                        border-color: #CD3434;
-                        color: #CD3434;
-                    }
                     &.prev {
                         border-color: #FFDBDB;
                         color: #CD3434;
                         background: #FFDBDB;
+                    }
+                    &.cur {
+                        border-color: #CD3434;
+                        color: #CD3434;
+                        background: #FFF;
                     }
                 }
             }
@@ -655,14 +664,14 @@
             }
             .qsn-input {
                 margin-top: unit(40, rpx);
-                border-bottom: 1px solid #DEDEDE;
-                padding: unit(20, rpx) 0;
+                font-size: 16px;
+                .qsn {
+                    padding: unit(20, rpx) 0;
+                    border-bottom: 1px solid #DEDEDE;
+                }
                 .input {
                     font-size: 16px;
                     width: 100%;
-                    box-sizing: border-box;
-                    height: unit(120, rpx);
-                    /*line-height: unit(45, rpx);*/
                 }
                 .textarea-placeholder {
                     color: #DEDEDE;
@@ -683,7 +692,7 @@
                     }
                     .sub {
                         font-size: unit(24, rpx);
-                        color: #DEDEDE;
+                        color: #F49A51;
                         width: unit(110, rpx);
                         display: flex;
                         justify-content: flex-end;
@@ -692,13 +701,13 @@
                     }
                     &.cur {
                         .txt {
-                            color: #F49A51;
+                            color: #CD3434;
                         }
                         .sub {
-                            color: #F49A51;
+                            color: #CD3434;
                         }
                         .input-placeholder {
-                            color: #F49A51;
+                            color: #CD3434;
                         }
                     }
                 }

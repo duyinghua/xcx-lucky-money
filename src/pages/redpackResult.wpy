@@ -96,7 +96,8 @@
             totalFee: 0,
             totalCount: 0,
             detailList: [],
-            serviveCard: {}
+            serviveCard: {},
+            taped: false
         }
         computed = {
             intimacyPicture(){
@@ -130,19 +131,23 @@
                 })
             },
             async buyServiveCard() {
-                let res = await http.post(apis.reliveRecharge, {
-                    redPackageID: this.id,
-                })
-                if (res._ok) {
-                    let payParam = res.weixinpayParamLite || {};
-                    wxRequestPayment(payParam, async () => {
-                        let res = await http.post(apis.servivecard, {
-                            redPackageID: this.id,
+                if (!this.taped) {
+                    this.taped = true;
+                    let res = await http.post(apis.reliveRecharge, {
+                        redPackageID: this.id,
+                    })
+                    if (res._ok) {
+                        let payParam = res.weixinpayParamLite || {};
+                        wxRequestPayment(payParam, async () => {
+                            let res = await http.post(apis.servivecard, {
+                                redPackageID: this.id,
+                            });
+                            if (res._ok && ~res._result.length) {
+                                this.relive();
+                            }
                         });
-                        if (res._ok && ~res._result.length) {
-                            this.relive();
-                        }
-                    });
+                    }
+                    this.taped = false;
                 }
             }
         }

@@ -48,6 +48,7 @@
             amount: '',
             paying: false,
             incompleteId: 0,
+            taped: false
         }
         computed = {
             /*serviceFee(){
@@ -111,25 +112,31 @@
         }
 
         async recharge(amount) {
-            let res = await http.post(apis.recharge, {
-                chargePrice: amount
-            });
-            if (res._ok) {
-                let payParam = res.weixinpayParamLite || {};
-                this.paying = true;
-                let payRes = await wxRequestPayment(payParam);
-                if (payRes) {
-                    let rrr = await http.post(apis.rechargeResult, {
-                        orderID: res.orderID
-                    });
-                    if (rrr._ok) {
-                        if (rrr.payResult.payStatus == 10) {
-                            this.buyRedPackage();
+
+            if (!this.taped) {
+                this.taped = true;
+                let res = await http.post(apis.recharge, {
+                    chargePrice: amount
+                });
+                if (res._ok) {
+                    let payParam = res.weixinpayParamLite || {};
+                    this.paying = true;
+                    let payRes = await wxRequestPayment(payParam);
+                    if (payRes) {
+                        let rrr = await http.post(apis.rechargeResult, {
+                            orderID: res.orderID
+                        });
+                        if (rrr._ok) {
+                            if (rrr.payResult.payStatus == 10) {
+                                this.buyRedPackage();
+                            }
                         }
                     }
+                    this.paying = false
                 }
-                this.paying = false
+                this.taped = false;
             }
+
         }
 
         async buyRedPackage() {

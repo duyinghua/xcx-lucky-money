@@ -46,7 +46,8 @@
             balance: 0,
             amount: '',
             withdrawNotes: '',
-            feeRate: ''
+            feeRate: '',
+            taped: false,
         }
         computed = {
             amountAbs(){
@@ -75,25 +76,29 @@
                 this.$apply();
             },
             async withdraw(){
-                let res = await http.post(apis.withdraw, {
-                    withdrawPrice: Number(this.amount)
-                });
-                if (res._ok) {
-                    this.balance = Number(res.balance || 0).toFixed(2);
-                    this.withdrawNotes = res.withdrawNotes;
-                    this.$apply();
-                    if (this.withdrawNotes) {
-                        wx.showToast({
-                            title: '申请成功',
-                            icon: 'success'
-                        })
-                    } else {
-                        wx.showModal({
-                            content: '提现失败',
-                            confirmText: '确定',
-                            showCancel: false
-                        })
+                if (!this.taped) {
+                    this.taped = true;
+                    let res = await http.post(apis.withdraw, {
+                        withdrawPrice: Number(this.amount)
+                    });
+                    if (res._ok) {
+                        this.balance = Number(res.balance || 0).toFixed(2);
+                        this.withdrawNotes = res.withdrawNotes;
+                        this.$apply();
+                        if (this.withdrawNotes) {
+                            wx.showToast({
+                                title: '申请成功',
+                                icon: 'success'
+                            })
+                        } else {
+                            wx.showModal({
+                                content: '提现失败',
+                                confirmText: '确定',
+                                showCancel: false
+                            })
+                        }
                     }
+                    this.taped = false;
                 }
             }
         }
