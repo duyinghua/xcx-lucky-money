@@ -73,6 +73,7 @@
                 <button plain="true" class="button" @tap="buyServiveCard">1元购买</button>
             </block>
         </view>
+        <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
     </view>
 </template>
 
@@ -434,6 +435,8 @@
                 border: 1px solid #CE2838;
             }
 
+        }
+        .share-canvas {
         }
     }
 </style>

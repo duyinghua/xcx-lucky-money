@@ -92,8 +92,8 @@
             },
             async gameStart(){
                 //todo
-//                this.recharge(this.amount);
-                this.buyRedPackage();
+                this.recharge(this.amount);
+//                this.buyRedPackage();
             },
             gameRestart(){
                 wx.navigateTo({
