@@ -26,7 +26,7 @@
                 'pages/createIssue',
                 'pages/sendDetail',
                 'pages/shareRedPack',
-                'pages/repackStart',
+                'pages/redpackStart',
                 'pages/gameResult',
             ],
             window: {

@@ -191,7 +191,7 @@
                 icon: 'success',
                 success: () => {
                     wx.redirectTo({
-                        url: `repackStart?id=${this.id}`
+                        url: `redpackStart?id=${this.id}`
                     })
                 }
             })

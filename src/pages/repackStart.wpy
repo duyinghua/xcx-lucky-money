@@ -1,5 +1,5 @@
 <template>
-    <view class="repackStart-page container">
+    <view class="redpackStart-page container">
         <view class="main">
             <view class="title">
                 <view class="bz-left">
@@ -301,7 +301,7 @@
 </script>
 
 <style lang="less" rel="stylesheet/less">
-    .repackStart-page {
+    .redpackStart-page {
         background-color: #CC4242;
         color: #FFF;
         .main {
