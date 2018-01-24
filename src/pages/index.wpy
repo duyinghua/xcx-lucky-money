@@ -15,7 +15,7 @@
                 <view class="input-box">
                     <view class="label">红包(元)</view>
                     <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
-                           bindblur="amountBlur"/>
+                           bindblur="amountBlur" disabled="{{incompleteId}}"/>
                 </view>
                 <view class="tip">
                     <text class="span">24小时内未被领取，则红包退回至</text>
@@ -27,8 +27,11 @@
                 </button>
             </view>
         </view>
-        <view class="tip"></view>
-        <view wx:if="{{incompleteId}}" class="continue" @tap="gameRestart">继续出题</view>
+        <view class="tip" wx:if="{{incompleteId}}">
+            <text class="span">您有未完成红包，请 </text>
+            <text class="span red" @tap="gameRestart">继续出题</text>
+        </view>
+
     </view>
 </template>
 
@@ -36,6 +39,7 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+    import login from '../lib/login.js'
     import wxRequestPayment from '../lib/wxRequestPayment.js'
 
     export default class Index extends wepy.page {
@@ -44,7 +48,7 @@
             enablePullDownRefresh: true
         }
         data = {
-            headPhoto: wepy.$instance.globalData.userInfo.headPicURL,
+            headPhoto: '',
             amount: '',
             paying: false,
             incompleteId: 0,
@@ -116,7 +120,7 @@
             if (!this.taped) {
                 this.taped = true;
                 let res = await http.post(apis.recharge, {
-                    chargePrice: amount
+                    redPackagePrice: amount
                 });
                 if (res._ok) {
                     let payParam = res.weixinpayParamLite || {};
@@ -175,8 +179,15 @@
             }
         }
 
-        onShow() {
-//            this.getBalance();
+        async onLoad() {
+            await login.doLogin();
+            this.headPhoto = wepy.$instance.globalData.userInfo.headPicURL;
+            this.$apply();
+
+        }
+
+        async onShow() {
+            await utils.sleep(0.5);
             if (!this.paying) {
                 this.incompleteRedPack();
             }
@@ -189,7 +200,7 @@
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                title: wepy.$instance.globalData.appName,
+                title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`
             }
@@ -300,8 +311,14 @@
         .tip {
             margin-top: unit(50, rpx);
             color: #BFBFBF;
-            font-size: unit(26, rpx);
             text-align: center;
+            font-size: 0;
+            .span {
+                font-size: unit(26, rpx);
+            }
+            .red {
+                color: #CD3434;
+            }
         }
         .continue {
             margin-top: unit(30, rpx);

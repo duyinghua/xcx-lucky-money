@@ -22,9 +22,9 @@ export default {
     withdraw: `${config.apiHost}/wap/redpackagelite/user/balance/withdraw`,//提现
 
     //出题
-    recharge: `${config.apiHost}/wap/redpackagelite/user/balance/chargepay`,//支付
+    recharge: `${config.apiHost}/wap/redpackagelite/publish/byorderpay`,//支付
     rechargeResult: `${config.apiHost}/wap/redpackagelite/user/balance/chargepay/result`,//支付结果
-    buyRedPack: `${config.apiHost}/wap/redpackagelite/publish`,//购买红包
+    buyRedPack: `${config.apiHost}/wap/redpackagelite/publish/bybalance`,//购买红包
     incompleteRedPack: `${config.apiHost}/wap/redpackagelite/qa/history`,//未完成红包恢复
     recommendQuestion: `${config.apiHost}/wap/redpackagelite/rec/qa`,//推荐问答
     commitQuestion: `${config.apiHost}/wap/redpackagelite/qa/save`,//保存问答

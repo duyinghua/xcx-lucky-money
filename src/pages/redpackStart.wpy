@@ -263,14 +263,8 @@
                 this.canAnswer = true;
             } else if (canRes.statusCode === 2) {
                 this.canAnswer = false;
-                wx.showModal({
-                    content: '把自己的红包留给别人吧~',
-                    showCancel: false,
-                    success: () => {
-                        wx.redirectTo({
-                            url: `index`
-                        })
-                    }
+                wx.redirectTo({
+                    url: 'sendDetail?id=' + this.id
                 })
             } else if (canRes.statusCode === 3) {
                 let res = await http.post(apis.servivecard, {
@@ -280,25 +274,13 @@
                     this.canAnswer = true;
                     this.latestWrongQuestionID = canRes.latestWrongQuestionID
                 } else {
-                    wx.showModal({
-                        content: '你已经参与过这个红包了哦~',
-                        showCancel: false,
-                        success: () => {
-                            wx.redirectTo({
-                                url: `redpackResult?id=${this.id}`
-                            })
-                        }
+                    wx.redirectTo({
+                        url: `redpackResult?id=${this.id}`
                     })
                 }
-            } else if (canRes.statusCode === 4) {
-                wx.showModal({
-                    content: '你已经参与过这个红包了哦~',
-                    showCancel: false,
-                    success: () => {
-                        wx.redirectTo({
-                            url: `redpackResult?id=${this.id}`
-                        })
-                    }
+            } else {
+                wx.redirectTo({
+                    url: `redpackResult?id=${this.id}`
                 })
             }
             this.getQuestionList();
@@ -308,7 +290,7 @@
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                title: wepy.$instance.globalData.appName,
+                title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`
             }

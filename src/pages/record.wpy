@@ -167,7 +167,7 @@
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                title: wepy.$instance.globalData.appName,
+                title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`
             }

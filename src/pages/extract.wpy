@@ -82,7 +82,7 @@
                         withdrawPrice: Number(this.amount)
                     });
                     if (res._ok) {
-                        this.balance = Number(res.balance || 0).toFixed(2);
+                        this.balance = Number(res.balance.balance || 0).toFixed(2);
                         this.withdrawNotes = res.withdrawNotes;
                         this.$apply();
                         if (this.withdrawNotes) {
@@ -124,7 +124,7 @@
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                title: wepy.$instance.globalData.appName,
+                title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`
             }
@@ -243,6 +243,8 @@
         }
         .wx-tip {
             position: absolute;
+            left: 0;
+            right: 0;
             bottom: 0;
             padding: unit(15, rpx) unit(30, rpx);
             font-size: unit(26, rpx);

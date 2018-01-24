@@ -66,6 +66,12 @@
             appid: 'wx7aa06bf425145c2c',
             config: {},
             userInfo: null,
+            shareInfo: [,
+                '听说你很了解我？答错一题算你输',
+                '这个红包很特别！不拼手气拼友谊',
+                '别问我红包有多深，就看你懂我有几分',
+                '是真老铁，还是路人乙？看你能答对几题'
+            ],
             pageData: {
                 goodsDetail: {
                     _reload: false
@@ -93,9 +99,9 @@
         }
 
         onLaunch() {
-            this.pullConfig();
             wepy.$instance.globalData.userInfo = wx.getStorageSync('USER_INFO')
             login.doLogin()
+            this.pullConfig();
         }
 
     }

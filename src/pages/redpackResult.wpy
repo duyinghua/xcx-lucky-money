@@ -1,5 +1,6 @@
 <template>
-    <view class="redpackResult-page container {{serviveCard.leftServiveTime?'banner-padding':''}}">
+    <view
+        class="redpackResult-page container {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'banner-padding':''}}">
         <view class="main">
             <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
             <view class="amount">获得
@@ -62,7 +63,7 @@
                 </view>
             </view>
         </view>
-        <view class="banner" wx:if="{{serviveCard.leftServiveTime}}">
+        <view class="banner" wx:if="{{serviveCard.leftServiveTime&&myInfo.intimacy!=100}}">
             <image class="revive" mode="widthFix" src="../img/revive.png"></image>
             <block wx:if="{{serviveCard.shared===0}}">
                 <view class="txt">分享获得复活卡</view>
@@ -73,7 +74,9 @@
                 <button plain="true" class="button" @tap="buyServiveCard">1元购买</button>
             </block>
         </view>
+        <!--<view hidden="{{!saveing}}">-->
         <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
+        <!--</view>-->
     </view>
 </template>
 
@@ -97,7 +100,8 @@
             totalCount: 0,
             detailList: [],
             serviveCard: {},
-            taped: false
+            taped: false,
+            saveing: false
         }
         computed = {
             intimacyPicture(){
@@ -179,6 +183,24 @@
             })
         }
 
+        resultImage() {
+            if (this.myInfo.intimacy < 30) {
+                return '../img//result-5.png';
+            }
+            if (this.myInfo.intimacy < 55) {
+                return '../img//result-4.png';
+            }
+            if (this.myInfo.intimacy < 80) {
+                return '../img//result-3.png';
+            }
+            if (this.myInfo.intimacy < 99) {
+                return '../img//result-2.png';
+            }
+            if (this.myInfo.intimacy == 100) {
+                return '../img//result-1.png';
+            }
+        }
+
         clearCanvas() {
             const ctx = wx.createCanvasContext('shareCanvas')
             ctx.clearRect(0, 0, 320, 469);
@@ -186,59 +208,79 @@
         }
 
         async saveShareImage() {
+//            this.saveing = true;
             wx.showLoading({
                 title: '图片生成中',
                 mask: true
             })
+            const userImage = await wepy.downloadFile({url: this.myInfo.headPicURL})
+
+
             const ctx = wx.createCanvasContext('shareCanvas')
-            let yOffset = 0;
-            const halfX = 160;
+            let yOffset = 27;
+            const halfX = 187.5;
             ctx.setTextBaseline('top')
             //  绘制背景
-            ctx.drawImage('../img/share-intimacy.png', 0, 0, 750, 1334)
-            //  绘制题数
-            yOffset += 82;   //间距
+            ctx.drawImage('../img/share-intimacy.png', 0, 0, 375, 667)
+
+            //  绘制头像
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(halfX, yOffset + 25, 25, 0, 2 * Math.PI)
+            ctx.closePath();
+            ctx.clip()
+            ctx.drawImage(userImage.tempFilePath, halfX - 25, yOffset, 50, 50)
+            yOffset += 50;  //元素高度
+            ctx.restore()
+
+            //  绘制昵称
+            yOffset += 7;   //间距
             ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(16)//24 64
+            ctx.setFontSize(14)
             ctx.setTextAlign('center')
-            ctx.fillText(this.count + '道题', halfX, yOffset);
-            yOffset += 20;  //元素高度
-            //  绘制金额
-            yOffset += 4;   //间距
-            /*this.amount = '6.66'
-             ctx.setFillStyle('#ffffff');
-             let numberWidth = 40;
-             let amountWidth = this.amount.length * numberWidth + 24;
-             ctx.setTextAlign('left')
-             ctx.setFontSize(64)
-             ctx.fillText(this.amount, halfX - amountWidth / 2, yOffset);
-             ctx.setFontSize(24)
-             ctx.fillText('元', halfX - amountWidth / 2 + this.amount.length * numberWidth, yOffset + 40);*/
-            ctx.setFontSize(64)
-            ctx.fillText('￥' + this.amount, halfX, yOffset);
-            yOffset += 64;   //元素高度
+            ctx.fillText(DrawCanvas.replaceEmoji(this.myInfo.userName), halfX, yOffset);
+            yOffset += 15;  //元素高度
             //  绘制说明
             yOffset += 15;   //间距
             ctx.setFillStyle('#ffffff')
+            ctx.setFontSize(15)
+            ctx.setTextAlign('center')
+            ctx.fillText(`我答对 ${this.totalCount} 题 获得 ${this.totalFee} 元红包`, halfX, yOffset);
+            yOffset += 20;  //元素高度
+
+            //  绘制动图
+            let resultImage = this.resultImage()
+            ctx.drawImage('../img/result-demo.jpg', halfX - 123.75, 169, 247.5, 300)
+
+            //  绘制分数
+            ctx.setFillStyle('#ffffff')
+            ctx.setFontSize(47)
+            ctx.fillText(this.myInfo.intimacy, halfX, 328);
+            ctx.setFontSize(20)
+            ctx.fillText('分', halfX + 52, 356);
+            //  绘制称号
+            ctx.setFillStyle('#ffffff')
             ctx.setFontSize(16)
             ctx.setTextAlign('center')
-            ctx.fillText('第1名冲顶好友拿走一半奖金', halfX, yOffset);
-            yOffset += 20;  //元素高度
+            DrawCanvas.drawText(ctx, '“' + this.myInfo.intimacy_des + '”', halfX, 414, 40)
+
 
             ctx.draw();
             DrawCanvas.canvasToSave('shareCanvas');
+//            this.saveing = false;
         }
 
-        onLoad(e) {
+        async onLoad(e) {
             this.id = e.id;
-            this.getResult();
+            await this.getResult();
+
 //            this.saveShareImage();
         }
 
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                title: wepy.$instance.globalData.appName,
+                title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`,
                 success: async () => {
@@ -466,10 +508,10 @@
         }
         .share-canvas {
             position: absolute;
-            width: 750px;
-            height: 1334px;
+            width: 375px;
+            height: 667px;
+            left: 0;
             top: -9999px;
-            /*top: 0;*/
         }
     }
 </style>
