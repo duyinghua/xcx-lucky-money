@@ -18,10 +18,19 @@
                     <view class="iss-list">
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
-                                <view class="picture">
+
+                                <view class="picture" @tap="uploadImage">
+                                    <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="img" mode="aspectFill"
+                                           src="{{issueList[curIssIndex].question.picURL}}"></image>
+                                    <block wx:else>
+                                        <image class="add-img" src="../img/picture-add.png"></image>
+                                        <text class="add-desc">添加照片</text>
+                                    </block>
+                                </view>
+                                <!--<view class="picture">
                                     <image class="img" mode="aspectFill"
                                            src="{{issueList[curIssIndex].question.picURL}}"></image>
-                                </view>
+                                </view>-->
                                 <view class="qsn-input">
                                     {{issueList[curIssIndex].question.content}}
                                 </view>
@@ -29,7 +38,7 @@
                                     <view class="li {{item.isRight?'cur':''}}"
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
-                                        <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
+                                        <input class="txt" placeholder="输入答案"
                                                maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
@@ -65,7 +74,7 @@
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}"
                                           wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
-                                        <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
+                                        <input class="txt" placeholder="输入答案"
                                                maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
@@ -306,13 +315,16 @@
 
             }),
             uploadImage(){
+                console.log('~~~~~~~~~~~~~~~' + this.curIssIndex)
                 wx.chooseImage({
                     count: 1,
                     success: res => {
                         let filePath = res.tempFilePaths[0];
-                        qiniuUploader.upload(filePath, (res) => {
+                        qiniuUploader.upload(filePath, (res2) => {
                             // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
-                            this.issueDiy.question.picURL = res.imageURL;
+                            let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
+                            curIssue.question.picURL = res2.imageURL;
+                            curIssue.complete = !this.checkIssue(curIssue);
                             this.$apply();
                         }, (error) => {
                             console.log('error: ' + error);
@@ -514,14 +526,10 @@
             }
         }
 
-        onLoad(e) {
+        async onLoad(e) {
             this.clearData();
             this.id = e.id;
             this.recover = e.recover || 0;
-        }
-
-        async onShow() {
-            console.log(wepy.$instance.globalData.userInfo.id);
             if (this.recover) {
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
