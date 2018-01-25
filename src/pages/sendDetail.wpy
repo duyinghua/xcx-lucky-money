@@ -23,7 +23,7 @@
                 已被
                 <view class="red">{{totalCount}}</view>
                 位好友领取
-                <view class="red">{{totalFee}}</view>
+                <view class="red">{{sendedFee}}</view>
                 元
             </view>
             <view class="explain" tap="explain">
@@ -65,6 +65,7 @@
         data = {
             id: 0,
             totalFee: 0,
+            sendedFee: 0,
             totalCount: 0,
             detailList: [],
             isLast: false
@@ -105,6 +106,7 @@
                 if (res._ok) {
                     if (init) {
                         this.totalFee = isNaN(res.totalFee) ? '0.00' : Number(res.totalFee).toFixed(2);
+                        this.sendedFee = isNaN(res.sendedFee) ? '0.00' : Number(res.sendedFee).toFixed(2);
                         this.totalCount = res.totalCount;
                     }
                     if (res.detailList.length) {

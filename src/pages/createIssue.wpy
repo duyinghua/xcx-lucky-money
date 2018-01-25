@@ -30,16 +30,15 @@
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
                                         <input class="txt" placeholder="{{item.isRight?'输入正确答案':'输入错误答案'}}"
-                                               maxlength="16" value="{{item.content}}" disabled="{{cantInput}}"
+                                               maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn change-btn" @tap="changeQuestion"
-                                            disabled="{{cantInput}}">换一题
+                                    <button plain="true" class="btn change-btn" @tap="changeQuestion">换一题
                                     </button>
-                                    <button plain="true" disabled="{{cantInput}}"
+                                    <button plain="true"
                                             class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}"
                                             disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
                                         确认
@@ -126,7 +125,6 @@
             noRecommend: false,
             uptoken: '',
             lastRecommendId: 0,
-            cantInput: false,
         }
 
         clearData() {
@@ -157,13 +155,12 @@
             this.noRecommend = false;
             this.uptoken = '';
             this.lastRecommendId = 0;
-            this.cantInput = false;
         }
 
         computed = {
             indexs(){
                 let res = [0, 1, 2, 3, 4];
-                if (this.curIssIndex < 4) {
+                if (this.issueList.length < 4) {
                     return res;
                 } else {
                     /*let diff = this.curIssIndex - 4;
@@ -179,7 +176,6 @@
                 if (index <= this.issueList.length - 1) {
                     this.curIssIndex = index;
                     this.curTab = 1;
-//                    this.cantInput = (index != this.issueList.length - 1);
                 }
                 this.$apply();
             },
@@ -223,9 +219,6 @@
                 this.$apply()
             },
             setAnswer(num){
-//                if (this.cantInput) {
-//                    return;
-//                }
                 let issue;
                 if (this.curTab == 1) {
                     issue = this.issueList[this.curIssIndex];
@@ -275,11 +268,12 @@
                     });
                     return;
                 }
+                let isUpdate = !!curIssue.question.uninId;
                 let commitIssue = await this.commitIssue(curIssue);
                 if (!commitIssue) {
                     return;
                 }
-                if (curIssue.question.uninId) {//修改更新一个题
+                if (isUpdate) {//修改更新一个题
                     wx.showToast({
                         title: '修改成功',
                         icon: 'success'
@@ -337,6 +331,13 @@
         async incompleteRedPack() {
             let res = await http.post(apis.incompleteRedPack, {});
             if (res._ok) {
+                res.qaList.forEach(item => {
+                    item.question.uninId = item.question.id;
+                    delete item.question.id;
+                    item.answerList.forEach(ans => {
+                        ans.isRight = ans.rightFlag;
+                    });
+                })
                 this.issueList = res.qaList;
             }
         }
