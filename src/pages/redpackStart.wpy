@@ -13,8 +13,8 @@
                     <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
                 </view>
             </view>
-            <view class="picture" hidden="{{!issueList[curIssIndex].question.picURL}}">
-                <image mode="aspectFill" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
+            <view hidden="{{!issueList[curIssIndex].question.picURL}}">
+                <image mode="widthFix" class="picture" src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}"></image>
             </view>
             <view class="question {{!issueList[curIssIndex].question.picURL?'no-pic':''}}">
                 {{issueList[curIssIndex].question.content}}
@@ -52,6 +52,8 @@
     import wepy from 'wepy'
     import {http, apis} from '../lib/inter.js'
     import utils from '../lib/utils.js'
+    import login from '../lib/login.js'
+
     import numberZh from '../lib/number_zh.js'
 
     export default class RedpackStart extends wepy.page {
@@ -70,6 +72,7 @@
             userPhoto: '',
             curIssIndex: 0,
             latestWrongQuestionID: 0,
+            qiniuClip: wepy.$instance.globalData.config.questionPicURLPostfix || '?imageMogr2/auto-orient/thumbnail/558x/gravity/Center/crop/x558/blur/1x0/quality/75|imageslim',
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
         }
@@ -162,9 +165,10 @@
         }
 
         async getQuestionList() {
-            let res = await http.post(apis.questionList, {
-                redPackageID: this.id
-            });
+            let res = await
+                http.post(apis.questionList, {
+                    redPackageID: this.id
+                });
             if (res._ok) {
 
                 this.userName = res.userName;
@@ -203,6 +207,7 @@
             let scene = e.scene ? decodeURIComponent(e.scene) : 0;
             this.id = e.id || scene;
 
+            await login.doLogin();
             //  先判断这个人能否答题，如果已经答过，去结果页。
             // 1 红包不存在 2不能自问自答 3只能用复活卡才能继续答题 4你已经领取过红包啦
             let canRes = await this.canIAnswer();
@@ -294,13 +299,9 @@
             }
             .picture {
                 margin-top: unit(56, rpx);
+                background: #CC4242;
                 width: unit(558, rpx);
                 height: unit(336, rpx);
-                background: #CC4242;
-                .img {
-                    width: 100%;
-                    height: 100%;
-                }
             }
             .answer {
                 margin-top: unit(50, rpx);

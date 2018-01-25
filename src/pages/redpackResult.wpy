@@ -143,15 +143,15 @@
                 if (!this.taped) {
                     this.taped = true;
                     let res = await
-                    http.post(apis.reliveRecharge, {
-                        redPackageID: this.id,
-                    })
+                        http.post(apis.reliveRecharge, {
+                            redPackageID: this.id,
+                        })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async () => {
+                        wxRequestPayment(payParam, async() => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
-                                });
+                            });
                             if (res._ok && ~res._result.length) {
                                 this.relive();
                             }
@@ -167,9 +167,22 @@
                 redPackageID: this.id
             })
             if (res._ok) {
-                this.myInfo = res.myModel;
-                this.authorInfo = res.authorModel;
-                this.detail = res.detailMap;
+                if (!res.myModel) {
+                    wx.showModal({
+                        content: '已结束',
+                        confirmText: '确定',
+                        showCancel: false,
+                        success: ()=> {
+                            wx.redirectTo({
+                                url: `index`
+                            });
+                        }
+                    })
+                    return;
+                }
+                this.myInfo = res.myModel || {};
+                this.authorInfo = res.authorModel || {};
+                this.detail = res.detailMap || {};
                 this.totalFee = isNaN(res.detailMap.totalFee) ? '0.00' : Number(res.detailMap.totalFee).toFixed(2);
                 this.sendedFee = isNaN(res.detailMap.sendedFee) ? '0.00' : Number(res.detailMap.sendedFee).toFixed(2);
                 this.totalCount = res.detailMap.totalCount;
@@ -185,8 +198,8 @@
                 title: msg || '已复活',
                 icon: 'success',
                 success: () => {
-                     wx.redirectTo({
-                      url: `redpackStart?id=${this.id}`
+                    wx.redirectTo({
+                        url: `redpackStart?id=${this.id}`
                     });
                 }
             })
@@ -251,7 +264,7 @@
 //            ctx.setTextAlign('center')
 //            ctx.fillText(DrawCanvas.replaceEmoji(this.myInfo.userName), halfX, yOffset);
 //            yOffset += 15;  //元素高度
-            if(this.myInfo.receiveFee){
+            if (this.myInfo.receiveFee) {
                 //  绘制说明
                 ctx.setFillStyle('#ffffff')
                 ctx.setFontSize(15)
@@ -285,7 +298,6 @@
             ctx.restore();
 
 
-
             //  绘制右头像
             ctx.save()
             ctx.beginPath()
@@ -310,20 +322,20 @@
         onShareAppMessage() {
             let rand = parseInt(Math.random() * 3) + 1;
             return {
-                    title: wepy.$instance.globalData.shareInfo[rand],
-                    path: 'pages/index',
-                    imageUrl: `../img/share-title${rand}.png`,
-                    success: async() => {
-                        if (this.serviveCard.shared === 0){
-                            let res = await
+                title: wepy.$instance.globalData.shareInfo[rand],
+                path: 'pages/index',
+                imageUrl: `../img/share-title${rand}.png`,
+                success: async() => {
+                    if (this.serviveCard.shared === 0) {
+                        let res = await
                             http.post(apis.relive, {
                                 redPackageID: this.id,
                             });
-                            if (res._ok) {
-                                this.relive();
-                            }
+                        if (res._ok) {
+                            this.relive();
                         }
-                     }
+                    }
+                }
             }
         }
     }
@@ -379,7 +391,7 @@
                     text-align: center;
                     font-size: unit(36, rpx);
                 }
-                .stamp{
+                .stamp {
                     position: absolute;
                     width: unit(140, rpx);
                     height: unit(100, rpx);

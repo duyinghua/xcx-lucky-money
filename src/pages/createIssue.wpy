@@ -19,7 +19,7 @@
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
                                 <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="picture-img" mode="widthFix"
-                                       src="{{issueList[curIssIndex].question.picURL}}" @tap="uploadImage"></image>
+                                       src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}" @tap="uploadImage"></image>
                                 <view wx:else class="picture" @tap="uploadImage">
                                     <image class="add-img" src="../img/picture-add.png"></image>
                                     <text class="add-desc">添加照片</text>
@@ -54,7 +54,7 @@
                             </view>
                             <view hidden="{{curTab!=2}}">
                                 <image wx:if="{{issueDiy.question.picURL}}" class="picture-img" mode="widthFix"
-                                       src="{{issueDiy.question.picURL}}" @tap="uploadImage"></image>
+                                       src="{{issueDiy.question.picURL}}{{qiniuClip}}" @tap="uploadImage"></image>
                                 <view wx:else class="picture" @tap="uploadImage">
                                     <image class="add-img" src="../img/picture-add.png"></image>
                                     <text class="add-desc">添加照片</text>
@@ -130,6 +130,7 @@
             noRecommend: false,
             uptoken: '',
             lastRecommendId: 0,
+            qiniuClip: wepy.$instance.globalData.config.questionPicURLPostfix || '?imageMogr2/auto-orient/thumbnail/558x/gravity/Center/crop/x558/blur/1x0/quality/75|imageslim',
         }
 
         clearData() {
@@ -334,6 +335,7 @@
                             uploadURL: 'https://up.qbox.me',
                             domain: 'http://redpackagelite.static.immocha.com/',
                             uptoken: this.uptoken, // 由其他程序生成七牛 uptoken
+                            key: `/question/${wepy.$instance.globalData.userInfo.id}/${Date.now()}.jpg`, // [非必须]自定义文件 key。如果不设置，默认为使用微信小程序 API 的临时文件名
                         });
                     }
                 })
