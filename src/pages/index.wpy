@@ -103,7 +103,20 @@
             },
             async gameStart(){
                 await this.incompleteRedPack();
-                if (!this.incompleteId) {
+                if (this.incompleteId) {
+                    wx.showModal({
+                        content: '您有一个未完成红包，需要先完成出题',
+                        confirmText: '继续出题',
+                        showCancel: false,
+                        success: wres => {
+                            if (wres.confirm) {
+                                wx.navigateTo({
+                                    url: 'createIssue?recover=1&&id=' + this.incompleteId
+                                })
+                            }
+                        }
+                    })
+                } else {
                     //todo
                     this.recharge(this.amount);
 //                this.buyRedPackage();
@@ -135,14 +148,23 @@
                     let payParam = res.weixinpayParamLite || {};
                     let payRes = await wxRequestPayment(payParam);
                     if (payRes) {
-                        let rrr = await http.post(apis.rechargeResult, {
-                            orderID: res.orderID
-                        });
-                        if (rrr._ok) {
-                            if (rrr.payResult.payStatus == 10) {
-                                this.buyRedPackage();
-                            }
+                        let i = 0;
+                        while (i < 3 && !this.incompleteId) {
+                            await this.incompleteRedPack();
                         }
+                        if (this.incompleteId) {
+                            wx.navigateTo({
+                                url: 'createIssue?id=' + this.incompleteId
+                            })
+                        }
+//                        let rrr = await http.post(apis.rechargeResult, {
+//                            orderID: res.orderID
+//                        });
+//                        if (rrr._ok) {
+//                            if (rrr.payResult.payStatus == 10) {
+//                                this.buyRedPackage();
+//                            }
+//                        }
                     }
                 }
                 this.taped = false;
@@ -167,18 +189,6 @@
             if (res._ok) {
                 if (res.redPackageID) {
                     this.incompleteId = res.redPackageID;
-                    wx.showModal({
-                        content: '您有一个未完成红包，需要先完成出题',
-                        confirmText: '继续出题',
-                        showCancel: false,
-                        success: wres => {
-                            if (wres.confirm) {
-                                wx.navigateTo({
-                                    url: 'createIssue?recover=1&&id=' + res.redPackageID
-                                })
-                            }
-                        }
-                    })
                 } else {
                     this.incompleteId = 0;
                 }

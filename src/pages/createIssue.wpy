@@ -36,7 +36,8 @@
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn change-btn" @tap="changeQuestion">换一题
+                                    <button plain="true" class="btn change-btn {{curIssIndex<issueList.length-1?'disabled':''}}" disabled="{{curIssIndex<issueList.length-1}}" @tap="changeQuestion">
+                                        换一题
                                     </button>
                                     <button plain="true"
                                             class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}"
@@ -246,6 +247,7 @@
 
             },
             async changeQuestion(){
+
                 if (!this.noRecommend) {
                     let newIss = await this.getNewIssue();
                     if (newIss) {
@@ -258,7 +260,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async () => {
+            confirmQuestion: utils.debounce(async() => {
                 let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
                 let msg = this.checkIssue(curIssue);
                 if (msg) {
@@ -742,6 +744,11 @@
                     &.change-btn {
                         color: #CD3434;
                         background: #FFF;
+                        &.disabled {
+                            color: #DEDEDE;
+                            border: 1px solid #DEDEDE;
+                            background: #FFF;
+                        }
                     }
                     &.confirm-btn {
                         color: #FFF;
