@@ -46,7 +46,7 @@
             </view>
             <view class="list">
                 <view class="li" wx:for="{{receiveList}}" wx:for-item="item" wx:for-index="index"
-                      wx:key="receive_{{index}}">
+                      wx:key="receive_{{index}}" @tap="receiveDetail({{item.redPackageID}})">
                     <view class="amount">￥{{item.fee}}</view>
                     <view class="date">{{item.createTime}}</view>
                 </view>
@@ -83,6 +83,11 @@
             sendDetail(id){
                 wx.navigateTo({
                     url: 'sendDetail?id=' + id
+                })
+            },
+            receiveDetail(id){
+                wx.navigateTo({
+                    url: 'redpackResult?id=' + id
                 })
             }
         }

@@ -444,12 +444,12 @@
                     }
                     .button {
                         width: unit(225, rpx);
-                        height: unit(78, rpx);
+                        height: unit(82, rpx);
                         padding: 0;
                         margin: unit(30, rpx) auto 0;
                         .img {
                             width: unit(225, rpx);
-                            height: unit(78, rpx);
+                            height: unit(82, rpx);
                         }
                     }
                 }

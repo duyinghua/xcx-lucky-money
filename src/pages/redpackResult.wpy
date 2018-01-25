@@ -13,7 +13,7 @@
                     <text class="value">{{myInfo.intimacy}}</text>
                     <text class="unit">分</text>
                 </view>
-                <view class="remark">{{myInfo.intimacy_des}}</view>
+                <view class="remark">{{myInfo.intimacy_des?'“'+myInfo.intimacy_des+'”':''}}</view>
                 <view class="left-photo">
                     <image class="photo"
                            src="{{myInfo.headPicURL}}"></image>
@@ -181,14 +181,14 @@
 
         relive(msg) {
             wx.showToast({
-                    title: msg || '已复活',
-                    icon: 'success',
-                    success: ()=>{
-                    wx.redirectTo({
-                    url: `redpackStart?id=${this.id}`
-                })
-        }
-        })
+                title: msg || '已复活',
+                icon: 'success',
+                success: () => {
+                     wx.redirectTo({
+                      url: `redpackStart?id=${this.id}`
+                    });
+                }
+            })
         }
 
         resultImage() {
@@ -220,48 +220,44 @@
                 title: '图片生成中',
                 mask: true
             })
-            let userImage = await
-            wepy.downloadFile({url: this.myInfo.headPicURL})
-            await
-            utils.sleep(1);
-            let authorImage = await
-            wepy.downloadFile({url: this.authorInfo.userHeadPic})
-
+            let userImage = await wepy.downloadFile({url: this.myInfo.headPicURL})
+            let authorImage = await wepy.downloadFile({url: this.authorInfo.userHeadPic})
 
             const ctx = wx.createCanvasContext('shareCanvas')
-            let yOffset = 27;
+            let yOffset = 45;
             const halfX = 187.5;
             ctx.setTextBaseline('top')
             //  绘制背景
             let resultImage = this.resultImage();
-            ctx.drawImage(resultImage, 0, 0, 375, 667)
+            ctx.drawImage(resultImage, 0, 0, 375, 592)
 
-            let cardTop = 168;
+            let cardTop = 93;
 
             //  绘制头像
-            ctx.save()
-            ctx.beginPath()
-            ctx.arc(halfX, yOffset + 25, 25, 0, 2 * Math.PI)
-            ctx.closePath();
-            ctx.clip()
-            ctx.drawImage(userImage.tempFilePath, halfX - 25, yOffset, 50, 50)
-            yOffset += 50;  //元素高度
-            ctx.restore()
+//            ctx.save()
+//            ctx.beginPath()
+//            ctx.arc(halfX, yOffset + 25, 25, 0, 2 * Math.PI)
+//            ctx.closePath();
+//            ctx.clip()
+//            ctx.drawImage(userImage.tempFilePath, halfX - 25, yOffset, 50, 50)
+//            yOffset += 50;  //元素高度
+//            ctx.restore()
 
             //  绘制昵称
-            yOffset += 7;   //间距
-            ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(14)
-            ctx.setTextAlign('center')
-            ctx.fillText(DrawCanvas.replaceEmoji(this.myInfo.userName), halfX, yOffset);
-            yOffset += 15;  //元素高度
-            //  绘制说明
-            yOffset += 15;   //间距
-            ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(15)
-            ctx.setTextAlign('center')
-            ctx.fillText(`我答对 ${this.myInfo.correctCount} 题 获得 ${this.myInfo.receiveFee} 元红包`, halfX, yOffset);
-            yOffset += 20;  //元素高度
+//            yOffset += 7;   //间距
+//            ctx.setFillStyle('#ffffff')
+//            ctx.setFontSize(14)
+//            ctx.setTextAlign('center')
+//            ctx.fillText(DrawCanvas.replaceEmoji(this.myInfo.userName), halfX, yOffset);
+//            yOffset += 15;  //元素高度
+            if(this.myInfo.receiveFee){
+                //  绘制说明
+                ctx.setFillStyle('#ffffff')
+                ctx.setFontSize(15)
+                ctx.setTextAlign('center')
+                ctx.fillText(`我答对 ${this.myInfo.correctCount} 题 获得 ${this.myInfo.receiveFee} 元红包`, halfX, yOffset);
+                yOffset += 20;  //元素高度
+            }
 
 
             //  绘制分数
@@ -285,7 +281,9 @@
             ctx.clip()
             ctx.drawImage(userImage.tempFilePath, 62 - 29, headTop, 58, 58)
             yOffset += 50;  //元素高度
-            ctx.restore()
+            ctx.restore();
+
+
 
             //  绘制右头像
             ctx.save()
@@ -294,6 +292,7 @@
             ctx.closePath();
             ctx.clip()
             ctx.drawImage(authorImage.tempFilePath, 308 - 29, headTop, 58, 58)
+
             yOffset += 50;  //元素高度
             ctx.restore()
             ctx.draw();
@@ -313,25 +312,19 @@
                     title: wepy.$instance.globalData.shareInfo[rand],
                     path: 'pages/index',
                     imageUrl: `../img/share-title${rand}.png`,
-                    success: async()
-                        = >
-                {
-                    if (this.serviveCard.shared === 0
-        )
-            {
-                let res = await
-                http.post(apis.relive, {
-                    redPackageID: this.id,
-                });
-                if (res._ok) {
-                    this.relive();
-                }
+                    success: async() => {
+                        if (this.serviveCard.shared === 0){
+                            let res = await
+                            http.post(apis.relive, {
+                                redPackageID: this.id,
+                            });
+                            if (res._ok) {
+                                this.relive();
+                            }
+                        }
+                     }
             }
-
         }
-        }
-        }
-
     }
 </script>
 
@@ -544,7 +537,7 @@
         .share-canvas {
             position: absolute;
             width: 375px;
-            height: 667px;
+            height: 592px;
             left: 0;
             /*top: 0px;*/
             top: -9999px;
