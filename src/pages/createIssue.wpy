@@ -667,7 +667,6 @@
             .picture-img {
                 width: unit(558, rpx);
                 height: 0;
-                max-height: unit(558, rpx);
             }
             .picture {
                 display: flex;

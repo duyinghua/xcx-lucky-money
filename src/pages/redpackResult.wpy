@@ -173,8 +173,8 @@
                         confirmText: '确定',
                         showCancel: false,
                         success: ()=> {
-                            wx.redirectTo({
-                                url: `index`
+                            wx.switchTab({
+                                url: 'index'
                             });
                         }
                     })

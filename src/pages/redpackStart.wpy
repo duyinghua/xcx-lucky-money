@@ -72,7 +72,7 @@
             userPhoto: '',
             curIssIndex: 0,
             latestWrongQuestionID: 0,
-            qiniuClip: wepy.$instance.globalData.config.questionPicURLPostfix || '?imageMogr2/auto-orient/thumbnail/558x/gravity/Center/crop/x558/blur/1x0/quality/75|imageslim',
+            qiniuClip: '',
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
         }
@@ -206,7 +206,7 @@
             this.clearData();
             let scene = e.scene ? decodeURIComponent(e.scene) : 0;
             this.id = e.id || scene;
-
+            this.qiniuClip = wepy.$instance.globalData.config.questionPicURLPostfix;
             await login.doLogin();
             //  先判断这个人能否答题，如果已经答过，去结果页。
             // 1 红包不存在 2不能自问自答 3只能用复活卡才能继续答题 4你已经领取过红包啦
