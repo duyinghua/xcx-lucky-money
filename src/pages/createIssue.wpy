@@ -170,7 +170,7 @@
         computed = {
             indexs(){
                 let res = [0, 1, 2, 3, 4];
-                if (this.issueList.length < 4) {
+                if (this.issueList.length <= 5) {
                     return res;
                 } else {
                     /*let diff = this.curIssIndex - 4;
@@ -513,7 +513,7 @@
                 redPackageID: this.id
             })
             if (res._ok) {
-                wx.redirectTo({
+                wx.navigateTo({
                     url: `shareRedPack?id=${this.id}&amount=${res.totalFee}&count=${res.questionCount}`
                 })
             }
