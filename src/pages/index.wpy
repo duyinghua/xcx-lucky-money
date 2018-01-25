@@ -15,14 +15,14 @@
                 <view class="input-box">
                     <view class="label">红包(元)</view>
                     <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
-                           bindblur="amountBlur" disabled="{{incompleteId}}"/>
+                           bindblur="amountBlur"/>
                 </view>
                 <view class="tip">
                     <text class="span">24小时内未被领取，则红包退回至</text>
                     <text class="span red" @tap="account">余额</text>
                 </view>
-                <button plain="true" class="begin-button {{(incompleteId||!amountAbs)?'disabled':''}}"
-                        disabled="{{(incompleteId||!amountAbs)}}" @tap="gameStart">
+                <button plain="true" class="begin-button {{(!amountAbs)?'disabled':''}}"
+                        disabled="{{(!amountAbs)}}" @tap="gameStart">
                     开始出题
                 </button>
             </view>

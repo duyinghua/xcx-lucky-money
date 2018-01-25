@@ -52,9 +52,12 @@ export default class HTTP {
             params = {...params, ...authInfo}
             req.data = {data: JSON.stringify(params)};
         }
-        showLoading && wepy.showLoading({title: '加载中'})
+        showLoading && wx.showLoading({
+            title: '加载中',
+            mask: true
+        });
         const res = await wepy.request(req)
-        showLoading && wepy.hideLoading()
+        showLoading && wx.hideLoading();
         if (res.statusCode === 200) {
             // console.log(res.data)
             let result = Object.assign({_result: res.data.data}, {_code: res.data.code});
@@ -73,7 +76,7 @@ export default class HTTP {
                     title: '提示',
                     content: '登录信息已过期，请重新登录后重试',
                     showCancel: false,
-                    success: async (res) => {
+                    success: async(res) => {
                         if (res.confirm) {
                             wepy.$instance.globalData.userInfo = '';
                             wx.setStorageSync('USER_INFO', '');

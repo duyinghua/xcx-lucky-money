@@ -320,14 +320,20 @@
                     count: 1,
                     success: res => {
                         let filePath = res.tempFilePaths[0];
+                        wx.showLoading({
+                            title: '上传图片中',
+                            mask: true
+                        });
                         qiniuUploader.upload(filePath, (res2) => {
                             // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
                             let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
                             curIssue.question.picURL = res2.imageURL;
                             curIssue.complete = !this.checkIssue(curIssue);
                             this.$apply();
+                            wx.hideLoading();
                         }, (error) => {
                             console.log('error: ' + error);
+                            wx.hideLoading();
                         }, {
                             region: 'ECN',
                             uploadURL: 'https://up.qbox.me',
@@ -424,7 +430,7 @@
             let res = await http.post(apis.recommendQuestion, {
                 redPackageID: this.id,
                 questionID: this.lastRecommendId
-            }, false, false);
+            });
             if (res._ok) {
                 if (res.question) {
                     this.lastRecommendId = res.question.id;
@@ -494,7 +500,7 @@
                     authorUserID: wepy.$instance.globalData.userInfo.id,
                 }),
                 answerListStr: JSON.stringify(answerList)
-            }, false, false);
+            });
             if (res._ok) {
                 if (!curIssue.question.uninId) { //添加一个题
                     this.issueList[this.issueList.length - 1].question.uninId = res.questionID;

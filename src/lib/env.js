@@ -2,25 +2,17 @@ const ENV = {
     dev: 'develop',
     pre: 'beta',
     prod: 'stable'
-}.prod;
+}.dev;
 
-const SSOHOST = {
-    develop: 'https://sso-daily.test.weidian.com',
-    stable: 'https://sso.weidian.com'
-}
+const SSOHOST = {}
 
 const APIHOST = {
-    develop: 'https://api.immocha.com',
-    stable: 'https://develop.immocha.com'
+    develop: 'https://develop.immocha.com',
+    stable: 'https://redpackagelite.api.immocha.com'
 }
 
-const IMAGEHOST = {
-    develop: 'https://mediaapi.daily.weidian.com',
-    stable: 'https://media.api.weidian.com'
-}
+const IMAGEHOST = {}
 
-const WEBVIEW_HOST = {
-    fangxin: 'https://m.fangxin.com'
-}
+const WEBVIEW_HOST = {}
 
 export {ENV, SSOHOST, APIHOST, IMAGEHOST, WEBVIEW_HOST}
