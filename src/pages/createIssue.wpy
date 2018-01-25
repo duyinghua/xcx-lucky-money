@@ -279,25 +279,34 @@
                 if (!commitIssue) {
                     return;
                 }
-                if (this.curTab == 2) {
-                    this.clearIssueDiy();
-                }
-                if (this.curIssIndex < 4) {
-                    this.addQuestion()
-                } else {
-                    wx.showModal({
-                        content: '没过瘾？你还可以多出几道题刁难大家哟',
-                        cancelText: '增加1题',
-                        confirmText: '完成出题',
-                        success: res => {
-                            if (res.confirm) {
-                                this.finishQuestion();
-                            } else {
-                                this.addQuestion()
+                if (curIssue.question.uninId) {//修改更新一个题
+                    wx.showToast({
+                        title: '修改成功',
+                        icon: 'success'
+                    })
+                } else {//添加一个题
+                    if (this.curTab == 2) {
+                        this.clearIssueDiy();
+                    }
+                    if (this.curIssIndex < 4) {
+                        this.addQuestion()
+                    } else {
+                        wx.showModal({
+                            content: '出题成功',
+                            cancelText: '增加1题',
+                            confirmText: '完成出题',
+                            confirmColor: '#CD3434',
+                            success: res => {
+                                if (res.confirm) {
+                                    this.finishQuestion();
+                                } else {
+                                    this.addQuestion()
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
+
 
             }),
             uploadImage(){
@@ -459,7 +468,7 @@
                     rightFlag: item.isRight
                 })
             });
-            let res = await http.post(apis.commitQuestion, { //todo
+            let res = await http.post(apis.commitQuestion, {
                 redPackageID: this.id,
                 updateQuestionID: 0,
                 questionStr: JSON.stringify({
@@ -472,7 +481,9 @@
                 answerListStr: JSON.stringify(answerList)
             }, false, false);
             if (res._ok) {
-                this.issueList[this.issueList.length - 1].question.uninId = res.questionID;
+                if (!curIssue.question.uninId) { //添加一个题
+                    this.issueList[this.issueList.length - 1].question.uninId = res.questionID;
+                }
                 return true;
             } else {
                 return false;
@@ -692,7 +703,7 @@
                     }
                     .sub {
                         font-size: unit(24, rpx);
-                        color: #F49A51;
+                        color: #808080;
                         width: unit(110, rpx);
                         display: flex;
                         justify-content: flex-end;
@@ -701,13 +712,13 @@
                     }
                     &.cur {
                         .txt {
-                            color: #CD3434;
+                            color: #F49A51;
                         }
                         .sub {
-                            color: #CD3434;
+                            color: #F49A51;
                         }
                         .input-placeholder {
-                            color: #CD3434;
+                            color: #F49A51;
                         }
                     }
                 }

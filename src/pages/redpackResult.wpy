@@ -32,7 +32,7 @@
                     <image class="icon" src="../img/icon-hongbao.png"></image>
                     我要出题
                 </button>
-                <button plain="true" class="li" open-type="share" wx:if="{{serviveCard.shared===1}}">
+                <button plain="true" class="li" @tap="shareHandler" wx:if="{{serviveCard.shared===1}}">
                     <image class="icon" src="../img/icon-fenxiang.png"></image>
                     分享
                 </button>
@@ -40,7 +40,7 @@
         </view>
         <view class="desc">
             共
-            <text class="b">{{totalFee}}</text>
+            <text class="b">{{sendedFee}}</text>
             元，已被
             <text class="b">{{totalCount}}</text>
             位好友领取
@@ -96,7 +96,9 @@
             id: 0,
             myInfo: {},
             authorInfo: {},
+            detail: {},
             totalFee: 0,
+            sendedFee: 0,
             totalCount: 0,
             detailList: [],
             serviveCard: {},
@@ -134,6 +136,9 @@
                     url: 'index'
                 })
             },
+            shareHandler(){
+                this.saveShareImage();
+            },
             async buyServiveCard() {
                 if (!this.taped) {
                     this.taped = true;
@@ -163,7 +168,9 @@
             if (res._ok) {
                 this.myInfo = res.myModel;
                 this.authorInfo = res.authorModel;
+                this.detail = res.detailMap;
                 this.totalFee = isNaN(res.detailMap.totalFee) ? '0.00' : Number(res.detailMap.totalFee).toFixed(2);
+                this.sendedFee = isNaN(res.detailMap.sendedFee) ? '0.00' : Number(res.detailMap.sendedFee).toFixed(2);
                 this.totalCount = res.detailMap.totalCount;
                 this.detailList = res.detailMap.detailList;
                 this.serviveCard = res.serviveCard;
@@ -185,19 +192,19 @@
 
         resultImage() {
             if (this.myInfo.intimacy < 30) {
-                return '../img//result-5.png';
+                return '../img/share-intimacy-5.png';
             }
             if (this.myInfo.intimacy < 55) {
-                return '../img//result-4.png';
+                return '../img/share-intimacy-4.png';
             }
             if (this.myInfo.intimacy < 80) {
-                return '../img//result-3.png';
+                return '../img/share-intimacy-3.png';
             }
             if (this.myInfo.intimacy < 99) {
-                return '../img//result-2.png';
+                return '../img/share-intimacy-2.png';
             }
             if (this.myInfo.intimacy == 100) {
-                return '../img//result-1.png';
+                return '../img/share-intimacy-1.png';
             }
         }
 
@@ -208,12 +215,12 @@
         }
 
         async saveShareImage() {
-//            this.saveing = true;
             wx.showLoading({
                 title: '图片生成中',
                 mask: true
             })
             const userImage = await wepy.downloadFile({url: this.myInfo.headPicURL})
+            const authorImage = await wepy.downloadFile({url: this.authorInfo.userHeadPic})
 
 
             const ctx = wx.createCanvasContext('shareCanvas')
@@ -221,7 +228,10 @@
             const halfX = 187.5;
             ctx.setTextBaseline('top')
             //  绘制背景
-            ctx.drawImage('../img/share-intimacy.png', 0, 0, 375, 667)
+            let resultImage = this.resultImage();
+            ctx.drawImage(resultImage, 0, 0, 375, 667)
+
+            let cardTop = 168;
 
             //  绘制头像
             ctx.save()
@@ -245,29 +255,44 @@
             ctx.setFillStyle('#ffffff')
             ctx.setFontSize(15)
             ctx.setTextAlign('center')
-            ctx.fillText(`我答对 ${this.totalCount} 题 获得 ${this.totalFee} 元红包`, halfX, yOffset);
+            ctx.fillText(`我答对 ${this.myInfo.correctCount} 题 获得 ${this.myInfo.receiveFee} 元红包`, halfX, yOffset);
             yOffset += 20;  //元素高度
 
-            //  绘制动图
-            let resultImage = this.resultImage()
-            ctx.drawImage('../img/result-demo.jpg', halfX - 123.75, 169, 247.5, 300)
 
             //  绘制分数
             ctx.setFillStyle('#ffffff')
             ctx.setFontSize(47)
-            ctx.fillText(this.myInfo.intimacy, halfX, 328);
+            ctx.fillText(this.myInfo.intimacy, halfX, cardTop + 165);
             ctx.setFontSize(20)
-            ctx.fillText('分', halfX + 52, 356);
+            ctx.fillText('分', halfX + 52, cardTop + 193);
             //  绘制称号
             ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(16)
+            ctx.setFontSize(18)
             ctx.setTextAlign('center')
-            DrawCanvas.drawText(ctx, '“' + this.myInfo.intimacy_des + '”', halfX, 414, 40)
+            ctx.fillText('“' + this.myInfo.intimacy_des + '”', halfX, cardTop + 251);
 
+            //  绘制左头像（自己）
+            let headTop = cardTop + 168;
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(62, headTop + 29, 29, 0, 2 * Math.PI)
+            ctx.closePath();
+            ctx.clip()
+            ctx.drawImage(userImage.tempFilePath, 62 - 29, headTop, 58, 58)
+            yOffset += 50;  //元素高度
+            ctx.restore()
 
+            //  绘制右头像
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(308, headTop + 29, 29, 0, 2 * Math.PI)
+            ctx.closePath();
+            ctx.clip()
+            ctx.drawImage(authorImage.tempFilePath, 308 - 29, headTop, 58, 58)
+            yOffset += 50;  //元素高度
+            ctx.restore()
             ctx.draw();
             DrawCanvas.canvasToSave('shareCanvas');
-//            this.saveing = false;
         }
 
         async onLoad(e) {
@@ -511,6 +536,7 @@
             width: 375px;
             height: 667px;
             left: 0;
+            /*top: 0px;*/
             top: -9999px;
         }
     }

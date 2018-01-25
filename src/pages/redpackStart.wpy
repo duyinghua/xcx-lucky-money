@@ -13,11 +13,11 @@
                     <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
                 </view>
             </view>
-            <view class="question {{!issueList[curIssIndex].question.picURL?'no-pic':''}}">
-                {{issueList[curIssIndex].question.content}}
-            </view>
             <view class="picture" hidden="{{!issueList[curIssIndex].question.picURL}}">
                 <image mode="aspectFill" class="img" src="{{issueList[curIssIndex].question.picURL}}"></image>
+            </view>
+            <view class="question {{!issueList[curIssIndex].question.picURL?'no-pic':''}}">
+                {{issueList[curIssIndex].question.content}}
             </view>
             <view class="answer">
                 <view
@@ -34,12 +34,14 @@
                     <view>{{amountLite}}元</view>
                 </view>
             </view>
-            <view class="mask" wx:if="{{!hideMask}}" @tap="closeMask">
+            <view class="mask" wx:if="{{!hideMask}}">
                 <view class="card">
-                    <image class="photo"
-                           src="{{userPhoto}}"></image>
+                    <image class="photo" src="{{userPhoto}}"></image>
                     <view class="name">{{userName}}</view>
                     <view class="desc">发出的年终亲密大考验</view>
+                    <button plain="true" class="button" @tap="closeMask">
+                        <image class="img" src="../img/start-btn.png"></image>
+                    </button>
                 </view>
             </view>
         </view>
@@ -339,14 +341,14 @@
                 }
             }
             .question {
-                margin-top: unit(56, rpx);
                 font-size: unit(32, rpx);
+                margin: unit(36, rpx) auto 0;
                 &.no-pic {
                     margin: unit(160, rpx) 0;
                 }
             }
             .picture {
-                margin: unit(36, rpx) auto 0;
+                margin-top: unit(56, rpx);
                 width: unit(558, rpx);
                 height: unit(336, rpx);
                 background: #CC4242;
@@ -413,8 +415,8 @@
                 align-items: center;
                 justify-content: center;
                 .card {
-                    width: unit(420, rpx);
-                    height: unit(368, rpx);
+                    width: unit(419, rpx);
+                    height: unit(366, rpx);
                     border-radius: unit(16, rpx);
                     background: #CC4242;
                     color: #FFF;
@@ -423,7 +425,7 @@
                     box-sizing: border-box;
                     transform: translateY(-36%);
                     .photo {
-                        margin-top: unit(68, rpx);
+                        margin-top: unit(26, rpx);
                         width: unit(88, rpx);
                         height: unit(88, rpx);
                         border-radius: unit(92, rpx);
@@ -435,11 +437,20 @@
                         white-space: nowrap;
                         font-size: unit(32, rpx);
                         font-weight: bold;
-                        margin-top: unit(10, rpx);
                     }
                     .desc {
                         font-size: unit(26, rpx);
-                        margin-top: unit(30, rpx);
+                        margin-top: unit(6, rpx);
+                    }
+                    .button {
+                        width: unit(225, rpx);
+                        height: unit(78, rpx);
+                        padding: 0;
+                        margin: unit(30, rpx) auto 0;
+                        .img {
+                            width: unit(225, rpx);
+                            height: unit(78, rpx);
+                        }
                     }
                 }
             }

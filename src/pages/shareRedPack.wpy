@@ -230,7 +230,6 @@
         }
 
         onShareAppMessage() {
-            let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.shareInfo[0],
                 path: `pages/redpackStart?id=${this.id}`,
@@ -277,7 +276,7 @@
                 position: relative;
                 width: unit(275, rpx);
                 height: unit(278, rpx);
-                margin: unit(60, rpx) auto 0;
+                margin: unit(90, rpx) auto 0;
                 .bg {
                     position: absolute;
                     left: 0;
@@ -296,7 +295,7 @@
                 }
             }
             .buttons {
-                margin-top: unit(166, rpx);
+                margin-top: unit(136, rpx);
                 display: flex;
                 justify-content: space-between;
                 .button {

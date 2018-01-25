@@ -27,10 +27,10 @@
                 </button>
             </view>
         </view>
-        <view class="tip" wx:if="{{incompleteId}}">
+        <!--<view class="tip" wx:if="{{incompleteId}}">
             <text class="span">您有未完成红包，请 </text>
             <text class="span red" @tap="gameRestart">继续出题</text>
-        </view>
+        </view>-->
 
     </view>
 </template>
@@ -50,10 +50,16 @@
         data = {
             headPhoto: '',
             amount: '',
-            paying: false,
             incompleteId: 0,
             taped: false
         }
+
+        clearData() {
+            this.amount = '';
+            this.incompleteId = 0;
+            this.taped = false
+        }
+
         computed = {
             /*serviceFee(){
              let res = 0;
@@ -96,9 +102,12 @@
                 this.$apply();
             },
             async gameStart(){
-                //todo
-                this.recharge(this.amount);
+                await this.incompleteRedPack();
+                if (!this.incompleteId) {
+                    //todo
+                    this.recharge(this.amount);
 //                this.buyRedPackage();
+                }
             },
             gameRestart(){
                 wx.navigateTo({
@@ -124,7 +133,6 @@
                 });
                 if (res._ok) {
                     let payParam = res.weixinpayParamLite || {};
-                    this.paying = true;
                     let payRes = await wxRequestPayment(payParam);
                     if (payRes) {
                         let rrr = await http.post(apis.rechargeResult, {
@@ -136,7 +144,6 @@
                             }
                         }
                     }
-                    this.paying = false
                 }
                 this.taped = false;
             }
@@ -161,9 +168,9 @@
                 if (res.redPackageID) {
                     this.incompleteId = res.redPackageID;
                     wx.showModal({
-                        content: '你有一个未完成红包，需要先完成出题',
+                        content: '您有一个未完成红包，需要先完成出题',
                         confirmText: '继续出题',
-                        cancelText: '先等等',
+                        showCancel: false,
                         success: wres => {
                             if (wres.confirm) {
                                 wx.navigateTo({
@@ -186,11 +193,8 @@
 
         }
 
-        async onShow() {
-            await utils.sleep(0.5);
-            if (!this.paying) {
-                this.incompleteRedPack();
-            }
+        onShow() {
+            this.clearData();
         }
 
         onPullDownRefresh() {
