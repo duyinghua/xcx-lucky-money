@@ -14,13 +14,12 @@
                     <text class="unit">分</text>
                 </view>
                 <view class="remark">{{myInfo.intimacy_des?'“'+myInfo.intimacy_des+'”':''}}</view>
+                <image class="stamp" src="../img/stamp.png"></image>
                 <view class="left-photo">
-                    <image class="photo"
-                           src="{{myInfo.headPicURL}}"></image>
+                    <image class="photo" src="{{myInfo.headPicURL}}"></image>
                 </view>
                 <view class="right-photo">
-                    <image class="photo"
-                           src="{{authorInfo.userHeadPic}}"></image>
+                    <image class="photo" src="{{authorInfo.userHeadPic}}"></image>
                 </view>
             </view>
             <view class="ctrl {{serviveCard.shared===1?'':'ctrl2'}}">
@@ -46,7 +45,7 @@
             位好友领取
         </view>
         <view class="list">
-            <view class="li" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
+            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
                 <view class="photo">
                     <image class="img" mode="widthFix"
                            src="{{item.headPicURL}}"></image>
@@ -100,6 +99,7 @@
             totalFee: 0,
             sendedFee: 0,
             totalCount: 0,
+            maxFee: 0,
             detailList: [],
             serviveCard: {},
             taped: false,
@@ -174,6 +174,7 @@
                 this.sendedFee = isNaN(res.detailMap.sendedFee) ? '0.00' : Number(res.detailMap.sendedFee).toFixed(2);
                 this.totalCount = res.detailMap.totalCount;
                 this.detailList = res.detailMap.detailList;
+                this.maxFee = res.detailMap.maxRedpackageFee;
                 this.serviveCard = res.serviveCard;
                 this.$apply();
             }
@@ -376,7 +377,14 @@
                 .remark {
                     margin: unit(40, rpx) unit(40, rpx) 0;
                     text-align: center;
-                    font-size: unit(32, rpx);
+                    font-size: unit(36, rpx);
+                }
+                .stamp{
+                    position: absolute;
+                    width: unit(140, rpx);
+                    height: unit(100, rpx);
+                    right: unit(20, rpx);
+                    bottom: unit(50, rpx);
                 }
                 .left-photo {
                     position: absolute;
@@ -487,7 +495,7 @@
                     }
 
                 }
-                &:first-child {
+                &.light {
                     .amount {
                         color: #FFB411;
                     }

@@ -165,61 +165,6 @@
             let res = await http.post(apis.questionList, {
                 redPackageID: this.id
             });
-            /*res = {
-             _ok: 1,
-             "code": 0,
-             "userName": "王骆",
-             "headPicURL": "https://wx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIk9ZLV5zQ3DRAwJ285kI0DaibccWv2KibjTM8HiaNuKeOuhmylCJ9m8t7jII0iaxUDsRHqMicljlSBQRw/0",
-             qaList: [{
-             "question": {
-             "id": 1,
-             "content": '我最喜欢吃的水果是什么',
-             "authorUserID": 123,
-             "picURL": 'https://si.geilicdn.com/fxx_26cb6f2d28d9d414067f16bfeceeb7ab.jpg?w=160&h=160&zm=3'
-             },
-             "answerList": [{
-             "id": 1,
-             "content": '樱桃',
-             "isRight": 0
-             }, {
-             "id": 2,
-             "content": '黄桃',
-             "isRight": 0
-             }, {
-             "id": 3,
-             "content": '荔枝',
-             "isRight": 0
-             }, {
-             "id": 4,
-             "content": '山竹',
-             "isRight": 1
-             }]
-             }, {
-             "question": {
-             "id": 11,
-             "content": '我最喜欢什么样的宠物',
-             "authorUserID": 123,
-             "picURL": ''
-             },
-             "answerList": [{
-             "id": 11,
-             "content": '好看的',
-             "isRight": 0
-             }, {
-             "id": 12,
-             "content": '好养的',
-             "isRight": 1
-             }, {
-             "id": 13,
-             "content": '啥也不喜欢',
-             "isRight": 0
-             }, {
-             "id": 14,
-             "content": '不知道',
-             "isRight": 0
-             }]
-             }]
-             }*/
             if (res._ok) {
 
                 this.userName = res.userName;

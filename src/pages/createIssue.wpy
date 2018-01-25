@@ -18,14 +18,11 @@
                     <view class="iss-list">
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
-
-                                <view class="picture" @tap="uploadImage">
-                                    <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="img" mode="aspectFill"
-                                           src="{{issueList[curIssIndex].question.picURL}}"></image>
-                                    <block wx:else>
-                                        <image class="add-img" src="../img/picture-add.png"></image>
-                                        <text class="add-desc">添加照片</text>
-                                    </block>
+                                <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="picture-img" mode="widthFix"
+                                       src="{{issueList[curIssIndex].question.picURL}}" @tap="uploadImage"></image>
+                                <view wx:else class="picture" @tap="uploadImage">
+                                    <image class="add-img" src="../img/picture-add.png"></image>
+                                    <text class="add-desc">添加照片</text>
                                 </view>
                                 <!--<view class="picture">
                                     <image class="img" mode="aspectFill"
@@ -56,13 +53,11 @@
                                 </view>
                             </view>
                             <view hidden="{{curTab!=2}}">
-                                <view class="picture" @tap="uploadImage">
-                                    <image wx:if="{{issueDiy.question.picURL}}" class="img" mode="aspectFill"
-                                           src="{{issueDiy.question.picURL}}"></image>
-                                    <block wx:else>
-                                        <image class="add-img" src="../img/picture-add.png"></image>
-                                        <text class="add-desc">添加照片</text>
-                                    </block>
+                                <image wx:if="{{issueDiy.question.picURL}}" class="picture-img" mode="widthFix"
+                                       src="{{issueDiy.question.picURL}}" @tap="uploadImage"></image>
+                                <view wx:else class="picture" @tap="uploadImage">
+                                    <image class="add-img" src="../img/picture-add.png"></image>
+                                    <text class="add-desc">添加照片</text>
                                 </view>
                                 <view class="qsn-input">
                                     <view class="qsn">
@@ -667,6 +662,11 @@
 
                 }
             }
+            .picture-img {
+                width: unit(558, rpx);
+                height: 0;
+                max-height: unit(558, rpx);
+            }
             .picture {
                 display: flex;
                 justify-content: center;
@@ -676,10 +676,6 @@
                 height: unit(336, rpx);
                 margin: 0 auto;
                 background: #FAFAFA;
-                .img {
-                    width: 100%;
-                    height: 100%;
-                }
                 .add-img {
                     width: unit(70, rpx);
                     height: unit(70, rpx);

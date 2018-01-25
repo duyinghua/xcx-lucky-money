@@ -32,7 +32,7 @@
             </view>
         </view>
         <view class="list">
-            <view class="li" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{item.index}}">
+            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{item.index}}">
                 <view class="photo">
                     <image class="img" mode="widthFix" src="{{item.headPicURL}}"></image>
                 </view>
@@ -67,6 +67,7 @@
             totalFee: 0,
             sendedFee: 0,
             totalCount: 0,
+            maxFee: 0,
             detailList: [],
             isLast: false
         }
@@ -108,6 +109,7 @@
                         this.totalFee = isNaN(res.totalFee) ? '0.00' : Number(res.totalFee).toFixed(2);
                         this.sendedFee = isNaN(res.sendedFee) ? '0.00' : Number(res.sendedFee).toFixed(2);
                         this.totalCount = res.totalCount;
+                        this.maxFee = res.maxRedpackageFee;
                     }
                     if (res.detailList.length) {
                         this.detailList = this.detailList.concat(res.detailList);
@@ -254,7 +256,7 @@
                     }
 
                 }
-                &:first-child {
+                &.light {
                     .amount {
                         color: #CD3434;
                     }
