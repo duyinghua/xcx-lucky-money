@@ -18,8 +18,10 @@
                     <view class="iss-list">
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
-                                <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="picture-img" mode="widthFix"
-                                       src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}" @tap="uploadImage"></image>
+                                <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="picture-img"
+                                       mode="widthFix"
+                                       src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}"
+                                       @tap="uploadImage"></image>
                                 <view wx:else class="picture" @tap="uploadImage">
                                     <image class="add-img" src="../img/picture-add.png"></image>
                                     <text class="add-desc">添加照片</text>
@@ -42,7 +44,9 @@
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn change-btn {{curIssIndex<issueList.length-1?'disabled':''}}" disabled="{{curIssIndex<issueList.length-1}}" @tap="changeQuestion">
+                                    <button plain="true"
+                                            class="btn change-btn {{curIssIndex<issueList.length-1?'disabled':''}}"
+                                            disabled="{{curIssIndex<issueList.length-1}}" @tap="changeQuestion">
                                         换一题
                                     </button>
                                     <button plain="true"
@@ -265,7 +269,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async() => {
+            confirmQuestion: utils.debounce(async () => {
                 let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
                 let msg = this.checkIssue(curIssue);
                 if (msg) {
@@ -326,6 +330,10 @@
                             curIssue.question.picURL = res2.imageURL;
                             curIssue.complete = !this.checkIssue(curIssue);
                             this.$apply();
+                            this.getWxPage().setData({
+                                issueList: this.issueList,
+                                issueDiy: this.issueDiy
+                            });
                             wx.hideLoading();
                         }, (error) => {
                             console.log('error: ' + error);
@@ -666,7 +674,7 @@
             }
             .picture-img {
                 width: unit(558, rpx);
-                height: 0;
+                height: unit(336, rpx);
             }
             .picture {
                 display: flex;
