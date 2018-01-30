@@ -13,7 +13,7 @@
                     <text class="value">{{myInfo.intimacy}}</text>
                     <text class="unit">分</text>
                 </view>
-                <view class="remark">{{myInfo.intimacy_des?'“'+myInfo.intimacy_des+'”':''}}</view>
+                <view class="remark">{{myInfo.intimacy_des ? '“' + myInfo.intimacy_des + '”' : ''}}</view>
                 <image class="stamp" src="../img/stamp.png"></image>
                 <view class="left-photo">
                     <image class="photo" src="{{myInfo.headPicURL}}"></image>
@@ -45,7 +45,8 @@
             位好友领取
         </view>
         <view class="list">
-            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
+            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
+                  wx:for-index="index" wx:key="{{index}}">
                 <view class="photo">
                     <image class="img" mode="widthFix"
                            src="{{item.headPicURL}}"></image>
@@ -62,11 +63,22 @@
                 </view>
             </view>
         </view>
+        <view wx:if="{{showShareBar}}"
+              class="share-bar {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'up':''}}">
+            <button plain="true" class="button share-friend" open-type="share">
+                <image class="icon" src="../img/icon-fenxiang.png"></image>
+                转发
+            </button>
+            <button plain="true" class="button share-timeline" @tap="shareTimeline">
+                <image class="icon" src="../img/icon-fenxiang.png"></image>
+                发朋友圈
+            </button>
+        </view>
         <view class="banner" wx:if="{{serviveCard.leftServiveTime&&myInfo.intimacy!=100}}">
             <image class="revive" mode="widthFix" src="../img/revive.png"></image>
             <block wx:if="{{serviveCard.shared===0}}">
                 <view class="txt">分享获得复活卡</view>
-                <button plain="true" class="button" open-type="share">分享</button>
+                <button plain="true" class="button" @tap="shareHandler">分享</button>
             </block>
             <block wx:elif="{{serviveCard.shared===1}}">
                 <view class="txt">购买复活卡(最多{{serviveCard.leftServiveTime}}次)</view>
@@ -102,6 +114,7 @@
             maxFee: 0,
             detailList: [],
             serviveCard: {},
+            showShareBar: false,
             taped: false,
             saveing: false
         }
@@ -137,7 +150,12 @@
                 })
             },
             shareHandler(){
-                this.saveShareImage();
+                this.showShareBar = true;
+                this.$apply();
+            },
+            async shareTimeline(){
+                await this.shareRelive();
+                await this.saveShareImage();
             },
             async buyServiveCard() {
                 if (!this.taped) {
@@ -148,7 +166,7 @@
                         })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async() => {
+                        wxRequestPayment(payParam, async () => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
                             });
@@ -172,7 +190,7 @@
                         content: '已结束',
                         confirmText: '确定',
                         showCancel: false,
-                        success: ()=> {
+                        success: () => {
                             wx.switchTab({
                                 url: 'index'
                             });
@@ -205,6 +223,17 @@
             })
         }
 
+        async shareRelive() {
+            if (this.serviveCard.shared === 0) {
+                let res = await  http.post(apis.relive, {
+                    redPackageID: this.id,
+                });
+                if (res._ok) {
+                    this.relive();
+                }
+            }
+        }
+
         resultImage() {
             if (this.myInfo.intimacy < 30) {
                 return '../img/share-intimacy-5.png';
@@ -230,6 +259,8 @@
         }
 
         async saveShareImage() {
+            this.showShareBar = false;
+            this.$apply();
             wx.showLoading({
                 title: '图片生成中',
                 mask: true
@@ -273,18 +304,20 @@
                 yOffset += 20;  //元素高度
             }
 
-
             //  绘制分数
             ctx.setFillStyle('#ffffff')
             ctx.setFontSize(47)
             ctx.fillText(this.myInfo.intimacy, halfX, cardTop + 170);
             ctx.setFontSize(20)
             ctx.fillText('分', halfX + 52, cardTop + 193);
+            //  绘制称号盖章
+            ctx.drawImage('../img/share-stamp.png', halfX + 46, cardTop + 240, 70, 50);
             //  绘制称号
             ctx.setFillStyle('#ffffff')
             ctx.setFontSize(18)
             ctx.setTextAlign('center')
             ctx.fillText('“' + this.myInfo.intimacy_des + '”', halfX, cardTop + 251);
+
 
             //  绘制左头像（自己）
             let headTop = cardTop + 168;
@@ -296,8 +329,6 @@
             ctx.drawImage(userImage.tempFilePath, 62 - 29, headTop, 58, 58)
             yOffset += 50;  //元素高度
             ctx.restore();
-
-
             //  绘制右头像
             ctx.save()
             ctx.beginPath()
@@ -320,21 +351,15 @@
         }
 
         onShareAppMessage() {
+            this.showShareBar = false;
+            this.$apply();
             let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.shareInfo[rand],
                 path: 'pages/index',
                 imageUrl: `../img/share-title${rand}.png`,
-                success: async() => {
-                    if (this.serviveCard.shared === 0) {
-                        let res = await
-                            http.post(apis.relive, {
-                                redPackageID: this.id,
-                            });
-                        if (res._ok) {
-                            this.relive();
-                        }
-                    }
+                success: async () => {
+                    await this.shareRelive();
                 }
             }
         }
@@ -514,6 +539,38 @@
                 }
             }
         }
+        .share-bar {
+            display: flex;
+            position: fixed;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 unit(120, rpx);
+            width: 100%;
+            height: unit(110, rpx);
+            left: 0;
+            bottom: 0;
+            z-index: 1;
+            background: #F49A51;
+            box-sizing: border-box;
+            &.up {
+                bottom: unit(117, rpx);
+            }
+            .button {
+                display: flex;
+                align-items: center;
+                margin: 0;
+                padding: 0 unit(30, rpx);
+                font-size: unit(30, rpx);
+                color: #FFF;
+                height: 100%;
+                line-height: normal;
+                .icon {
+                    width: unit(32, rpx);
+                    height: unit(32, rpx);
+                    margin-right: unit(16, rpx);
+                }
+            }
+        }
         .banner {
             position: fixed;
             width: 100%;
@@ -522,6 +579,7 @@
             bottom: 0;
             z-index: 1;
             background: #F49A51;
+            border-top: unit(1, rpx) solid #D68844;
             display: flex;
             align-items: center;
             padding: 0 unit(30, rpx);

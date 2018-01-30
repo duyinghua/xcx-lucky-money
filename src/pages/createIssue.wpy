@@ -298,14 +298,14 @@
                     } else {
                         wx.showModal({
                             content: '出题成功',
-                            cancelText: '增加1题',
-                            confirmText: '完成出题',
+                            cancelText: '完成出题',
+                            confirmText: '增加1题',
                             confirmColor: '#CD3434',
                             success: res => {
                                 if (res.confirm) {
-                                    this.finishQuestion();
-                                } else {
                                     this.addQuestion()
+                                } else {
+                                    this.finishQuestion();
                                 }
                             }
                         });

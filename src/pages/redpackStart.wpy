@@ -14,7 +14,8 @@
                 </view>
             </view>
             <view hidden="{{!issueList[curIssIndex].question.picURL}}">
-                <image mode="widthFix" class="picture" src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}"></image>
+                <image mode="widthFix" class="picture"
+                       src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}"></image>
             </view>
             <view class="question {{!issueList[curIssIndex].question.picURL?'no-pic':''}}">
                 {{issueList[curIssIndex].question.content}}
@@ -131,25 +132,24 @@
                         animation.opacity(0).translate('-50%', 0).step();
                         this.redpackAnimation = animation.export();
                         this.$apply();
-                        //下一题
-                        this.amountLite = 0;
-                        if (this.curIssIndex == this.issueList.length - 1) {
-                            //冲顶成功！
-                            wx.redirectTo({
-                                url: `redpackResult?id=${this.id}`
-                            })
-                        } else {
-                            this.canAnswer = false;
-                            this.curIssIndex++;
-                            this.$apply();
-                            await utils.sleep(this.delayAnswer);
-                            this.canAnswer = true;
-                        }
                     } else {
-                        await utils.sleep(0.8);
+//                        wx.redirectTo({
+//                            url: `redpackResult?id=${this.id}`//&questionId=${curIssue.question.id}
+//                        })
+                    }
+                    //下一题
+                    this.amountLite = 0;
+                    if (this.curIssIndex == this.issueList.length - 1) {
+                        //冲顶成功！
                         wx.redirectTo({
-                            url: `redpackResult?id=${this.id}`//&questionId=${curIssue.question.id}
+                            url: `redpackResult?id=${this.id}`
                         })
+                    } else {
+                        this.canAnswer = false;
+                        this.curIssIndex++;
+                        this.$apply();
+                        await utils.sleep(this.delayAnswer);
+                        this.canAnswer = true;
                     }
                 }
             }
@@ -165,10 +165,9 @@
         }
 
         async getQuestionList() {
-            let res = await
-                http.post(apis.questionList, {
-                    redPackageID: this.id
-                });
+            let res = await http.post(apis.questionList, {
+                redPackageID: this.id
+            });
             if (res._ok) {
 
                 this.userName = res.userName;
