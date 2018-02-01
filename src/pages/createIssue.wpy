@@ -33,7 +33,7 @@
                                 <view class="qsn-input">
                                     {{issueList[curIssIndex].question.content}}
                                 </view>
-                                <view class="tip">tips：答案可修改</view>
+                                <view class="tip">(答案可点击修改)</view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}"
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
@@ -108,6 +108,7 @@
             id: 0,
             recover: 0,
             curTab: 1,
+            type: 0,
             issueList: [],
             curIssIndex: 0,
             issScrollLeft: 0,
@@ -140,6 +141,7 @@
 
         clearData() {
             this.curTab = 1;
+            this.type = 0;
             this.issueList = [];
             this.curIssIndex = 0;
             this.issScrollLeft = 0;
@@ -541,6 +543,7 @@
         async onLoad(e) {
             this.clearData();
             this.id = e.id;
+            this.type = e.type || 1;
             this.recover = e.recover || 0;
             if (this.recover) {
                 await this.incompleteRedPack();

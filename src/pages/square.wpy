@@ -17,7 +17,7 @@
                 </view>
                 <view class="info">
                     <view class="center">
-                        <view class="name">{{item.authorUserID}}</view>
+                        <view class="name">{{item.authorUserName}}</view>
                         <view class="count">{{item.questionCount}}道题</view>
                     </view>
                     <view class="right">

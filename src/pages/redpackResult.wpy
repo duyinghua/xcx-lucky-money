@@ -8,7 +8,7 @@
                 元红包
             </view>
             <view class="result"
-                  style="background: url(http://redpackagelite.static.immocha.com/wxlite/result-{{myInfo.level}}-20180125.png) no-repeat center top / cover">
+                  style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
                 <view class="score">
                     <text class="value">{{myInfo.intimacy}}</text>
                     <text class="unit">分</text>
@@ -43,6 +43,7 @@
             元，已被
             <text class="b">{{totalCount}}</text>
             位好友领取
+            <view class="more" @tap="toSquare">抢更多红包></view>
         </view>
         <view class="list">
             <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
@@ -133,6 +134,11 @@
             shareHandler(){
                 this.showShareBar = true;
                 this.$apply();
+            },
+            toSquare(){
+                wx.switchTab({
+                    url: 'square'
+                })
             },
             async shareTimeline(){
                 await this.shareRelive();
@@ -441,6 +447,9 @@
             box-shadow: 0 -1px 2px #B61010;
             b {
                 font-weight: bold;
+            }
+            .more {
+                float: right;
             }
         }
         .list {

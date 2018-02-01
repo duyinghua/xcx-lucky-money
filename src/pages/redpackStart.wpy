@@ -136,6 +136,7 @@
 //                        wx.redirectTo({
 //                            url: `redpackResult?id=${this.id}`//&questionId=${curIssue.question.id}
 //                        })
+                        await utils.sleep(1.2);
                     }
                     //下一题
                     this.amountLite = 0;

@@ -26,9 +26,8 @@
                 <view class="red">{{sendedFee}}</view>
                 元
             </view>
-            <view class="explain" @tap="explain">
-                <image class="icon" src="../img/icon-wh.png"></image>
-                玩法说明
+            <view class="explain" @tap="more">
+                抢更多红包>
             </view>
         </view>
         <view class="list">
@@ -72,9 +71,9 @@
             isLast: false
         }
         methods = {
-            explain(){
-                wx.navigateTo({
-                    url: 'qa'
+            more(){
+                wx.switchTab({
+                    url: 'square'
                 })
             },
             extractHandler(){

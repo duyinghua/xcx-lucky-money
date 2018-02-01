@@ -300,8 +300,10 @@
                 }
             }
             .link-home {
+                position: relative;
+                z-index: 2;
                 margin-top: unit(100, rpx);
-                font-size: unit(24, rpx);
+                font-size: unit(28, rpx);
                 text-align: center;
                 color: #FFF;
                 line-height: unit(40, rpx);

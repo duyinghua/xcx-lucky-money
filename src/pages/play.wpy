@@ -155,7 +155,7 @@
                         }
                         if (this.incompleteId) {
                             wx.navigateTo({
-                                url: 'createIssue?id=' + this.incompleteId
+                                url: 'createIssue?type=' + this.type + '&id=' + this.incompleteId
                             })
                         }
 //                        let rrr = await http.post(apis.rechargeResult, {
