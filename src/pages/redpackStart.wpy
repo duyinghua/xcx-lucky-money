@@ -72,7 +72,7 @@
             userName: '',
             userPhoto: '',
             curIssIndex: 0,
-            latestWrongQuestionID: 0,
+            beRelived: 0,
             qiniuClip: '',
             delayAnswer: 0.6,
             canAnswer: false //延迟答题，防止误点
@@ -87,7 +87,7 @@
             this.userName = '';
             this.userPhoto = '';
             this.curIssIndex = 0;
-            this.latestWrongQuestionID = 0;
+            this.beRelived = 0;
             this.delayAnswer = 0.6;
             this.canAnswer = false //延迟答题，防止误点
         }
@@ -174,14 +174,14 @@
                 this.userPhoto = res.headPicURL;
                 this.issueList = res.qaList;
 
-                if (res.lastQuestionID) { //恢复答题现场
-                    this.issueList.some((item, idx) => {
-                        if (item.question.id == res.lastQuestionID) {
-                            this.curIssIndex = idx;
-                            return true;
-                        }
-                    });
-                }
+//                if (res.lastQuestionID) { //恢复答题现场 qalist里只有未的答题，lastQuestionID就没必要了
+//                    this.issueList.some((item, idx) => {
+//                        if (item.question.id == res.lastQuestionID) {
+//                            this.curIssIndex = idx;
+//                            return true;
+//                        }
+//                    });
+//                }
                 this.$apply();
             }
         }
@@ -191,7 +191,7 @@
                 redPackageID: this.id,
                 questionID: qid,
                 answerID: aid,
-                isConsumeCard: this.latestWrongQuestionID == qid ? 1 : 0
+                isConsumeCard: (this.beRelived && (this.curIssIndex == 0)) ? 1 : 0
             });
             if (res._ok) {
                 this.amountLite = res.fee ? Number(res.fee).toFixed(2) : 0;
@@ -208,7 +208,7 @@
             this.qiniuClip = wepy.$instance.globalData.config.questionPicURLPostfix;
             await login.doLogin();
             //  先判断这个人能否答题，如果已经答过，去结果页。
-            // 1 红包不存在 2不能自问自答 3只能用复活卡才能继续答题 4你已经领取过红包啦
+            // 1 红包不存在 2不能自问自答 3 old只能用复活卡才能继续答题 4你已经领取过红包啦 5 超时 6 领取完红包 7 new 答完了，没有全部答对
             let canRes = await this.canIAnswer();
             if (canRes.statusCode === 0) {
                 this.canAnswer = true;
@@ -217,18 +217,8 @@
                 wx.redirectTo({
                     url: 'sendDetail?id=' + this.id
                 })
-            } else if (canRes.statusCode === 3) {
-                let res = await http.post(apis.servivecard, {
-                    redPackageID: this.id,
-                });
-                if (res._ok && ~res._result.indexOf(canRes.latestWrongQuestionID)) {
-                    this.canAnswer = true;
-                    this.latestWrongQuestionID = canRes.latestWrongQuestionID
-                } else {
-                    wx.redirectTo({
-                        url: `redpackResult?id=${this.id}`
-                    })
-                }
+            } else if (canRes.statusCode === 7) { //消费复活卡
+                this.beRelived = 1
             } else {
                 wx.redirectTo({
                     url: `redpackResult?id=${this.id}`

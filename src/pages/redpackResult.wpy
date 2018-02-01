@@ -8,7 +8,7 @@
                 元红包
             </view>
             <view class="result"
-                  style="{{intimacyPicture}}">
+                  style="background: url(http://redpackagelite.static.immocha.com/wxlite/result-{{myInfo.level}}-20180125.png) no-repeat center top / cover">
                 <view class="score">
                     <text class="value">{{myInfo.intimacy}}</text>
                     <text class="unit">分</text>
@@ -57,7 +57,7 @@
                         <view class="amount">￥{{item.receiveFee}}</view>
                     </view>
                     <view class="row">
-                        <view class="level">亲密值{{item.intimacy}}</view>
+                        <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
                         <view class="datetime">{{item.createTime}}</view>
                     </view>
                 </view>
@@ -70,7 +70,7 @@
                 转发
             </button>
             <button plain="true" class="button share-timeline" @tap="shareTimeline">
-                <image class="icon" src="../img/icon-fenxiang.png"></image>
+                <image class="icon" src="../img/icon-timeline.png"></image>
                 发朋友圈
             </button>
         </view>
@@ -118,26 +118,7 @@
             taped: false,
             saveing: false
         }
-        computed = {
-            intimacyPicture(){
-                if (this.myInfo.intimacy < 30) {
-                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-5-20180125.png) no-repeat center top / cover';
-                }
-                if (this.myInfo.intimacy < 56) {
-                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-4-20180125.png) no-repeat center top / cover';
-                }
-                if (this.myInfo.intimacy < 80) {
-                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-3-20180125.png) no-repeat center top / cover';
-                }
-                if (this.myInfo.intimacy < 100) {
-                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-2-20180125.png) no-repeat center top / cover';
-                }
-                if (this.myInfo.intimacy == 100) {
-                    return 'background: url(http://redpackagelite.static.immocha.com/wxlite/result-1-20180125.png) no-repeat center top / cover';
-                }
-                return '';
-            }
-        }
+        computed = {}
         methods = {
             extractHandler(){
                 wx.switchTab({
@@ -146,7 +127,7 @@
             },
             createHandler(){
                 wx.switchTab({
-                    url: 'index'
+                    url: 'play'
                 })
             },
             shareHandler(){
@@ -192,7 +173,7 @@
                         showCancel: false,
                         success: () => {
                             wx.switchTab({
-                                url: 'index'
+                                url: 'play'
                             });
                         }
                     })
@@ -234,24 +215,6 @@
             }
         }
 
-        resultImage() {
-            if (this.myInfo.intimacy < 30) {
-                return '../img/share-intimacy-5.png';
-            }
-            if (this.myInfo.intimacy < 56) {
-                return '../img/share-intimacy-4.png';
-            }
-            if (this.myInfo.intimacy < 80) {
-                return '../img/share-intimacy-3.png';
-            }
-            if (this.myInfo.intimacy < 100) {
-                return '../img/share-intimacy-2.png';
-            }
-            if (this.myInfo.intimacy == 100) {
-                return '../img/share-intimacy-1.png';
-            }
-        }
-
         clearCanvas() {
             const ctx = wx.createCanvasContext('shareCanvas')
             ctx.clearRect(0, 0, 320, 469);
@@ -273,8 +236,7 @@
             const halfX = 187.5;
             ctx.setTextBaseline('top')
             //  绘制背景
-            let resultImage = this.resultImage();
-            ctx.drawImage(resultImage, 0, 0, 375, 592)
+            ctx.drawImage(`../img/share-intimacy-${this.myInfo.level}.png`, 0, 0, 375, 592)
 
             let cardTop = 93;
 

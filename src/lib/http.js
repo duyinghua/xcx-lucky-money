@@ -42,6 +42,7 @@ export default class HTTP {
                 }
             }
             authInfo = {
+                appVersion: '1.0',
                 tToken: userInfo.tToken,
                 cur_uid: userInfo.id,//2702847//todo
             }
@@ -76,7 +77,7 @@ export default class HTTP {
                     title: '提示',
                     content: '登录信息已过期，请重新登录后重试',
                     showCancel: false,
-                    success: async(res) => {
+                    success: async (res) => {
                         if (res.confirm) {
                             wepy.$instance.globalData.userInfo = '';
                             wx.setStorageSync('USER_INFO', '');

@@ -1,0 +1,99 @@
+<template>
+    <view class="qa-page container">
+        <view class="list">
+            <view class="item" wx:for="{{qaList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}">
+                <view class="title" @tap="showDesc({{index}})">
+                    <view class="text">{{item.name}}</view>
+                    <image class="arrow {{item.isShow?'down':''}}" src="../img/arrow.png"></image>
+                </view>
+                <view class="desc" hidden="{{!item.isShow}}">{{item.content}}</view>
+            </view>
+        </view>
+        <button plain="true" class="kefu" open-type="contact">
+            <image class="img" src="../img/icon-kefu.png"></image>
+            联系客服
+        </button>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import {http, apis} from '../lib/inter.js'
+
+    export default class Ground extends wepy.page {
+        data = {
+            qaList: []
+        }
+        methods = {
+            showDesc(index) {
+                this.qaList[index].isShow = !this.qaList[index].isShow;
+                this.$apply();
+            }
+        }
+
+        async getRules() {
+            let res = await http.post(apis.rules, {});
+            if (res._ok) {
+                this.qaList = res._result;
+                this.$apply();
+            }
+        }
+
+        onLoad() {
+            this.getRules();
+        }
+
+    }
+
+</script>
+<style lang="less" rel="stylesheet/less">
+    .qa-page {
+        background: #FFF;
+        .list {
+            font-size: unit(30, rpx);
+            .item {
+                border-bottom: unit(1, rpx) solid #DEDEDE;
+                .title {
+                    display: flex;
+                    color: #333;
+                    padding: unit(30, rpx);
+                    .text {
+                        flex: 1;
+                        margin-right: unit(24, rpx);
+                    }
+                    .arrow {
+                        width: unit(20, rpx);
+                        height: unit(34, rpx);
+                        margin-top: unit(5, rpx);
+                        &.down {
+                            transform: rotate(90deg);
+                        }
+                    }
+                }
+                .desc {
+                    color: #808080;
+                    padding: unit(15, rpx) unit(30, rpx) unit(30, rpx);
+                }
+            }
+        }
+        .kefu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: unit(254, rpx);
+            height: unit(84, rpx);
+            border: 1px solid #CD3434;
+            border-radius: unit(84, rpx);
+            margin: unit(50, rpx) auto;
+            padding: 0;
+            line-height: normal;
+            font-size: unit(26, rpx);
+            color: #CD3434;
+            .img {
+                width: unit(36, rpx);
+                height: unit(32, rpx);
+                margin-right: unit(10, rpx);
+            }
+        }
+    }
+</style>
+

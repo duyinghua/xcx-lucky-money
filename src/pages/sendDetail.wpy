@@ -42,7 +42,7 @@
                         <view class="amount">￥{{item.receiveFee}}</view>
                     </view>
                     <view class="row">
-                        <view class="level">亲密值{{item.intimacy}}分</view>
+                        <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
                         <view class="datetime">{{item.createTime}}</view>
                     </view>
                 </view>
@@ -84,7 +84,7 @@
             },
             createHandler(){
                 wx.switchTab({
-                    url: 'index'
+                    url: 'play'
                 })
             },
             shareRedPack(){

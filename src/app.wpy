@@ -22,6 +22,8 @@
         config = {
             pages: [
                 'pages/index',
+                'pages/play',
+                'pages/ground',
                 'pages/record',
                 'pages/extract',
                 'pages/createIssue',
@@ -46,6 +48,11 @@
                         text: '发红包',
                         iconPath: 'img/tab-hongbao-d.png',
                         selectedIconPath: 'img/tab-hongbao-a.png',
+                    }, {
+                        pagePath: 'pages/ground',
+                        text: '红包广场',
+                        iconPath: 'img/tab-guangchang-d.png',
+                        selectedIconPath: 'img/tab-guangchang-a.png',
                     }, {
                         pagePath: 'pages/record',
                         text: '我的记录',

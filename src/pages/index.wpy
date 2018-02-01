@@ -2,35 +2,18 @@
     <view class="index-page container">
         <view class="explain" @tap="explain">
             <view class="cont">
-                <image class="icon" src="../img/icon-wh.png"></image>
+                <image class="icon" src="../img/icon-wh2.png"></image>
                 玩法说明
             </view>
         </view>
-        <view class="begin-box">
-            <image class="bg" src="../img/begin-bg.png"></image>
-            <view class="box">
-                <view class="photo">
-                    <image class="img" src="{{headPhoto}}"></image>
-                </view>
-                <view class="input-box">
-                    <view class="label">红包(元)</view>
-                    <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
-                           bindblur="amountBlur"/>
-                </view>
-                <view class="tip">
-                    <text class="span">24小时内未被领取，则红包退回至</text>
-                    <text class="span red" @tap="account">余额</text>
-                </view>
-                <button plain="true" class="begin-button {{(!amountAbs)?'disabled':''}}"
-                        disabled="{{(!amountAbs)}}" @tap="gameStart">
-                    开始出题
-                </button>
+        <view class="main">
+            <view class="photo">
+                <image class="img" src="{{headPhoto}}"></image>
             </view>
+            <image class="button" src="../img/index-btn1.png" @tap="play"></image>
+            <image class="button" src="../img/index-btn2.png" @tap="ground"></image>
+            <image class="button" src="../img/index-btn3.png"></image>
         </view>
-        <!--<view class="tip" wx:if="{{incompleteId}}">
-            <text class="span">您有未完成红包，请 </text>
-            <text class="span red" @tap="gameRestart">继续出题</text>
-        </view>-->
 
     </view>
 </template>
@@ -49,166 +32,36 @@
         }
         data = {
             headPhoto: '',
-            amount: '',
-            incompleteId: 0,
-            taped: false
         }
 
         clearData() {
-            this.amount = '';
-            this.incompleteId = 0;
-            this.taped = false
         }
 
-        computed = {
-            /*serviceFee(){
-             let res = 0;
-             if (this.amount) {
-             let abs = Number(this.amount);
-             let amount = isNaN(abs) ? '' : abs;
-             res = Math.ceil(amount) / 100;
-             }
-             return Number(res).toFixed(2);
-             },*/
-            amountAbs(){
-                let abs = Number(this.amount);
-                return isNaN(abs) ? '' : abs;
-            }
-        }
+        computed = {}
         methods = {
             explain(){
                 wx.navigateTo({
                     url: 'qa'
                 })
             },
-            account(){
-                wx.switchTab({
-                    url: 'extract'
-                })
-            },
-            amountInput(e){
-                this.amount = e.detail.value.trim() || '';
-                this.$apply();
-            },
-            amountBlur(e){
-                let value = e.detail.value.trim() || '';
-                value = parseFloat(value);
-                if (isNaN(value)) {
-                    value = '';
-                } else {
-                    value = value.toFixed(2);
-                }
-                this.amount = value;
-                this.$apply();
-            },
-            async gameStart(){
-                await this.incompleteRedPack();
-                if (this.incompleteId) {
-                    wx.showModal({
-                        content: '您有一个未完成红包，需要先完成出题',
-                        confirmText: '继续出题',
-                        showCancel: false,
-                        success: wres => {
-                            if (wres.confirm) {
-                                wx.navigateTo({
-                                    url: 'createIssue?recover=1&&id=' + this.incompleteId
-                                })
-                            }
-                        }
-                    })
-                } else {
-                    //todo
-                    this.recharge(this.amount);
-//                this.buyRedPackage();
-                }
-            },
-            gameRestart(){
+            play(){
                 wx.navigateTo({
-                    url: 'createIssue?recover=1&&id=' + this.incompleteId
+                    url: 'play?type=1'
                 })
-            }
-        }
-
-        async getBalance() {
-            let res = await http.post(apis.balanceInfo, {});
-            if (res._ok) {
-                this.balance = Number(res.balance || 0).toFixed(2);
-                this.$apply();
-            }
-        }
-
-        async recharge(amount) {
-
-            if (!this.taped) {
-                this.taped = true;
-                let res = await http.post(apis.recharge, {
-                    redPackagePrice: amount
-                });
-                if (res._ok) {
-                    let payParam = res.weixinpayParamLite || {};
-                    let payRes = await wxRequestPayment(payParam);
-                    if (payRes) {
-                        let i = 0;
-                        while (i < 3 && !this.incompleteId) {
-                            await this.incompleteRedPack();
-                        }
-                        if (this.incompleteId) {
-                            wx.navigateTo({
-                                url: 'createIssue?id=' + this.incompleteId
-                            })
-                        }
-//                        let rrr = await http.post(apis.rechargeResult, {
-//                            orderID: res.orderID
-//                        });
-//                        if (rrr._ok) {
-//                            if (rrr.payResult.payStatus == 10) {
-//                                this.buyRedPackage();
-//                            }
-//                        }
-                    }
-                }
-                this.taped = false;
-            }
-
-        }
-
-        async buyRedPackage() {
-            let res = await http.post(apis.buyRedPack, {
-                redPackagePrice: this.amount
-            });
-            if (res._ok) {
-                let id = res._result;
+            },
+            ground(){
                 wx.navigateTo({
-                    url: 'createIssue?id=' + id
+                    url: 'play?type=2'
                 })
-            }
+            },
         }
 
-        async incompleteRedPack() {
-            let res = await http.post(apis.incompleteRedPack, {});
-            if (res._ok) {
-                if (res.redPackageID) {
-                    this.incompleteId = res.redPackageID;
-                } else {
-                    this.incompleteId = 0;
-                }
-                this.$apply();
-            }
-        }
 
         async onLoad() {
             await login.doLogin();
             this.headPhoto = wepy.$instance.globalData.userInfo.headPicURL;
             this.$apply();
 
-        }
-
-        onShow() {
-            this.clearData();
-        }
-
-        onPullDownRefresh() {
-            this.incompleteRedPack();
         }
 
         onShareAppMessage() {
@@ -224,6 +77,11 @@
 
 <style lang="less" rel="stylesheet/less">
     .index-page {
+        flex: 1;
+        position: relative;
+        background: url('http://redpackagelite.static.immocha.com/wxlite/index-bg.png') no-repeat center top / cover;
+        box-sizing: border-box;
+        overflow: hidden;
         .explain {
             margin: unit(46, rpx) unit(30, rpx) unit(15, rpx);
             display: flex;
@@ -232,113 +90,41 @@
             .cont {
                 display: flex;
                 align-items: center;
-                color: #CD3434;
+                color: #FFF;
                 font-size: unit(26, rpx);
                 .icon {
                     width: unit(26, rpx);
                     height: unit(26, rpx);
-                    margin-right: unit(8, rpx);
+                    margin-right: unit(10, rpx);
                 }
             }
 
         }
-        .begin-box {
-            position: relative;
-            width: unit(698, rpx);
-            height: unit(650, rpx);
-            margin: 0 auto;
-            .bg {
-                width: unit(698, rpx);
-                height: unit(650, rpx);
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-            .box {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                left: 0;
-                top: 0;
-                z-index: 1;
-                padding: 0 unit(64, rpx);
-                box-sizing: border-box;
-                .photo {
+        .main {
+            .photo {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: unit(144, rpx);
+                height: unit(144, rpx);
+                margin: unit(33, rpx) auto unit(60, rpx);
+                overflow: hidden;
+                border-radius: unit(144, rpx);
+                background: #FFF;
+                .img {
                     display: block;
-                    width: unit(126, rpx);
-                    height: unit(126, rpx);
-                    margin: unit(12, rpx) auto;
-                    overflow: hidden;
-                    border-radius: unit(126, rpx);;
-                    .img {
-                        width: 100%;
-                        height: 100%;
-                    }
-                }
-                .input-box {
-                    display: flex;
-                    margin: unit(110, rpx) 0 unit(100, rpx);
-                    .label {
-                        flex: 1;
-                        font-size: unit(32, rpx);
-                        height: unit(64, rpx);
-                        line-height: unit(64, rpx);
-                    }
-                    .input {
-                        font-size: unit(32, rpx);
-                        height: unit(64, rpx);
-                        line-height: unit(64, rpx);
-                        width: unit(404, rpx);
-                        border-bottom: 1px solid #DEDEDE;
-                    }
-                    .input-placeholder {
-                        color: #DEDEDE;
-                    }
-                }
-                .tip {
-                    text-align: center;
-                    font-size: 0;
-                    color: #A5A5A5;
-                    .span {
-                        font-size: unit(26, rpx);
-                    }
-                    .red {
-                        color: #CD3434;
-                    }
-                }
-                .begin-button {
-                    margin-top: unit(38, rpx);
-                    width: unit(558, rpx);
-                    height: unit(80, rpx);
-                    border-radius: unit(80, rpx);
-                    background: #CD3434;
-                    text-align: center;
-                    color: #FFF;
-                    font-size: unit(32, rpx);
-                    &.disabled {
-                        background: #DEDEDE;
-                    }
+                    width: unit(132, rpx);
+                    height: unit(132, rpx);
+                    border-radius: unit(136, rpx);
                 }
             }
+            .button {
+                display: block;
+                width: unit(558, rpx);
+                height: unit(179, rpx);
+                margin: unit(22, rpx) auto 0;
+            }
+        }
 
-        }
-        .tip {
-            margin-top: unit(50, rpx);
-            color: #BFBFBF;
-            text-align: center;
-            font-size: 0;
-            .span {
-                font-size: unit(26, rpx);
-            }
-            .red {
-                color: #CD3434;
-            }
-        }
-        .continue {
-            margin-top: unit(30, rpx);
-            color: #CD3434;
-            font-size: unit(26, rpx);
-            text-align: center;
-        }
     }
 </style>
