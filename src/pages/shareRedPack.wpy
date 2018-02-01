@@ -17,6 +17,7 @@
                 <image class="bg" src="../img/redpack-qrcode-box.png"></image>
                 <image class="img" src="{{qrcode}}"></image>
             </view>
+            <view class="link-home" @tap="backhome">返回首页</view>
             <view class="buttons">
                 <button plain="true" class="button" open-type="share">
                     <image class="img" src="../img/redpack-btn-friend.png"></image>
@@ -77,6 +78,11 @@
         }
 
         methods = {
+            backhome(){
+                wx.switchTab({
+                    url: 'index'
+                })
+            },
             shareTimeline(){
 //                if (this.qrcode) {
                 this.clearCanvas();
@@ -293,8 +299,15 @@
                     border-radius: unit(100, rpx);
                 }
             }
+            .link-home {
+                margin-top: unit(100, rpx);
+                font-size: unit(24, rpx);
+                text-align: center;
+                color: #FFF;
+                line-height: unit(40, rpx);
+            }
             .buttons {
-                margin-top: unit(136, rpx);
+                margin-top: unit(36, rpx);
                 display: flex;
                 justify-content: space-between;
                 .button {

@@ -33,6 +33,7 @@
                                 <view class="qsn-input">
                                     {{issueList[curIssIndex].question.content}}
                                 </view>
+                                <view class="tip">tips：答案可修改</view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}"
                                           wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
@@ -662,7 +663,7 @@
                     .iss-list {
                         width: 100%;
                         overflow: hidden;
-                        white-space: nowrap;
+                        /*white-space: nowrap;*/
                         font-size: 0;
                         .item {
                             display: inline-block;
@@ -710,6 +711,12 @@
                     color: #DEDEDE;
                     font-size: 14px;
                 }
+            }
+            .tip {
+                color: #999;
+                font-size: unit(24, rpx);
+                margin-top: unit(20, rpx);
+                margin-bottom: unit(-20, rpx);
             }
             .aws-input {
                 margin-top: unit(40, rpx);

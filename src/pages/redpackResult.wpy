@@ -127,7 +127,7 @@
             },
             createHandler(){
                 wx.switchTab({
-                    url: 'play'
+                    url: 'index'
                 })
             },
             shareHandler(){
@@ -173,7 +173,7 @@
                         showCancel: false,
                         success: () => {
                             wx.switchTab({
-                                url: 'play'
+                                url: 'index'
                             });
                         }
                     })

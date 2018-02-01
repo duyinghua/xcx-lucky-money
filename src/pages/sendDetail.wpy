@@ -32,7 +32,8 @@
             </view>
         </view>
         <view class="list">
-            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item" wx:for-index="index" wx:key="{{item.index}}">
+            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
+                  wx:for-index="index" wx:key="{{item.index}}">
                 <view class="photo">
                     <image class="img" mode="widthFix" src="{{item.headPicURL}}"></image>
                 </view>
@@ -83,7 +84,7 @@
             },
             createHandler(){
                 wx.switchTab({
-                    url: 'play'
+                    url: 'index'
                 })
             },
             shareRedPack(){
@@ -108,7 +109,7 @@
                         this.totalFee = isNaN(res.totalFee) ? '0.00' : Number(res.totalFee).toFixed(2);
                         this.sendedFee = isNaN(res.sendedFee) ? '0.00' : Number(res.sendedFee).toFixed(2);
                         this.totalCount = res.totalCount;
-                        this.maxFee = res.maxRedpackageFee;
+                        this.maxFee = res.maxRedpackageFee || 0;
                     }
                     if (res.detailList.length) {
                         this.detailList = this.detailList.concat(res.detailList);

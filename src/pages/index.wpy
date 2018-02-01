@@ -45,12 +45,15 @@
                 })
             },
             play(type){
-                if (this.mode == 2) { //正式
+                if (!this.mode) {
+                    return;
+                }
+                if (this.mode == 1 && type == 1) { //提审并且是个人红包
+                    this.goIssue(type);
+                } else {
                     wx.navigateTo({
                         url: 'play?type=' + type
                     })
-                } else if (this.mode == 1) { //提审
-                    this.goIssue(type);
                 }
             },
         }
@@ -75,7 +78,11 @@
         }
 
         async onLoad() {
-            this.pullConfig();
+            if (wepy.$instance.globalData.config.fuctionCode) {
+                this.mode = wepy.$instance.globalData.config.fuctionCode
+            } else {
+                await this.pullConfig();
+            }
             await login.doLogin();
             this.headPhoto = wepy.$instance.globalData.userInfo.headPicURL;
             this.$apply();
