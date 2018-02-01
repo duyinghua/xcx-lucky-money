@@ -10,8 +10,8 @@
             <view class="photo">
                 <image class="img" src="{{headPhoto}}"></image>
             </view>
-            <image class="button" src="../img/index-btn1.png" @tap="play"></image>
-            <image class="button" src="../img/index-btn2.png" @tap="ground"></image>
+            <image class="button" src="../img/index-btn1.png" @tap="play(1)"></image>
+            <image class="button" src="../img/index-btn2.png" @tap="play(2)"></image>
             <image class="button" src="../img/index-btn3.png"></image>
         </view>
 
@@ -27,11 +27,11 @@
 
     export default class Index extends wepy.page {
         config = {
-            navigationBarTitleText: '冲顶超人',
             enablePullDownRefresh: true
         }
         data = {
             headPhoto: '',
+            mode: 0,
         }
 
         clearData() {
@@ -44,24 +44,41 @@
                     url: 'qa'
                 })
             },
-            play(){
-                wx.navigateTo({
-                    url: 'play?type=1'
-                })
-            },
-            ground(){
-                wx.navigateTo({
-                    url: 'play?type=2'
-                })
+            play(type){
+                if (this.mode == 2) { //正式
+                    wx.navigateTo({
+                        url: 'play?type=' + type
+                    })
+                } else if (this.mode == 1) { //提审
+                    this.goIssue(type);
+                }
             },
         }
 
+        async goIssue(type) {
+            let res = await http.post(apis.freeRedPack, {
+                redPackageType: type
+            });
+            if (res._ok) {
+                wx.navigateTo({
+                    url: 'createIssue?id=' + res._result
+                })
+            }
+        }
+
+        async pullConfig() {
+            let res = await http.post(apis.config, {});
+            if (res._ok) {
+                wepy.$instance.globalData.config = res._result;
+                this.mode = wepy.$instance.globalData.config.fuctionCode
+            }
+        }
 
         async onLoad() {
+            this.pullConfig();
             await login.doLogin();
             this.headPhoto = wepy.$instance.globalData.userInfo.headPicURL;
             this.$apply();
-
         }
 
         onShareAppMessage() {

@@ -59,7 +59,6 @@
         config = {
             backgroundColor: '#CD3434',
             backgroundTextStyle: 'light',
-            navigationBarTitleText: '冲顶超人',
             enablePullDownRefresh: true,
         }
         data = {

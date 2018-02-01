@@ -23,7 +23,7 @@
             pages: [
                 'pages/index',
                 'pages/play',
-                'pages/ground',
+                'pages/square',
                 'pages/record',
                 'pages/extract',
                 'pages/createIssue',
@@ -49,7 +49,7 @@
                         iconPath: 'img/tab-hongbao-d.png',
                         selectedIconPath: 'img/tab-hongbao-a.png',
                     }, {
-                        pagePath: 'pages/ground',
+                        pagePath: 'pages/square',
                         text: '红包广场',
                         iconPath: 'img/tab-guangchang-d.png',
                         selectedIconPath: 'img/tab-guangchang-a.png',

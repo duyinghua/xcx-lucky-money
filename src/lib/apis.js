@@ -22,6 +22,7 @@ export default {
     withdraw: `${config.apiHost}/wap/redpackagelite/user/balance/withdraw`,//提现
 
     //出题
+    freeRedPack: `${config.apiHost}/wap/redpackagelite/publish/byreview`,//免费出题
     recharge: `${config.apiHost}/wap/redpackagelite/publish/byorderpay`,//支付
     rechargeResult: `${config.apiHost}/wap/redpackagelite/user/balance/chargepay/result`,//支付结果
     buyRedPack: `${config.apiHost}/wap/redpackagelite/publish/bybalance`,//购买红包
@@ -29,6 +30,8 @@ export default {
     recommendQuestion: `${config.apiHost}/wap/redpackagelite/rec/qa`,//推荐问答
     commitQuestion: `${config.apiHost}/wap/redpackagelite/qa/save`,//保存问答
     finishQuestion: `${config.apiHost}/wap/redpackagelite/qa/finish`,//完成出题
+    squareList: `${config.apiHost}/wap/redpackagelite/square/list`,//广场红包墙
+
     //答题
     canIAnswer: `${config.apiHost}/wap/redpackagelite/check/cando`,//能否答题
     questionList: `${config.apiHost}/wap/redpackagelite/qalist`,//答题列表

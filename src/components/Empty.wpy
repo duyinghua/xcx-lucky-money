@@ -1,0 +1,32 @@
+<template>
+    <view class="empty-component">
+        <view class="content">
+            <image class="img" src="../img/empty.png"></image>
+            <slot>暂无数据</slot>
+        </view>
+    </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    export default class Empty extends wepy.component {
+        data = {}
+    }
+</script>
+<style lang="less" rel="stylesheet/less">
+    .empty-component {
+        padding: unit(1, rpx) 0;
+        .content {
+            font-size: 14px; /*px*/
+            color: #999;
+            text-align: center;
+            margin-top: 20%;
+            letter-spacing: 0.4px;
+            .img {
+                display: block;
+                margin: 0 auto unit(20, rpx);
+                width: unit(251, rpx);
+                height: unit(190, rpx);
+            }
+        }
+    }
+</style>
