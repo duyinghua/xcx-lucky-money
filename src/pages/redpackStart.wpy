@@ -220,6 +220,7 @@
                     url: 'sendDetail?id=' + this.id
                 })
             } else if (canRes.statusCode === 31) { //消费复活卡
+                this.canAnswer = true;
                 this.beRelived = 1
             } else {
                 wx.redirectTo({

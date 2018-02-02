@@ -27,7 +27,6 @@
 
     export default class Index extends wepy.page {
         config = {
-            enablePullDownRefresh: true
         }
         data = {
             headPhoto: '',

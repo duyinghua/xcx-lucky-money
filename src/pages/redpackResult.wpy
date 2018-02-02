@@ -324,7 +324,7 @@
             let rand = parseInt(Math.random() * 3) + 1;
             return {
                 title: wepy.$instance.globalData.shareInfo[rand],
-                path: 'pages/index',
+                path: `pages/redpackStart?id=${this.id}`,
                 imageUrl: `../img/share-title${rand}.png`,
                 success: async () => {
                     await this.shareRelive();
