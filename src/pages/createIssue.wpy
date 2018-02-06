@@ -2,7 +2,7 @@
     <view class="createIssue-page container">
         <scroll-view class="iss-index" scroll-x="true" scroll-left="{{issScrollLeft}}">
             <view class="li" wx:for="{{indexs}}" wx:for-index="index_i" wx:key="{{index_i}}">
-                <view class="num {{index_i<issueList.length?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
+                <view class="num {{index_i<issueList.length+1?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
                       @tap="changeIndex({{index_i}})">
                     {{index_i + 1}}
                 </view>
@@ -18,9 +18,9 @@
                     <view class="iss-list">
                         <view class="item">
                             <view hidden="{{curTab!=1}}">
-                                <image wx:if="{{issueList[curIssIndex].question.picURL}}" class="picture-img"
+                                <image wx:if="{{curIssue.question.picURL}}" class="picture-img"
                                        mode="widthFix"
-                                       src="{{issueList[curIssIndex].question.picURL}}{{qiniuClip}}"
+                                       src="{{curIssue.question.picURL}}{{qiniuClip}}"
                                        @tap="uploadImage"></image>
                                 <view wx:else class="picture" @tap="uploadImage">
                                     <image class="add-img" src="../img/picture-add.png"></image>
@@ -28,15 +28,15 @@
                                 </view>
                                 <!--<view class="picture">
                                     <image class="img" mode="aspectFill"
-                                           src="{{issueList[curIssIndex].question.picURL}}"></image>
+                                           src="{{curIssue.question.picURL}}"></image>
                                 </view>-->
                                 <view class="qsn-input">
-                                    {{issueList[curIssIndex].question.content}}
+                                    {{curIssue.question.content}}
                                 </view>
                                 <view class="tip">(答案可点击修改)</view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}"
-                                          wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="item"
+                                          wx:for="{{curIssue.answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
                                         <input class="txt" placeholder="输入答案"
                                                maxlength="16" value="{{item.content}}"
@@ -46,20 +46,20 @@
                                 </view>
                                 <view class="buttons">
                                     <button plain="true"
-                                            class="btn change-btn {{curIssIndex<issueList.length-1?'disabled':''}}"
-                                            disabled="{{curIssIndex<issueList.length-1}}" @tap="changeQuestion">
+                                            class="btn change-btn {{curIssIndex<issueList.length?'disabled':''}}"
+                                            disabled="{{curIssIndex<issueList.length}}" @tap="changeQuestion">
                                         换一题
                                     </button>
                                     <button plain="true"
-                                            class="btn confirm-btn {{!issueList[curIssIndex].complete?'disabled':''}}"
-                                            disabled="{{!issueList[curIssIndex].complete}}" @tap="confirmQuestion">
+                                            class="btn confirm-btn {{!curIssue.complete?'disabled':''}}"
+                                            disabled="{{!curIssue.complete}}" @tap="confirmQuestion">
                                         确认
                                     </button>
                                 </view>
                             </view>
                             <view hidden="{{curTab!=2}}">
-                                <image wx:if="{{issueDiy.question.picURL}}" class="picture-img" mode="widthFix"
-                                       src="{{issueDiy.question.picURL}}{{qiniuClip}}" @tap="uploadImage"></image>
+                                <image wx:if="{{curIssue.question.picURL}}" class="picture-img" mode="widthFix"
+                                       src="{{curIssue.question.picURL}}{{qiniuClip}}" @tap="uploadImage"></image>
                                 <view wx:else class="picture" @tap="uploadImage">
                                     <image class="add-img" src="../img/picture-add.png"></image>
                                     <text class="add-desc">添加照片</text>
@@ -67,12 +67,12 @@
                                 <view class="qsn-input">
                                     <view class="qsn">
                                         <input class="input" placeholder="输入问题(如猜旅行经历、兴趣爱好等)" maxlength="35"
-                                               value="{{issueDiy.question.content}}"
+                                               value="{{curIssue.question.content}}"
                                                bindinput="questionInput"/>
                                     </view>
                                 </view>
                                 <view class="aws-input">
-                                    <view class="li {{item.isRight?'cur':''}}" wx:for="{{issueDiy.answerList}}"
+                                    <view class="li {{item.isRight?'cur':''}}" wx:for="{{curIssue.answerList}}"
                                           wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">
                                         <input class="txt" placeholder="输入答案"
                                                maxlength="16" value="{{item.content}}"
@@ -81,8 +81,8 @@
                                     </view>
                                 </view>
                                 <view class="buttons">
-                                    <button plain="true" class="btn add-btn {{!issueDiy.complete?'disabled':''}}"
-                                            disabled="{{!issueDiy.complete}}" @tap="confirmQuestion">
+                                    <button plain="true" class="btn add-btn {{!curIssue.complete?'disabled':''}}"
+                                            disabled="{{!curIssue.complete}}" @tap="confirmQuestion">
                                         确定
                                     </button>
                                 </view>
@@ -132,6 +132,8 @@
                 }],
                 complete: false
             },
+            lastRecommend: {},//最近一个推荐题
+            readyIssue: {},//正在出的题
             animationData: {},
             noRecommend: false,
             uptoken: '',
@@ -145,6 +147,8 @@
             this.issueList = [];
             this.curIssIndex = 0;
             this.issScrollLeft = 0;
+            this.lastRecommend = {};
+            this.readyIssue = {};
             this.issueDiy = {
                 question: {
                     content: '',
@@ -172,7 +176,7 @@
 
         computed = {
             indexs(){
-                let res = [0, 1, 2, 3, 4];
+                let res = new Array(5);
                 if (this.issueList.length <= 5) {
                     return res;
                 } else {
@@ -182,37 +186,33 @@
                      });*/
                     return this.issueList;
                 }
+            },
+            curIssue(){
+                if (this.curTab == 1) {
+                    this.readyIssue = this.lastRecommend
+                } else if (this.curTab == 2) {
+                    this.readyIssue = this.issueDiy
+                }
+                return this.currentIssue();
             }
         }
+
         methods = {
+
             changeIndex(index){
-                if (index <= this.issueList.length - 1) {
+                if (index <= this.issueList.length + 1 - 1) {
                     this.curIssIndex = index;
-                    this.curTab = 1;
+                    this.curTab = this.type;    // 切换到了之前出过的题的话，默认tab由个人（推荐）/广场（自定义）红包类型而定
                 }
                 this.$apply();
             },
             tabHandler(num){
                 this.curTab = num;
-                if (this.curTab == 1) {
-                    this.issueList[this.issueList.length - 1] = this.lastRecIssue;
-                } else {
-                    this.lastRecIssue = this.issueList[this.issueList.length - 1];
-                    this.issueList[this.issueList.length - 1] = this.issueDiy;
-                }
                 this.$apply();
-                this.getWxPage().setData({
-                    issueList: this.issueList
-                });
             },
             questionInput(e){
                 let content = e.detail.value.trim() || ''
-                let issue;
-                if (this.curTab == 1) {
-                    issue = this.issueList[this.curIssIndex];
-                } else {
-                    issue = this.issueDiy;
-                }
+                let issue = this.currentIssue();
                 if (issue) {
                     issue.question.content = content;
                     issue.complete = !this.checkIssue(issue);
@@ -221,23 +221,13 @@
             },
             answerInput(index, e){
                 let content = e.detail.value.trim() || ''
-                let issue;
-                if (this.curTab == 1) {
-                    issue = this.issueList[this.curIssIndex];
-                } else {
-                    issue = this.issueDiy;
-                }
+                let issue = this.currentIssue();
                 issue.answerList[index].content = content;
                 issue.complete = !this.checkIssue(issue);
                 this.$apply()
             },
             setAnswer(num){
-                let issue;
-                if (this.curTab == 1) {
-                    issue = this.issueList[this.curIssIndex];
-                } else {
-                    issue = this.issueDiy;
-                }
+                let issue = this.currentIssue();
                 issue.answerList.forEach((item, i) => {
                     if (i == num) {
                         item.isRight = 1;
@@ -247,33 +237,30 @@
                 })
                 issue.complete = !this.checkIssue(issue);
                 this.$apply();
-                if (this.curTab == 1) {
-                    this.getWxPage().setData({
-                        issueList: this.issueList
-                    });
-                } else {
-                    this.getWxPage().setData({
-                        issueDiy: this.issueDiy
-                    });
-                }
 
+//                this.getWxPage().setData({
+//                    readyIssue: this.readyIssue
+//                });
             },
             async changeQuestion(){
-
                 if (!this.noRecommend) {
-                    let newIss = await this.getNewIssue();
-                    if (newIss) {
-                        this.issueList[this.issueList.length - 1] = newIss;
-                        this.$apply();
-                        this.getWxPage().setData({
-                            issueList: this.issueList
-                        });
-                    }
+                    this.lastRecommend = await this.getNewIssue();
+                    this.readyIssue = this.lastRecommend;
+                    this.$apply();
+//                    if (newIss) {
+//                        this.issueList[this.issueList.length - 1] = newIss;
+//                        this.$apply();
+//                        this.getWxPage().setData({
+//                            issueList: this.issueList
+//                        });
+//                    }
+
                 }
 
             },
             confirmQuestion: utils.debounce(async () => {
-                let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
+                let curIssue = this.currentIssue();
+
                 let msg = this.checkIssue(curIssue);
                 if (msg) {
                     wx.showModal({
@@ -329,12 +316,12 @@
                         });
                         qiniuUploader.upload(filePath, (res2) => {
                             // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
-                            let curIssue = this.curTab == 1 ? this.issueList[this.curIssIndex] : this.issueDiy;
+                            let curIssue = this.currentIssue();
                             curIssue.question.picURL = res2.imageURL;
                             curIssue.complete = !this.checkIssue(curIssue);
                             this.$apply();
                             this.getWxPage().setData({
-                                issueList: this.issueList,
+//                                issueList: this.issueList,
                                 issueDiy: this.issueDiy
                             });
                             wx.hideLoading();
@@ -353,6 +340,11 @@
             }
 
         }
+
+        currentIssue() {
+            return this.curIssIndex >= this.issueList.length ? this.readyIssue : this.issueList[this.curIssIndex];
+        }
+
         /*
          * 获取未完成红包历史题目
          * */
@@ -418,11 +410,11 @@
              this.$apply();
              }, 300);*/
 
-            this.curTab = 1;
+            this.curTab = this.type;
             this.curIssIndex++;
-            let newIss = await this.getNewIssue();
-            newIss && this.issueList.push(newIss);
-            this.issScrollLeft = 9999;
+            this.lastRecommend = await this.getNewIssue();
+            this.readyIssue = this.lastRecommend;
+            this.issScrollLeft = 999999;
             this.$apply();
             this.getWxPage().setData({
                 issScrollLeft: this.issScrollLeft,
@@ -511,7 +503,8 @@
             });
             if (res._ok) {
                 if (!curIssue.question.uninId) { //添加一个题
-                    this.issueList[this.issueList.length - 1].question.uninId = res.questionID;
+                    curIssue.question.uninId = res.questionID;
+                    this.issueList.push(curIssue);
                 }
                 return true;
             } else {
@@ -544,19 +537,21 @@
             this.clearData();
             this.id = e.id;
             this.type = e.type || 1;
+            this.curTab = this.type;
             this.recover = e.recover || 0;
             if (this.recover) {
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
             }
-            let newIss = await this.getNewIssue();
-            newIss && this.issueList.push(newIss);
-            this.issScrollLeft = 9999;
+            this.lastRecommend = await this.getNewIssue();
+            this.readyIssue = this.lastRecommend;
+//            this.lastRecommend && this.issueList.push(this.readyIssue);
+            this.issScrollLeft = 999999;
             this.$apply();
-            this.getWxPage().setData({
-                issScrollLeft: this.issScrollLeft,
-                issueList: this.issueList
-            });
+//            this.getWxPage().setData({
+//                issScrollLeft: this.issScrollLeft,
+//                issueList: this.issueList
+//            });
             this.getUptoken();
         }
 

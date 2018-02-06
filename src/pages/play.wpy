@@ -111,7 +111,7 @@
                         success: wres => {
                             if (wres.confirm) {
                                 wx.navigateTo({
-                                    url: 'createIssue?recover=1&&id=' + this.incompleteId
+                                    url: `createIssue?type=${this.type}&recover=1&id=${this.incompleteId}`
                                 })
                             }
                         }
@@ -122,11 +122,6 @@
 //                this.buyRedPackage();
                 }
             },
-            gameRestart(){
-                wx.navigateTo({
-                    url: 'createIssue?recover=1&&id=' + this.incompleteId
-                })
-            }
         }
 
         async getBalance() {
@@ -173,17 +168,17 @@
 
         }
 
-        async buyRedPackage() {
-            let res = await http.post(apis.buyRedPack, {
-                redPackagePrice: this.amount
-            });
-            if (res._ok) {
-                let id = res._result;
-                wx.navigateTo({
-                    url: 'createIssue?id=' + id
-                })
-            }
-        }
+//        async buyRedPackage() {
+//            let res = await http.post(apis.buyRedPack, {
+//                redPackagePrice: this.amount
+//            });
+//            if (res._ok) {
+//                let id = res._result;
+//                wx.navigateTo({
+//                    url: 'createIssue?id=' + id
+//                })
+//            }
+//        }
 
         async incompleteRedPack() {
             let res = await http.post(apis.incompleteRedPack, {});

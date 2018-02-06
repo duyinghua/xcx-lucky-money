@@ -1,4 +1,13 @@
 export default class Utils {
+    static newClass(object) {
+        if (typeof object !== 'object') {
+            console.error('参数不是一个对象');
+            return object;
+        }
+        let objStr = JSON.stringify(object);
+        return JSON.parse(objStr);
+    }
+
     static sleep(s) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
