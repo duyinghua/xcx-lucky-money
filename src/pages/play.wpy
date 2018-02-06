@@ -12,10 +12,17 @@
                 <view class="photo">
                     <image class="img" src="{{headPhoto}}"></image>
                 </view>
-                <view class="input-box">
-                    <view class="label">红包(元)</view>
-                    <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
-                           bindblur="amountBlur"/>
+                <view class="input-area">
+                    <view class="input-box">
+                        <view class="label">红包(元)</view>
+                        <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
+                               bindblur="amountBlur"/>
+                    </view>
+                    <view wx:if="{{type==2}}" class="input-box mt">
+                        <view class="label">想说的话</view>
+                        <input class="input" type="text" placeholder="寄语或想表达的内容" value="{{message}}" bindinput="messageInput"
+                               bindblur="messageBlur"/>
+                    </view>
                 </view>
                 <view class="tip">
                     <text class="span">24小时内未被领取，则红包退回至</text>
@@ -49,6 +56,7 @@
         data = {
             headPhoto: '',
             amount: '',
+            message: '',
             type: 1,
             incompleteId: 0,
             taped: false
@@ -101,6 +109,10 @@
                 this.amount = value;
                 this.$apply();
             },
+            messageInput(e){
+                this.message = e.detail.value.trim() || '';
+                this.$apply();
+            },
             async gameStart(){
                 await this.incompleteRedPack();
                 if (this.incompleteId) {
@@ -111,7 +123,7 @@
                         success: wres => {
                             if (wres.confirm) {
                                 wx.navigateTo({
-                                    url: `createIssue?type=${this.type}&recover=1&id=${this.incompleteId}`
+                                    url: `createIssue?type=${this.type}&id=${this.incompleteId}&recover=1&msg=${this.message}` //todo message要返回
                                 })
                             }
                         }
@@ -150,7 +162,7 @@
                         }
                         if (this.incompleteId) {
                             wx.navigateTo({
-                                url: 'createIssue?type=' + this.type + '&id=' + this.incompleteId
+                                url: `createIssue?type=${this.type}&id=${this.incompleteId}&msg=${this.message}`
                             })
                         }
 //                        let rrr = await http.post(apis.rechargeResult, {
@@ -195,7 +207,7 @@
         async onLoad(e) {
             await login.doLogin();
             this.headPhoto = wepy.$instance.globalData.userInfo.headPicURL;
-            this.type = e.type
+            this.type = e.type || 1
             this.$apply();
 
         }
@@ -277,24 +289,33 @@
                         height: 100%;
                     }
                 }
-                .input-box {
+                .input-area {
+                    height: unit(170, rpx);
+                    margin: unit(80, rpx) 0 unit(60, rpx);
                     display: flex;
-                    margin: unit(120, rpx) 0 unit(100, rpx);
-                    .label {
-                        flex: 1;
-                        font-size: unit(32, rpx);
-                        height: unit(64, rpx);
-                        line-height: unit(64, rpx);
-                    }
-                    .input {
-                        font-size: unit(32, rpx);
-                        height: unit(64, rpx);
-                        line-height: unit(64, rpx);
-                        width: unit(404, rpx);
-                        border-bottom: 1px solid #DEDEDE;
-                    }
-                    .input-placeholder {
-                        color: #DEDEDE;
+                    flex-direction: column;
+                    justify-content: center;
+                    .input-box {
+                        display: flex;
+                        .label {
+                            flex: 1;
+                            font-size: unit(32, rpx);
+                            height: unit(64, rpx);
+                            line-height: unit(64, rpx);
+                        }
+                        .input {
+                            font-size: unit(32, rpx);
+                            height: unit(64, rpx);
+                            line-height: unit(64, rpx);
+                            width: unit(404, rpx);
+                            border-bottom: 1px solid #DEDEDE;
+                        }
+                        .input-placeholder {
+                            color: #DEDEDE;
+                        }
+                        &.mt {
+                            margin-top: unit(30, rpx);
+                        }
                     }
                 }
                 .tip {

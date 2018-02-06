@@ -109,6 +109,7 @@
             recover: 0,
             curTab: 1,
             type: 0,
+            msg: '',
             issueList: [],
             curIssIndex: 0,
             issScrollLeft: 0,
@@ -177,14 +178,14 @@
         computed = {
             indexs(){
                 let res = new Array(5);
-                if (this.issueList.length <= 5) {
+                if (this.issueList.length < 5) {
                     return res;
                 } else {
                     /*let diff = this.curIssIndex - 4;
                      return res.map(item => {
                      return item + diff;
                      });*/
-                    return this.issueList;
+                    return new Array(this.issueList.length + 1);
                 }
             },
             curIssue(){
@@ -258,7 +259,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async () => {
+            confirmQuestion: utils.debounce(async() => {
                 let curIssue = this.currentIssue();
 
                 let msg = this.checkIssue(curIssue);
@@ -459,16 +460,18 @@
                 return '请填写问题';
             }
             let setRight = false;
-            let checkAnswer = curIssue.answerList.some(item => {
-                if (!item.content.trim()) {
-                    return true;
+            let answerCount = 0;
+            curIssue.answerList.forEach(item => {
+                item.content = item.content.trim();
+                if (item.content) {
+                    answerCount++;
                 }
-                if (!setRight && item.isRight) {
+                if (!setRight && item.content && item.isRight) {
                     setRight = true;
                 }
             })
-            if (checkAnswer) {
-                return '请完整填写全部答案';
+            if (answerCount < 2) {
+                return '请至少填写2个答案';
             }
             if (!setRight) {
                 return '请设置一个正确答案';
@@ -521,7 +524,7 @@
             })
             if (res._ok) {
                 wx.navigateTo({
-                    url: `shareRedPack?id=${this.id}&amount=${res.totalFee}&count=${res.questionCount}`
+                    url: `shareRedPack?id=${this.id}&type=${this.type}&amount=${res.totalFee}&count=${res.questionCount}&msg=${this.msg}`
                 })
             }
         }
@@ -537,6 +540,7 @@
             this.clearData();
             this.id = e.id;
             this.type = e.type || 1;
+            this.msg = e.msg;
             this.curTab = this.type;
             this.recover = e.recover || 0;
             if (this.recover) {

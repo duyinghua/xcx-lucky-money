@@ -1,94 +1,97 @@
 <template>
     <view
         class="redpackResult-page container {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'banner-padding':''}}">
-        <view class="main">
-            <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
-            <view class="amount">获得
-                <text class="value">{{myInfo.receiveFee}}</text>
-                元红包
+        <block wx:if="{{loaded}}">
+            <view class="main">
+                <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
+                <view class="amount">获得
+                    <text class="value">{{myInfo.receiveFee}}</text>
+                    元红包
+                </view>
+                <view class="result"
+                      style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
+                    <view class="score">
+                        <text class="value">{{myInfo.intimacy}}</text>
+                        <text class="unit">分</text>
+                    </view>
+                    <view class="remark">{{myInfo.intimacy_des ? '“' + myInfo.intimacy_des + '”' : ''}}</view>
+                    <image class="stamp" src="../img/stamp.png"></image>
+                    <view class="left-photo">
+                        <image class="photo" src="{{myInfo.headPicURL}}"></image>
+                    </view>
+                    <view class="right-photo">
+                        <image class="photo" src="{{authorInfo.userHeadPic}}"></image>
+                    </view>
+                </view>
+                <view class="ctrl {{serviveCard.shared===1?'':'ctrl2'}}">
+                    <button plain="true" class="li" @tap="extractHandler">
+                        <image class="icon" src="../img/icon-tixian.png"></image>
+                        提现
+                    </button>
+                    <button plain="true" class="li" @tap="createHandler">
+                        <image class="icon" src="../img/icon-hongbao.png"></image>
+                        我要出题
+                    </button>
+                    <button plain="true" class="li" @tap="shareHandler" wx:if="{{serviveCard.shared===1}}">
+                        <image class="icon" src="../img/icon-fenxiang.png"></image>
+                        分享
+                    </button>
+                </view>
             </view>
-            <view class="result"
-                  style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
-                <view class="score">
-                    <text class="value">{{myInfo.intimacy}}</text>
-                    <text class="unit">分</text>
-                </view>
-                <view class="remark">{{myInfo.intimacy_des ? '“' + myInfo.intimacy_des + '”' : ''}}</view>
-                <image class="stamp" src="../img/stamp.png"></image>
-                <view class="left-photo">
-                    <image class="photo" src="{{myInfo.headPicURL}}"></image>
-                </view>
-                <view class="right-photo">
-                    <image class="photo" src="{{authorInfo.userHeadPic}}"></image>
+            <view class="desc">
+                共
+                <text class="b">{{sendedFee}}</text>
+                元，已被
+                <text class="b">{{totalCount}}</text>
+                位好友领取
+                <view class="more" @tap="toSquare">抢更多红包></view>
+            </view>
+            <view class="list">
+                <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
+                      wx:for-index="index" wx:key="{{index}}">
+                    <view class="photo">
+                        <image class="img" mode="widthFix"
+                               src="{{item.headPicURL}}"></image>
+                    </view>
+                    <view class="info">
+                        <view class="row">
+                            <view class="name">{{item.userName}}</view>
+                            <view class="amount">￥{{item.receiveFee}}</view>
+                        </view>
+                        <view class="row">
+                            <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
+                            <view class="datetime">{{item.createTime}}</view>
+                        </view>
+                    </view>
                 </view>
             </view>
-            <view class="ctrl {{serviveCard.shared===1?'':'ctrl2'}}">
-                <button plain="true" class="li" @tap="extractHandler">
-                    <image class="icon" src="../img/icon-tixian.png"></image>
-                    提现
-                </button>
-                <button plain="true" class="li" @tap="createHandler">
-                    <image class="icon" src="../img/icon-hongbao.png"></image>
-                    我要出题
-                </button>
-                <button plain="true" class="li" @tap="shareHandler" wx:if="{{serviveCard.shared===1}}">
+
+            <view wx:if="{{showShareBar}}"
+                  class="share-bar {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'up':''}}">
+                <button plain="true" class="button share-friend" open-type="share">
                     <image class="icon" src="../img/icon-fenxiang.png"></image>
-                    分享
+                    转发
+                </button>
+                <button plain="true" class="button share-timeline" @tap="shareTimeline">
+                    <image class="icon" src="../img/icon-timeline.png"></image>
+                    发朋友圈
                 </button>
             </view>
-        </view>
-        <view class="desc">
-            共
-            <text class="b">{{sendedFee}}</text>
-            元，已被
-            <text class="b">{{totalCount}}</text>
-            位好友领取
-            <view class="more" @tap="toSquare">抢更多红包></view>
-        </view>
-        <view class="list">
-            <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
-                  wx:for-index="index" wx:key="{{index}}">
-                <view class="photo">
-                    <image class="img" mode="widthFix"
-                           src="{{item.headPicURL}}"></image>
-                </view>
-                <view class="info">
-                    <view class="row">
-                        <view class="name">{{item.userName}}</view>
-                        <view class="amount">￥{{item.receiveFee}}</view>
-                    </view>
-                    <view class="row">
-                        <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
-                        <view class="datetime">{{item.createTime}}</view>
-                    </view>
-                </view>
+            <view class="banner" wx:if="{{serviveCard.leftServiveTime&&myInfo.intimacy!=100}}">
+                <image class="revive" mode="widthFix" src="../img/revive.png"></image>
+                <block wx:if="{{serviveCard.shared===0}}">
+                    <view class="txt">分享获得复活卡</view>
+                    <button plain="true" class="button" @tap="shareHandler">分享</button>
+                </block>
+                <block wx:elif="{{serviveCard.shared===1}}">
+                    <view class="txt">购买复活卡(最多{{serviveCard.leftServiveTime}}次)</view>
+                    <button plain="true" class="button" @tap="buyServiveCard">1元购买</button>
+                </block>
             </view>
-        </view>
-        <view wx:if="{{showShareBar}}"
-              class="share-bar {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'up':''}}">
-            <button plain="true" class="button share-friend" open-type="share">
-                <image class="icon" src="../img/icon-fenxiang.png"></image>
-                转发
-            </button>
-            <button plain="true" class="button share-timeline" @tap="shareTimeline">
-                <image class="icon" src="../img/icon-timeline.png"></image>
-                发朋友圈
-            </button>
-        </view>
-        <view class="banner" wx:if="{{serviveCard.leftServiveTime&&myInfo.intimacy!=100}}">
-            <image class="revive" mode="widthFix" src="../img/revive.png"></image>
-            <block wx:if="{{serviveCard.shared===0}}">
-                <view class="txt">分享获得复活卡</view>
-                <button plain="true" class="button" @tap="shareHandler">分享</button>
-            </block>
-            <block wx:elif="{{serviveCard.shared===1}}">
-                <view class="txt">购买复活卡(最多{{serviveCard.leftServiveTime}}次)</view>
-                <button plain="true" class="button" @tap="buyServiveCard">1元购买</button>
-            </block>
-        </view>
-        <!--<view hidden="{{!saveing}}">-->
-        <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
-        <!--</view>-->
+            <!--<view hidden="{{!saveing}}">-->
+            <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
+            <!--</view>-->
+        </block>
     </view>
 </template>
 
@@ -117,7 +120,8 @@
             serviveCard: {},
             showShareBar: false,
             taped: false,
-            saveing: false
+            saveing: false,
+            loaded: false
         }
         computed = {}
         methods = {
@@ -153,7 +157,7 @@
                         })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async () => {
+                        wxRequestPayment(payParam, async() => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
                             });
@@ -185,6 +189,7 @@
                     })
                     return;
                 }
+                this.loaded = true;
                 this.myInfo = res.myModel || {};
                 this.authorInfo = res.authorModel || {};
                 this.detail = res.detailMap || {};
@@ -326,7 +331,7 @@
                 title: wepy.$instance.globalData.shareInfo[rand],
                 path: `pages/redpackStart?id=${this.id}`,
                 imageUrl: `../img/share-title${rand}.png`,
-                success: async () => {
+                success: async() => {
                     await this.shareRelive();
                 }
             }

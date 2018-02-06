@@ -12,19 +12,22 @@
         <view class="list">
             <view wx:for="{{redpackList}}" wx:for-item="item" wx:for-index="index" wx:key="{{index}}"
                   class="item" @tap="goHandler({{item.id}})">
-                <view class="photo">
-                    <image class="img" mode="aspectFill" src="{{item.headPicURL}}"></image>
-                </view>
-                <view class="info">
-                    <view class="center">
-                        <view class="name">{{item.authorUserName}}</view>
-                        <view class="count">{{item.questionCount}}道题</view>
+                <view class="cont">
+                    <view class="photo">
+                        <image class="img" mode="aspectFill" src="{{item.headPicURL}}"></image>
                     </view>
-                    <view class="right">
-                        <view class="amount">￥{{item.redPackageFee}}</view>
-                        <view class="text">去答题</view>
+                    <view class="info">
+                        <view class="center">
+                            <view class="name">{{item.authorUserName}}</view>
+                            <view class="count">{{item.questionCount}}道题</view>
+                        </view>
+                        <view class="right">
+                            <view class="amount">￥{{item.redPackageFee}}</view>
+                            <view class="text">去答题</view>
+                        </view>
                     </view>
                 </view>
+                <view class="desc">答题就能分红包！</view>
             </view>
         </view>
         <Empty wx:if="{{loaded && !redpackList.length}}"></Empty>
@@ -123,52 +126,75 @@
             .item {
                 margin-top: unit(20, rpx);
                 background: #FFF;
-                height: unit(154, rpx);
-                display: flex;
                 align-items: center;
                 padding: unit(26, rpx) unit(32, rpx);
-                box-sizing: border-box;
-                .photo {
-                    width: unit(100, rpx);
-                    height: unit(100, rpx);
-                    border-radius: unit(6, rpx);
-                    background: #EEE;
-                    margin-right: unit(26, rpx);
-                    overflow: hidden;
-                    .img {
-                        width: 100%;
-                        height: 100%;
+                .cont {
+                    position: relative;
+                    &:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        left: unit(56, rpx);
+                        bottom: unit(-14, rpx);
+                        width: unit(20, rpx);
+                        height: unit(20, rpx);
+                        transform: rotate(-45deg);
+                        transform-origin: center top;
+                        border-top: unit(1, rpx) solid #E8E8E8;
+                        border-right: unit(1, rpx) solid #E8E8E8;
+                        background: #FFFFFF;
                     }
-                }
-                .info {
-                    color: #808080;
-                    width: unit(560, rpx);
-                    flex: 1;
+                    padding-bottom: unit(30, rpx);
+                    border-bottom: unit(1, rpx) solid #E8E8E8;
                     display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    font-size: unit(24, rpx);
-                    .center {
-                        text-align: left;
-                        .name {
-                            color: #333;
-                            font-size: unit(28, rpx);
-                        }
-                        .count {
+                    .photo {
+                        width: unit(100, rpx);
+                        height: unit(100, rpx);
+                        border-radius: unit(6, rpx);
+                        background: #EEE;
+                        margin-right: unit(26, rpx);
+                        overflow: hidden;
+                        .img {
+                            width: 100%;
+                            height: 100%;
                         }
                     }
-                    .right {
-                        text-align: right;
-                        .amount {
-                            color: #CD3434;
-                            font-size: unit(28, rpx);
-                            font-weight: bold;
+                    .info {
+                        color: #808080;
+                        width: unit(560, rpx);
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        font-size: unit(24, rpx);
+                        .center {
+                            text-align: left;
+                            .name {
+                                color: #333;
+                                font-size: unit(28, rpx);
+                            }
+                            .count {
+                                margin-top: unit(10, rpx);
+                            }
                         }
-                        .text {
+                        .right {
+                            text-align: right;
+                            .amount {
+                                color: #CD3434;
+                                font-size: unit(28, rpx);
+                                font-weight: bold;
+                            }
+                            .text {
+                                margin-top: unit(10, rpx);
+                            }
                         }
                     }
                 }
-
+                .desc {
+                    color: #333;
+                    font-size: 14px;
+                    margin-top: unit(10, rpx);
+                }
             }
         }
     }

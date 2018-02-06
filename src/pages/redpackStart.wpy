@@ -24,7 +24,7 @@
                 <view
                     class="li {{answer.content.length>11?'font-s':''}} {{answer.myAnswer==1?'yes':(answer.myAnswer==2?'no':'')}}"
                     wx:for="{{issueList[curIssIndex].answerList}}" wx:for-item="answer" wx:for-index="answer_i"
-                    wx:key="answer_{{answer_i}}" @tap="answerHandler({{answer_i}})">
+                    wx:key="answer_{{answer_i}}" wx:if="{{answer.content}}" @tap="answerHandler({{answer_i}})">
                     {{answer.content}}
                 </view>
             </view>
