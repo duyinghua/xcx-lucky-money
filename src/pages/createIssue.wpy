@@ -322,8 +322,8 @@
                             curIssue.complete = !this.checkIssue(curIssue);
                             this.$apply();
                             this.getWxPage().setData({
-//                                issueList: this.issueList,
-                                issueDiy: this.issueDiy
+                                readyIssue: this.readyIssue,
+                                issueList: this.issueList
                             });
                             wx.hideLoading();
                         }, (error) => {
@@ -541,9 +541,9 @@
 
         async onLoad(e) {
             this.clearData();
-            this.id = e.id;
+            this.id = e.id || 0;
             this.type = e.type || 1;
-            this.msg = e.msg;
+            this.msg = e.msg || '';
             this.recover = e.recover || 0;
             if (this.recover) {
                 await this.incompleteRedPack();

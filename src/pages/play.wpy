@@ -22,8 +22,7 @@
                     <view wx:if="{{type==2}}" class="input-box mt">
                         <view class="label">想说的话</view>
                         <input class="input" type="text" placeholder="寄语或想表达的内容" value="{{message}}"
-                               bindinput="messageInput"
-                               bindblur="messageBlur"/>
+                               bindinput="messageInput"/>
                     </view>
                 </view>
                 <view class="tip">
