@@ -22,7 +22,7 @@
             <view class="txt">
                 已被
                 <view class="red">{{totalCount}}</view>
-                位好友领取
+                位朋友领取
                 <view class="red">{{sendedFee}}</view>
                 元
             </view>
@@ -67,6 +67,7 @@
             sendedFee: 0,
             totalCount: 0,
             maxFee: 0,
+            msg: '',
             detailList: [],
             isLast: false
         }
@@ -88,7 +89,7 @@
             },
             shareRedPack(){
                 wx.navigateTo({
-                    url: `shareRedPack?id=${this.id}&amount=${this.totalFee}&count=${this.totalCount}`
+                    url: `shareRedPack?id=${this.id}&amount=${this.totalFee}&count=${this.totalCount}&msg=${this.msg}`
                 })
             }
         }
@@ -109,6 +110,7 @@
                         this.sendedFee = isNaN(res.sendedFee) ? '0.00' : Number(res.sendedFee).toFixed(2);
                         this.totalCount = res.totalCount;
                         this.maxFee = res.maxRedpackageFee || 0;
+                        this.msg = res.msg;
                     }
                     if (res.detailList.length) {
                         this.detailList = this.detailList.concat(res.detailList);

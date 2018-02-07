@@ -7,7 +7,7 @@
                 </view>
                 <view class="tit">
                     <view class="index">第{{curIssTitle}}题</view>
-                    <view class="desc">{{issueList[curIssIndex].question.passRate}}%好友通过此题</view>
+                    <view class="desc">{{issueList[curIssIndex].question.passRate}}%人通过此题</view>
                 </view>
                 <view class="bz-right">
                     <image class="img" mode="widthFix" src="../img/bz-right.png"></image>
@@ -39,7 +39,7 @@
                 <view class="card">
                     <image class="photo" src="{{userPhoto}}"></image>
                     <view class="name">{{userName}}</view>
-                    <view class="desc">发出的年终亲密大考验</view>
+                    <view class="desc">TA发出的答题红包</view>
                     <button plain="true" class="button" @tap="closeMask">
                         <image class="img" src="../img/start-btn.png"></image>
                     </button>

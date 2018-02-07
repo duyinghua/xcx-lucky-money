@@ -259,7 +259,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async() => {
+            confirmQuestion: utils.debounce(async () => {
                 let curIssue = this.currentIssue();
 
                 let msg = this.checkIssue(curIssue);
@@ -352,6 +352,9 @@
         async incompleteRedPack() {
             let res = await http.post(apis.incompleteRedPack, {});
             if (res._ok) {
+                this.id = res.redPackageID;
+                this.type = res.redPackageType;
+                this.msg = res.msg;
                 res.qaList.forEach(item => {
                     item.question.uninId = item.question.id;
                     delete item.question.id;
@@ -541,12 +544,12 @@
             this.id = e.id;
             this.type = e.type || 1;
             this.msg = e.msg;
-            this.curTab = this.type;
             this.recover = e.recover || 0;
             if (this.recover) {
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
             }
+            this.curTab = this.type;
             this.lastRecommend = await this.getNewIssue();
             this.readyIssue = this.lastRecommend;
 //            this.lastRecommend && this.issueList.push(this.readyIssue);

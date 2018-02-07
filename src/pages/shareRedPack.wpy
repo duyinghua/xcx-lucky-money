@@ -16,10 +16,10 @@
             </block>
             <block wx:else>
                 <view class="message">
-                    <text class="p">{{msg}}</text>
+                    <text wx:if="{{msg}}" class="p">“{{msg}}”</text>
                 </view>
                 <view class="info">
-                    <view class="count">回答{{count}}道题，一起瓜分</view>
+                    <view class="count">{{count}}道题，一起瓜分</view>
                     <view class="amount">
                         <text class="value">{{amount}}</text>
                         元
@@ -137,12 +137,14 @@
                 ctx.drawImage('../img/share-redpack.png', 0, 0, 320, 469);
             } else {
                 ctx.drawImage('../img/share-redpack-square.png', 0, 0, 320, 469); //todo
-                ctx.setFillStyle('#ffffff')
-                ctx.setFontSize(20)
-                ctx.setTextAlign('center')
-                let msgHeight = DrawCanvas.drawText(ctx, DrawCanvas.replaceEmoji(this.msg), halfX, 18, 10, 26);
-                yOffset += msgHeight;
-                yOffset -= 30;
+                if (this.msg) {
+                    ctx.setFillStyle('#ffffff')
+                    ctx.setFontSize(20)
+                    ctx.setTextAlign('center')
+                    let msgHeight = DrawCanvas.drawText(ctx, DrawCanvas.replaceEmoji(this.msg), halfX, 18, 10, 26);
+                    yOffset += msgHeight;
+                    yOffset -= 30;
+                }
             }
             //  绘制题数
             yOffset += 82;   //间距
@@ -153,7 +155,7 @@
             if (this.type == 1) {
                 countText = this.count + '道题';
             } else {
-                countText = '回答' + this.count + '道题，一起瓜分';
+                countText = this.count + '道题，一起瓜分';
             }
             ctx.fillText(countText, halfX, yOffset);
             yOffset += 20;  //元素高度
@@ -258,9 +260,9 @@
         onLoad(e) {
             this.id = e.id;
             this.amount = e.amount;
-            this.msg = e.msg;
             this.count = e.count;
             this.type = e.type || 1;
+            this.msg = e.msg || '';
             this.$apply();
             this.getQrCode();
 //            this.saveShareImage();
@@ -274,7 +276,6 @@
             return {
                 title: wepy.$instance.globalData.shareInfo[0],
                 path: `pages/redpackStart?id=${this.id}`,
-//                imageUrl: `../img/share-title${rand}.png`
             }
         }
     }

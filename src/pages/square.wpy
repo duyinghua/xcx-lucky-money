@@ -27,7 +27,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="desc">答题就能分红包！</view>
+                <view wx:if="{{item.des}}" class="desc">{{item.des}}</view>
             </view>
         </view>
         <Empty wx:if="{{loaded && !redpackList.length}}"></Empty>
@@ -129,23 +129,6 @@
                 align-items: center;
                 padding: unit(26, rpx) unit(32, rpx);
                 .cont {
-                    position: relative;
-                    &:after {
-                        content: '';
-                        display: block;
-                        position: absolute;
-                        left: unit(56, rpx);
-                        bottom: unit(-14, rpx);
-                        width: unit(20, rpx);
-                        height: unit(20, rpx);
-                        transform: rotate(-45deg);
-                        transform-origin: center top;
-                        border-top: unit(1, rpx) solid #E8E8E8;
-                        border-right: unit(1, rpx) solid #E8E8E8;
-                        background: #FFFFFF;
-                    }
-                    padding-bottom: unit(30, rpx);
-                    border-bottom: unit(1, rpx) solid #E8E8E8;
                     display: flex;
                     .photo {
                         width: unit(100, rpx);
@@ -193,7 +176,23 @@
                 .desc {
                     color: #333;
                     font-size: 14px;
-                    margin-top: unit(10, rpx);
+                    border-top: unit(1, rpx) solid #E8E8E8;
+                    position: relative;
+                    padding-top: unit(15, rpx);
+                    &:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        left: unit(56, rpx);
+                        top: unit(-10, rpx);
+                        width: unit(20, rpx);
+                        height: unit(20, rpx);
+                        transform: rotate(-45deg);
+                        transform-origin: center top;
+                        border-top: unit(1, rpx) solid #E8E8E8;
+                        border-right: unit(1, rpx) solid #E8E8E8;
+                        background: #FFF;
+                    }
                 }
             }
         }

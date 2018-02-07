@@ -15,12 +15,14 @@
                 <view class="input-area">
                     <view class="input-box">
                         <view class="label">红包(元)</view>
-                        <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}" bindinput="amountInput"
+                        <input class="input" type="digit" placeholder="输入红包金额" value="{{amount}}"
+                               bindinput="amountInput"
                                bindblur="amountBlur"/>
                     </view>
                     <view wx:if="{{type==2}}" class="input-box mt">
                         <view class="label">想说的话</view>
-                        <input class="input" type="text" placeholder="寄语或想表达的内容" value="{{message}}" bindinput="messageInput"
+                        <input class="input" type="text" placeholder="寄语或想表达的内容" value="{{message}}"
+                               bindinput="messageInput"
                                bindblur="messageBlur"/>
                     </view>
                 </view>
@@ -57,6 +59,7 @@
             headPhoto: '',
             amount: '',
             message: '',
+            msg: '',//之前红包的msg
             type: 1,
             incompleteId: 0,
             taped: false
@@ -123,7 +126,7 @@
                         success: wres => {
                             if (wres.confirm) {
                                 wx.navigateTo({
-                                    url: `createIssue?type=${this.type}&id=${this.incompleteId}&recover=1&msg=${this.message}` //todo message要返回
+                                    url: `createIssue?recover=1`
                                 })
                             }
                         }
@@ -150,7 +153,8 @@
                 this.taped = true;
                 let res = await http.post(apis.recharge, {
                     redPackagePrice: amount,
-                    redPackageType: this.type
+                    redPackageType: this.type,
+                    msg: this.message
                 });
                 if (res._ok) {
                     let payParam = res.weixinpayParamLite || {};
@@ -197,6 +201,8 @@
             if (res._ok) {
                 if (res.redPackageID) {
                     this.incompleteId = res.redPackageID;
+                    this.type = res.redPackageType;
+                    this.msg = res.msg;
                 } else {
                     this.incompleteId = 0;
                 }

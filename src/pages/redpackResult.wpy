@@ -3,12 +3,12 @@
         class="redpackResult-page container {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'banner-padding':''}}">
         <block wx:if="{{loaded}}">
             <view class="main">
-                <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
+                <view class="title" wx:if="{{myInfo.redPackageType==1}}">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
                 <view class="amount">获得
                     <text class="value">{{myInfo.receiveFee}}</text>
                     元红包
                 </view>
-                <view class="result"
+                <view class="result" wx:if="{{myInfo.redPackageType==1}}"
                       style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
                     <view class="score">
                         <text class="value">{{myInfo.intimacy}}</text>
@@ -43,7 +43,7 @@
                 <text class="b">{{sendedFee}}</text>
                 元，已被
                 <text class="b">{{totalCount}}</text>
-                位好友领取
+                位朋友领取
                 <view class="more" @tap="toSquare">抢更多红包></view>
             </view>
             <view class="list">
@@ -348,7 +348,8 @@
             padding-bottom: unit(117, rpx);
         }
         .main {
-            height: unit(980, rpx);
+            min-height: unit(200, rpx);
+            max-height: unit(980, rpx);
             background: url('http://redpackagelite.static.immocha.com/wxlite/answer-bg.jpg') no-repeat center top / cover;
             .title {
                 text-align: center;

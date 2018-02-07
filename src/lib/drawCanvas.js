@@ -20,11 +20,12 @@ export default class drawCanvas {
                 temp += chr[a]
             } else {
                 row.push(temp)
-                temp = ''
-                maxLenght += limit
+                temp = chr[a]
+                maxLenght += limit;
             }
         }
         row.push(temp)
+        console.log(row);
         for (let b = 0; b < row.length; b++) {
             context.fillText(row[b], x, y + b * lineHeight)
         }
