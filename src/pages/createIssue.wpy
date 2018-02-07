@@ -71,6 +71,7 @@
                                                bindinput="questionInput"/>
                                     </view>
                                 </view>
+                                <view class="tip">(至少设置两个答案)</view>
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}" wx:for="{{curIssue.answerList}}"
                                           wx:for-item="item" wx:for-index="a_index" wx:key="diy_{{a_index}}">

@@ -136,7 +136,7 @@
             if (this.type == 1) {
                 ctx.drawImage('../img/share-redpack.png', 0, 0, 320, 469);
             } else {
-                ctx.drawImage('../img/share-redpack-square.png', 0, 0, 320, 469); //todo
+                ctx.drawImage('../img/share-redpack-square.png', 0, 0, 320, 469);
                 if (this.msg) {
                     ctx.setFillStyle('#ffffff')
                     ctx.setFontSize(20)
@@ -273,8 +273,14 @@
         }
 
         onShareAppMessage() {
+            let title;
+            if (this.type == 1) {
+                title = wepy.$instance.globalData.shareInfo[0];
+            } else if (this.type == 2) {
+                title = this.msg
+            }
             return {
-                title: wepy.$instance.globalData.shareInfo[0],
+                title: title,
                 path: `pages/redpackStart?id=${this.id}`,
             }
         }

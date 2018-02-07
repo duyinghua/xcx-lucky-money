@@ -3,12 +3,12 @@
         class="redpackResult-page container {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'banner-padding':''}}">
         <block wx:if="{{loaded}}">
             <view class="main">
-                <view class="title" wx:if="{{myInfo.redPackageType==1}}">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
+                <view class="title" wx:if="{{type==1}}">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
                 <view class="amount">获得
                     <text class="value">{{myInfo.receiveFee}}</text>
                     元红包
                 </view>
-                <view class="result" wx:if="{{myInfo.redPackageType==1}}"
+                <view class="result" wx:if="{{type==1}}"
                       style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
                     <view class="score">
                         <text class="value">{{myInfo.intimacy}}</text>
@@ -89,7 +89,9 @@
                 </block>
             </view>
             <!--<view hidden="{{!saveing}}">-->
-            <canvas class="share-canvas" canvas-id="shareCanvas"></canvas>
+            <canvas class="share-canvas {{shareCanvasShow?'show':''}}" canvas-id="shareCanvas"></canvas>
+            <canvas class="share-square-canvas {{shareSquareCanvasShow?'show':''}}" canvas-id="shareSquareCanvas"></canvas>
+
             <!--</view>-->
         </block>
     </view>
@@ -112,6 +114,7 @@
             myInfo: {},
             authorInfo: {},
             detail: {},
+            type: 0,
             totalFee: 0,
             sendedFee: 0,
             totalCount: 0,
@@ -121,7 +124,9 @@
             showShareBar: false,
             taped: false,
             saveing: false,
-            loaded: false
+            loaded: false,
+            shareCanvasShow: false,
+            shareSquareCanvasShow: false
         }
         computed = {}
         methods = {
@@ -146,7 +151,11 @@
             },
             async shareTimeline(){
                 await this.shareRelive();
-                await this.saveShareImage();
+                if (this.type == 1) {
+                    await this.saveShareImage();
+                } else {
+                    await this.saveSquareShareImage();
+                }
             },
             async buyServiveCard() {
                 if (!this.taped) {
@@ -191,6 +200,7 @@
                 }
                 this.loaded = true;
                 this.myInfo = res.myModel || {};
+                this.type = res.myModel.redPackageType;
                 this.authorInfo = res.authorModel || {};
                 this.detail = res.detailMap || {};
                 this.totalFee = isNaN(res.detailMap.totalFee) ? '0.00' : Number(res.detailMap.totalFee).toFixed(2);
@@ -226,13 +236,8 @@
             }
         }
 
-        clearCanvas() {
-            const ctx = wx.createCanvasContext('shareCanvas')
-            ctx.clearRect(0, 0, 320, 469);
-            ctx.draw();
-        }
-
         async saveShareImage() {
+            this.shareCanvasShow = true;
             this.showShareBar = false;
             this.$apply();
             wx.showLoading({
@@ -244,30 +249,13 @@
 
             const ctx = wx.createCanvasContext('shareCanvas')
             let yOffset = 45;
-            const halfX = 187.5;
+            const halfX = 160;
             ctx.setTextBaseline('top')
             //  绘制背景
-            ctx.drawImage(`../img/share-intimacy-${this.myInfo.level}.png`, 0, 0, 375, 592)
+            ctx.drawImage(`../img/share-intimacy-${this.myInfo.level}.png`, 0, 0, 320, 569)
 
-            let cardTop = 93;
+            let cardTop = 118;
 
-            //  绘制头像
-//            ctx.save()
-//            ctx.beginPath()
-//            ctx.arc(halfX, yOffset + 25, 25, 0, 2 * Math.PI)
-//            ctx.closePath();
-//            ctx.clip()
-//            ctx.drawImage(userImage.tempFilePath, halfX - 25, yOffset, 50, 50)
-//            yOffset += 50;  //元素高度
-//            ctx.restore()
-
-            //  绘制昵称
-//            yOffset += 7;   //间距
-//            ctx.setFillStyle('#ffffff')
-//            ctx.setFontSize(14)
-//            ctx.setTextAlign('center')
-//            ctx.fillText(DrawCanvas.replaceEmoji(this.myInfo.userName), halfX, yOffset);
-//            yOffset += 15;  //元素高度
             if (this.myInfo.receiveFee) {
                 //  绘制说明
                 ctx.setFillStyle('#ffffff')
@@ -279,60 +267,114 @@
 
             //  绘制分数
             ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(47)
+            ctx.setFontSize(36)
             ctx.fillText(this.myInfo.intimacy, halfX, cardTop + 170);
-            ctx.setFontSize(20)
-            ctx.fillText('分', halfX + 52, cardTop + 193);
+            ctx.setFontSize(18)
+            ctx.fillText('分', halfX + 42, cardTop + 193);
             //  绘制称号盖章
-            ctx.drawImage('../img/share-stamp.png', halfX + 46, cardTop + 240, 70, 50);
+            ctx.drawImage('../img/share-stamp.png', halfX + 36, cardTop + 228, 60, 43);
             //  绘制称号
             ctx.setFillStyle('#ffffff')
-            ctx.setFontSize(18)
+            ctx.setFontSize(16)
             ctx.setTextAlign('center')
-            ctx.fillText('“' + this.myInfo.intimacy_des + '”', halfX, cardTop + 251);
+            ctx.fillText('“' + this.myInfo.intimacy_des + '”', halfX, cardTop + 240);
 
 
             //  绘制左头像（自己）
-            let headTop = cardTop + 168;
+            let headTop = cardTop + 169;
             ctx.save()
             ctx.beginPath()
-            ctx.arc(62, headTop + 29, 29, 0, 2 * Math.PI)
+            ctx.arc(53, headTop + 24, 24, 0, 2 * Math.PI)
             ctx.closePath();
             ctx.clip()
-            ctx.drawImage(userImage.tempFilePath, 62 - 29, headTop, 58, 58)
+            ctx.drawImage(userImage.tempFilePath, 53 - 24, headTop, 48, 48)
             yOffset += 50;  //元素高度
             ctx.restore();
             //  绘制右头像
             ctx.save()
             ctx.beginPath()
-            ctx.arc(308, headTop + 29, 29, 0, 2 * Math.PI)
+            ctx.arc(263, headTop + 24, 24, 0, 2 * Math.PI)
             ctx.closePath();
             ctx.clip()
-            ctx.drawImage(authorImage.tempFilePath, 308 - 29, headTop, 58, 58)
+            ctx.drawImage(authorImage.tempFilePath, 263 - 24, headTop, 48, 48)
 
             yOffset += 50;  //元素高度
             ctx.restore()
             ctx.draw();
-            DrawCanvas.canvasToSave('shareCanvas');
+            await DrawCanvas.canvasToSave('shareCanvas');
+            this.shareCanvasShow = false;
+            this.$apply();
+        }
+
+        async saveSquareShareImage() {  // todo 二维码，金额，题数
+            this.shareSquareCanvasShow = true;
+            this.showShareBar = false;
+            this.$apply();
+            wx.showLoading({
+                title: '图片生成中',
+                mask: true
+            })
+
+            const ctx = wx.createCanvasContext('shareSquareCanvas')
+            let yOffset = 0;
+            const halfX = 160;
+            ctx.setTextBaseline('top')
+            //  绘制背景
+            ctx.drawImage(`../img/share-square.png`, 0, 0, 320, 265)
+            //  绘制寄语
+            this.myInfo.msg = '希望大家在新的一年大吉大利，狗年大吉'
+            if (this.myInfo.msg) {
+                ctx.setFillStyle('#ffffff')
+                ctx.setFontSize(16)
+                ctx.setTextAlign('center')
+                let msgHeight = DrawCanvas.drawText(ctx, DrawCanvas.replaceEmoji(this.myInfo.msg), halfX, 20, 16);
+                yOffset += msgHeight;
+            }
+            //  绘制题数
+            yOffset += 30;   //间距
+            ctx.setFillStyle('#ffffff')
+            ctx.setFontSize(14)//24 64
+            ctx.setTextAlign('center')
+            ctx.fillText('N道题，一起瓜分', halfX, yOffset);
+            yOffset += 20;  //元素高度
+            //  绘制金额
+            yOffset += 4;   //间距
+            ctx.setFontSize(36)
+            ctx.fillText('￥888.88', halfX, yOffset);
+            yOffset += 64;   //元素高度
+            ctx.draw();
+            await DrawCanvas.canvasToSave('shareSquareCanvas');
+            this.shareSquareCanvasShow = false;
+            this.$apply();
         }
 
         async onLoad(e) {
             this.id = e.id;
             await this.getResult();
-
-//            this.saveShareImage();
+//            this.saveShareImage()
+//            this.saveSquareShareImage();
         }
 
         onShareAppMessage() {
             this.showShareBar = false;
             this.$apply();
-            let rand = parseInt(Math.random() * 3) + 1;
-            return {
-                title: wepy.$instance.globalData.shareInfo[rand],
-                path: `pages/redpackStart?id=${this.id}`,
-                imageUrl: `../img/share-title${rand}.png`,
-                success: async() => {
-                    await this.shareRelive();
+            if (this.type == 1) {
+                let rand = parseInt(Math.random() * 3) + 1;
+                return {
+                    title: wepy.$instance.globalData.shareInfo[rand],
+                    path: `pages/redpackStart?id=${this.id}`,
+                    imageUrl: `../img/share-title${rand}.png`,
+                    success: async() => {
+                        await this.shareRelive();
+                    }
+                }
+            } else if (this.type == 2) {
+                return {
+                    title: this.myInfo.msg,
+                    path: `pages/redpackStart?id=${this.id}`,
+                    success: async() => {
+                        await this.shareRelive();
+                    }
                 }
             }
         }
@@ -349,7 +391,6 @@
         }
         .main {
             min-height: unit(200, rpx);
-            max-height: unit(980, rpx);
             background: url('http://redpackagelite.static.immocha.com/wxlite/answer-bg.jpg') no-repeat center top / cover;
             .title {
                 text-align: center;
@@ -425,7 +466,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                margin: unit(50, rpx) unit(96, rpx) 0;
+                margin: unit(50, rpx) unit(96, rpx) unit(30, rpx);
                 .li {
                     display: flex;
                     align-items: center;
@@ -591,11 +632,27 @@
         }
         .share-canvas {
             position: absolute;
-            width: 375px;
-            height: 592px;
-            left: 0;
+            width: 320px;
+            height: 569px;
+            left: 50%;
+            margin-left: -160px;
+            top: -9999px;
+            &.show {
+                /*top: 0;*/
+            }
+        }
+        .share-square-canvas {
+            position: absolute;
+            width: 320px;
+            height: 265px;
+            left: 50%;
+            margin-left: -160px;
             /*top: 0px;*/
             top: -9999px;
+            &.show {
+                /*top: 0;*/
+            }
         }
+
     }
 </style>
