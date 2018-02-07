@@ -67,6 +67,7 @@
             sendedFee: 0,
             totalCount: 0,
             maxFee: 0,
+            type: 0,
             msg: '',
             detailList: [],
             isLast: false
@@ -89,7 +90,7 @@
             },
             shareRedPack(){
                 wx.navigateTo({
-                    url: `shareRedPack?id=${this.id}&amount=${this.totalFee}&count=${this.totalCount}&msg=${this.msg}`
+                    url: `shareRedPack?id=${this.id}&amount=${this.totalFee}&count=${this.totalCount}&type=${this.type}&msg=${this.msg}`
                 })
             }
         }
@@ -110,6 +111,7 @@
                         this.sendedFee = isNaN(res.sendedFee) ? '0.00' : Number(res.sendedFee).toFixed(2);
                         this.totalCount = res.totalCount;
                         this.maxFee = res.maxRedpackageFee || 0;
+                        this.type = res.type;
                         this.msg = res.msg;
                     }
                     if (res.detailList.length) {
