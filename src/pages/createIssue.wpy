@@ -2,10 +2,9 @@
     <view class="createIssue-page container">
         <scroll-view class="iss-index" scroll-x="true" scroll-left="{{issScrollLeft}}">
             <view class="li" wx:for="{{indexs}}" wx:for-index="index_i" wx:key="{{index_i}}">
-                <view class="num {{index_i<issueList.length+1?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
-                      @tap="changeIndex({{index_i}})">
-                    {{index_i + 1}}
-                </view>
+                <text class="num {{index_i<issueList.length+1?'prev':''}} {{index_i==curIssIndex?'cur':''}}"
+                      @tap="changeIndex({{index_i}})">{{index_i + 1}}
+                </text>
             </view>
         </scroll-view>
         <view class="tab">
@@ -260,7 +259,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async () => {
+            confirmQuestion: utils.debounce(async() => {
                 let curIssue = this.currentIssue();
 
                 let msg = this.checkIssue(curIssue);

@@ -38,41 +38,42 @@
                     </button>
                 </view>
             </view>
-            <view class="desc">
-                共
-                <text class="b">{{sendedFee}}</text>
-                元，已被
-                <text class="b">{{totalCount}}</text>
-                位朋友领取
-                <view class="more" @tap="toSquare">答更多题目></view>
-            </view>
-            <view class="list">
-                <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
-                      wx:for-index="index" wx:key="{{index}}">
-                    <view class="photo">
-                        <image class="img" mode="widthFix"
-                               src="{{item.headPicURL}}"></image>
-                    </view>
-                    <view class="info">
-                        <view class="row">
-                            <view class="name">{{item.userName}}</view>
-                            <view class="amount">￥{{item.receiveFee}}</view>
+            <block wx:if="{{type!=3}}">
+                <view class="desc">
+                    共
+                    <text class="b">{{sendedFee}}</text>
+                    元，已被
+                    <text class="b">{{totalCount}}</text>
+                    位朋友领取
+                    <view class="more" @tap="toSquare">答更多题目></view>
+                </view>
+                <view class="list">
+                    <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
+                          wx:for-index="index" wx:key="{{index}}">
+                        <view class="photo">
+                            <image class="img" mode="widthFix"
+                                   src="{{item.headPicURL}}"></image>
                         </view>
-                        <view class="row">
-                            <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
-                            <view class="datetime">{{item.createTime}}</view>
+                        <view class="info">
+                            <view class="row">
+                                <view class="name">{{item.userName}}</view>
+                                <view class="amount">￥{{item.receiveFee}}</view>
+                            </view>
+                            <view class="row">
+                                <view class="level">亲密值{{item.intimacy}}分 答对{{item.correctCount}}题</view>
+                                <view class="datetime">{{item.createTime}}</view>
+                            </view>
                         </view>
                     </view>
                 </view>
-            </view>
-
+            </block>
             <view wx:if="{{showShareBar}}"
                   class="share-bar {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'up':''}}">
                 <button plain="true" class="button share-friend" open-type="share">
                     <image class="icon" src="../img/icon-fenxiang.png"></image>
                     转发
                 </button>
-                <button plain="true" class="button share-timeline" @tap="shareTimeline">
+                <button wx:if="{{type!=3}}" plain="true" class="button share-timeline" @tap="shareTimeline">
                     <image class="icon" src="../img/icon-timeline.png"></image>
                     发朋友圈
                 </button>
@@ -168,7 +169,7 @@
                         })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async () => {
+                        wxRequestPayment(payParam, async() => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
                             });
@@ -410,13 +411,13 @@
         onShareAppMessage() {
             this.showShareBar = false;
             this.$apply();
-            if (this.type == 1) {
+            if (this.type == 1 || this.type == 3) {
                 let rand = parseInt(Math.random() * 3) + 1;
                 return {
                     title: wepy.$instance.globalData.shareInfo[rand],
                     path: `pages/redpackStart?id=${this.id}`,
                     imageUrl: `../img/share-title${rand}.png`,
-                    success: async () => {
+                    success: async() => {
                         await this.shareRelive();
                     }
                 }
@@ -424,7 +425,7 @@
                 return {
                     title: this.myInfo.msg,
                     path: `pages/redpackStart?id=${this.id}`,
-                    success: async () => {
+                    success: async() => {
                         await this.shareRelive();
                     }
                 }
