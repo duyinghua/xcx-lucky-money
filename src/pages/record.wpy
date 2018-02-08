@@ -1,8 +1,8 @@
 <template>
     <view class="record-page container">
         <view class="tab">
-            <view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">我发出的</view>
             <view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">我抢到的</view>
+            <view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">我发出的</view>
         </view>
         <view hidden="{{curTab!=1}}" class="send-record">
             <view class="overview">
@@ -38,6 +38,7 @@
                 <view class="item">
                     <view class="label">金额(元)</view>
                     <view class="value">{{receiveTotalFee}}</view>
+                    <view class="extract" @tap="extractHandler">余额提现</view>
                 </view>
                 <view class="item">
                     <view class="label">数量(个)</view>
@@ -64,7 +65,7 @@
             enablePullDownRefresh: true
         }
         data = {
-            curTab: 1,
+            curTab: 2,
             sendTotalFee: 0,
             sendTotalCount: 0,
             sendList: [],
@@ -75,6 +76,11 @@
             isLastReceive: false
         }
         methods = {
+            extractHandler(){
+                wx.navigateTo({
+                    url: 'extract'
+                })
+            },
             tabHandler(num){
                 this.curTab = num;
                 this.$apply()
@@ -207,6 +213,7 @@
             padding: 0 unit(70, rpx);
             .item {
                 display: flex;
+                align-items: center;
                 .label {
                     color: #BFBFBF;
                     font-size: unit(26, rpx);
@@ -214,6 +221,11 @@
                 }
                 .value {
                     font-size: unit(36, rpx);
+                }
+                .extract {
+                    font-size: unit(26, rpx);
+                    color: #CD3434;
+                    margin-left: unit(30, rpx);
                 }
             }
         }

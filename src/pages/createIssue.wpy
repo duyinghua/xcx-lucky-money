@@ -204,7 +204,7 @@
             changeIndex(index){
                 if (index <= this.issueList.length + 1 - 1) {
                     this.curIssIndex = index;
-                    this.curTab = this.type;    // 切换到了之前出过的题的话，默认tab由个人（推荐）/广场（自定义）红包类型而定
+                    this.curTab = this.type == 2 ? 2 : 1;  // 切换到了之前出过的题的话，默认tab由个人（推荐）/广场（自定义）红包类型而定
                 }
                 this.$apply();
             },
@@ -415,7 +415,7 @@
              this.$apply();
              }, 300);*/
 
-            this.curTab = this.type;
+            this.curTab = this.type == 2 ? 2 : 1;
             this.curIssIndex++;
             this.lastRecommend = await this.getNewIssue();
             this.readyIssue = this.lastRecommend;
@@ -527,7 +527,7 @@
                 redPackageID: this.id
             })
             if (res._ok) {
-                wx.navigateTo({
+                wx.redirectTo({
                     url: `shareRedPack?id=${this.id}&type=${this.type}&amount=${res.totalFee}&count=${res.questionCount}&msg=${this.msg}`
                 })
             }
@@ -550,7 +550,8 @@
                 await this.incompleteRedPack();
                 this.curIssIndex = this.issueList.length
             }
-            this.curTab = this.type;
+
+            this.curTab = this.type == 2 ? 2 : 1;
             this.lastRecommend = await this.getNewIssue();
             this.readyIssue = this.lastRecommend;
 //            this.lastRecommend && this.issueList.push(this.readyIssue);

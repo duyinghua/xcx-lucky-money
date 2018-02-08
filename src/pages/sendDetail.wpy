@@ -27,7 +27,7 @@
                 元
             </view>
             <view class="explain" @tap="more">
-                抢更多红包>
+                答更多题目>
             </view>
         </view>
         <view class="list">
@@ -79,7 +79,7 @@
                 })
             },
             extractHandler(){
-                wx.switchTab({
+                wx.navigateTo({
                     url: 'extract'
                 })
             },

@@ -3,12 +3,12 @@
         class="redpackResult-page container {{serviveCard.leftServiveTime&&myInfo.intimacy!=100?'banner-padding':''}}">
         <block wx:if="{{loaded}}">
             <view class="main">
-                <view class="title" wx:if="{{type==1}}">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
-                <view class="amount">获得
+                <view class="title">{{myInfo.intimacy == 100 ? '冲顶成功' : '答题结束'}}</view>
+                <view class="amount" wx:if="{{myInfo.receiveFee!=0}}">获得
                     <text class="value">{{myInfo.receiveFee}}</text>
                     元红包
                 </view>
-                <view class="result" wx:if="{{type==1}}"
+                <view class="result" wx:if="{{type!=2}}"
                       style="background: url({{myInfo.levelPicURL}}) no-repeat center top / cover">
                     <view class="score">
                         <text class="value">{{myInfo.intimacy}}</text>
@@ -44,7 +44,7 @@
                 元，已被
                 <text class="b">{{totalCount}}</text>
                 位朋友领取
-                <view class="more" @tap="toSquare">抢更多红包></view>
+                <view class="more" @tap="toSquare">答更多题目></view>
             </view>
             <view class="list">
                 <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
@@ -90,7 +90,8 @@
             </view>
             <!--<view hidden="{{!saveing}}">-->
             <canvas class="share-canvas {{shareCanvasShow?'show':''}}" canvas-id="shareCanvas"></canvas>
-            <canvas class="share-square-canvas {{shareSquareCanvasShow?'show':''}}" canvas-id="shareSquareCanvas"></canvas>
+            <canvas class="share-square-canvas {{shareSquareCanvasShow?'show':''}}"
+                    canvas-id="shareSquareCanvas"></canvas>
 
             <!--</view>-->
         </block>
@@ -125,13 +126,14 @@
             taped: false,
             saveing: false,
             loaded: false,
+            qrcode: '',
             shareCanvasShow: false,
             shareSquareCanvasShow: false
         }
         computed = {}
         methods = {
             extractHandler(){
-                wx.switchTab({
+                wx.navigateTo({
                     url: 'extract'
                 })
             },
@@ -153,7 +155,7 @@
                 await this.shareRelive();
                 if (this.type == 1) {
                     await this.saveShareImage();
-                } else {
+                } else if (this.type == 2) {
                     await this.saveSquareShareImage();
                 }
             },
@@ -166,7 +168,7 @@
                         })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async() => {
+                        wxRequestPayment(payParam, async () => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
                             });
@@ -244,15 +246,25 @@
                 title: '图片生成中',
                 mask: true
             })
-            let userImage = await wepy.downloadFile({url: this.myInfo.headPicURL})
-            let authorImage = await wepy.downloadFile({url: this.authorInfo.userHeadPic})
-
+            let userImage, authorImage, shareImageBg;
+            try {
+                userImage = await wepy.downloadFile({url: this.myInfo.headPicURL})
+                authorImage = await wepy.downloadFile({url: this.authorInfo.userHeadPic})
+                shareImageBg = await wepy.downloadFile({url: this.myInfo.sharePic})
+            } catch (e) {
+                wx.hideLoading();
+                wx.showModal({
+                    content: '图片保存异常',
+                    showCancel: false,
+                })
+                return;
+            }
             const ctx = wx.createCanvasContext('shareCanvas')
             let yOffset = 45;
             const halfX = 160;
             ctx.setTextBaseline('top')
             //  绘制背景
-            ctx.drawImage(`../img/share-intimacy-${this.myInfo.level}.png`, 0, 0, 320, 569)
+            ctx.drawImage(shareImageBg.tempFilePath, 0, 0, 320, 569)
 
             let cardTop = 118;
 
@@ -261,7 +273,7 @@
                 ctx.setFillStyle('#ffffff')
                 ctx.setFontSize(15)
                 ctx.setTextAlign('center')
-                ctx.fillText(`我答对 ${this.myInfo.correctCount} 题 获得 ${this.myInfo.receiveFee} 元红包`, halfX, yOffset);
+                ctx.fillText(`我答对 ${this.myInfo.correctCount} 题 获得 ${this.myInfo.receiveFee} 元奖励`, halfX, yOffset);
                 yOffset += 20;  //元素高度
             }
 
@@ -306,7 +318,7 @@
             this.$apply();
         }
 
-        async saveSquareShareImage() {  // todo 二维码，金额，题数
+        async saveSquareShareImage() {
             this.shareSquareCanvasShow = true;
             this.showShareBar = false;
             this.$apply();
@@ -314,11 +326,23 @@
                 title: '图片生成中',
                 mask: true
             })
-
+            let qrcodeImage;
+            try {
+                qrcodeImage = await wepy.downloadFile({url: this.qrcode})
+            } catch (e) {
+                console.log(e);
+                wx.hideLoading();
+                wx.showModal({
+                    content: '二维码生成异常',
+                    showCancel: false,
+                })
+                return;
+            }
             const ctx = wx.createCanvasContext('shareSquareCanvas')
             let yOffset = 0;
             const halfX = 160;
             ctx.setTextBaseline('top')
+
             //  绘制背景
             ctx.drawImage(`../img/share-square.png`, 0, 0, 320, 265)
             //  绘制寄语
@@ -330,17 +354,29 @@
                 let msgHeight = DrawCanvas.drawText(ctx, DrawCanvas.replaceEmoji(this.myInfo.msg), halfX, 20, 16);
                 yOffset += msgHeight;
             }
+
+            //  绘制二维码
+            let qrcodeY = 162;
+            ctx.save()
+            ctx.beginPath()
+            ctx.arc(halfX, qrcodeY + 40, 40, 0, 2 * Math.PI)
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(qrcodeImage.tempFilePath, halfX - 39, qrcodeY + 5, 78, 78);
+//            ctx.drawImage('../img/demo-qrcode.png', halfX - 35, qrcodeY + 5, 70, 70);
+            ctx.restore();
+
             //  绘制题数
             yOffset += 30;   //间距
             ctx.setFillStyle('#ffffff')
             ctx.setFontSize(14)//24 64
             ctx.setTextAlign('center')
-            ctx.fillText('N道题，一起瓜分', halfX, yOffset);
+            ctx.fillText(this.myInfo.correctCount + '道题，一起瓜分', halfX, yOffset);
             yOffset += 20;  //元素高度
             //  绘制金额
             yOffset += 4;   //间距
             ctx.setFontSize(36)
-            ctx.fillText('￥888.88', halfX, yOffset);
+            ctx.fillText('￥' + this.totalFee, halfX, yOffset);
             yOffset += 64;   //元素高度
             ctx.draw();
             await DrawCanvas.canvasToSave('shareSquareCanvas');
@@ -348,9 +384,25 @@
             this.$apply();
         }
 
+        async getQrCode() {
+            let res = await http.post(apis.wxQrCode, {
+                redPackageID: this.id,
+                scene: this.id,
+                page: 'pages/redpackStart',//gameStart/gameStart
+                width: 396,
+                auto_color: false,
+                line_color: JSON.stringify({r: 0, g: 0, b: 0})
+            })
+            if (res._ok) {
+                this.qrcode = res._result;
+                this.$apply();
+            }
+        }
+
         async onLoad(e) {
             this.id = e.id;
             await this.getResult();
+            this.getQrCode();
 //            this.saveShareImage()
 //            this.saveSquareShareImage();
         }
@@ -364,7 +416,7 @@
                     title: wepy.$instance.globalData.shareInfo[rand],
                     path: `pages/redpackStart?id=${this.id}`,
                     imageUrl: `../img/share-title${rand}.png`,
-                    success: async() => {
+                    success: async () => {
                         await this.shareRelive();
                     }
                 }
@@ -372,7 +424,7 @@
                 return {
                     title: this.myInfo.msg,
                     path: `pages/redpackStart?id=${this.id}`,
-                    success: async() => {
+                    success: async () => {
                         await this.shareRelive();
                     }
                 }
@@ -647,8 +699,8 @@
             height: 265px;
             left: 50%;
             margin-left: -160px;
-            /*top: 0px;*/
             top: -9999px;
+            /*top: 0px;*/
             &.show {
                 /*top: 0;*/
             }

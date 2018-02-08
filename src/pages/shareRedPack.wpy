@@ -14,12 +14,24 @@
                     </view>
                 </view>
             </block>
-            <block wx:else>
+            <block wx:elif="{{type==2}}">
                 <view class="message">
                     <text wx:if="{{msg}}" class="p">“{{msg}}”</text>
                 </view>
                 <view class="info">
                     <view class="count">{{count}}道题，一起瓜分</view>
+                    <view class="amount">
+                        <text class="value">{{amount}}</text>
+                        元
+                    </view>
+                </view>
+            </block>
+            <block wx:elif="{{type==3}}">
+                <view class="message">
+                    <text class="p">情侣心跳测试</text>
+                </view>
+                <view class="info">
+                    <view class="count">{{count}}道题</view>
                     <view class="amount">
                         <text class="value">{{amount}}</text>
                         元
@@ -135,7 +147,7 @@
             //  绘制背景
             if (this.type == 1) {
                 ctx.drawImage('../img/share-redpack.png', 0, 0, 320, 469);
-            } else {
+            } else if (this.type == 2) {
                 ctx.drawImage('../img/share-redpack-square.png', 0, 0, 320, 469);
                 if (this.msg) {
                     ctx.setFillStyle('#ffffff')
@@ -154,7 +166,7 @@
             let countText = ''
             if (this.type == 1) {
                 countText = this.count + '道题';
-            } else {
+            } else if (this.type == 2) {
                 countText = this.count + '道题，一起瓜分';
             }
             ctx.fillText(countText, halfX, yOffset);
@@ -200,7 +212,7 @@
             let res = await http.post(apis.wxQrCode, {
                 redPackageID: this.id,
                 scene: this.id,
-                page: 'pages/goodsDetail',//gameStart/gameStart
+                page: 'pages/redpackStart',//pages/goodsDetail
                 width: 396,
                 auto_color: false,
                 line_color: JSON.stringify({r: 0, g: 0, b: 0})
@@ -299,8 +311,8 @@
             overflow: hidden;
             .title {
                 display: block;
-                width: unit(352, rpx);
-                height: unit(120, rpx);
+                width: unit(256, rpx);
+                height: unit(119, rpx);
                 margin: unit(66, rpx) auto 0;
             }
             .message {

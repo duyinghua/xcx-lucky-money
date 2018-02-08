@@ -39,7 +39,7 @@
                 <view class="card">
                     <image class="photo" src="{{userPhoto}}"></image>
                     <view class="name">{{userName}}</view>
-                    <view class="desc">TA发出的答题红包</view>
+                    <view class="desc">TA发出的答题奖励</view>
                     <button plain="true" class="button" @tap="closeMask">
                         <image class="img" src="../img/start-btn.png"></image>
                     </button>

@@ -11,8 +11,8 @@
                 <image class="img" src="{{headPhoto}}"></image>
             </view>
             <image class="button" src="../img/index-btn1.png" @tap="play(1)"></image>
+            <image class="button" src="../img/index-btn3.png" @tap="play(3)"></image>
             <image class="button" src="../img/index-btn2.png" @tap="play(2)"></image>
-            <image class="button" src="../img/index-btn3.png"></image>
         </view>
 
     </view>
@@ -26,8 +26,7 @@
     import wxRequestPayment from '../lib/wxRequestPayment.js'
 
     export default class Index extends wepy.page {
-        config = {
-        }
+        config = {}
         data = {
             headPhoto: '',
             mode: 0,
@@ -47,7 +46,7 @@
                 if (!this.mode) {
                     return;
                 }
-                if (this.mode == 1 && type == 1) { //提审并且是个人红包
+                if (this.mode == 1) { //提审
                     this.goIssue(type);
                 } else {
                     wx.navigateTo({
@@ -63,7 +62,7 @@
             });
             if (res._ok) {
                 wx.navigateTo({
-                    url: 'createIssue?id=' + res._result
+                    url: `createIssue?id=${res._result}&type=${type}`
                 })
             }
         }

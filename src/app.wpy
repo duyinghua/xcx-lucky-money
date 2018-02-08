@@ -45,12 +45,12 @@
                 list: [
                     {
                         pagePath: 'pages/index',
-                        text: '发红包',
+                        text: '出题',
                         iconPath: 'img/tab-hongbao-d.png',
                         selectedIconPath: 'img/tab-hongbao-a.png',
                     }, {
                         pagePath: 'pages/square',
-                        text: '红包广场',
+                        text: '冲顶广场',
                         iconPath: 'img/tab-guangchang-d.png',
                         selectedIconPath: 'img/tab-guangchang-a.png',
                     }, {
@@ -58,12 +58,12 @@
                         text: '我的记录',
                         iconPath: 'img/tab-jilu-d.png',
                         selectedIconPath: 'img/tab-jilu-a.png',
-                    }, {
+                    }/*, {
                         pagePath: 'pages/extract',
                         text: '余额提现',
                         iconPath: 'img/tab-qianbao-d.png',
                         selectedIconPath: 'img/tab-qianbao-a.png',
-                    }
+                    }*/
                 ]
             },
         }
@@ -80,15 +80,6 @@
                 '是真老铁，还是路人乙？看你能答对几题'
             ],
             pageData: {
-                goodsDetail: {
-                    _reload: false
-                },
-                writeComment: {
-                    commentData: {}
-                },
-                myCollection: {
-                    dataList: [],
-                }
             }
         }
 

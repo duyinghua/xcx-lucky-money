@@ -92,7 +92,7 @@
                 })
             },
             account(){
-                wx.switchTab({
+                wx.navigateTo({
                     url: 'extract'
                 })
             },

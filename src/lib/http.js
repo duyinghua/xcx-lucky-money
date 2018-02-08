@@ -42,7 +42,7 @@ export default class HTTP {
                 }
             }
             authInfo = {
-                appVersion: '1.0',
+                appVersion: '1.2.0',
                 tToken: userInfo.tToken,
                 cur_uid: userInfo.id,//2702847//todo
             }
