@@ -27,12 +27,10 @@
                 </view>
             </block>
             <block wx:elif="{{type==3}}">
-                <view class="message">
-                    <text class="p">情侣心跳测试</text>
-                </view>
+                <image class="title3" src="../img/redpack-title-3.png"></image>
                 <view class="info">
                     <view class="count">{{count}}道题</view>
-                    <view class="amount">
+                    <view class="amount" wx:if="{{amount!=0}}">
                         <text class="value">{{amount}}</text>
                         元
                     </view>
@@ -47,7 +45,7 @@
                 <button plain="true" class="button" open-type="share">
                     <image class="img" src="../img/redpack-btn-friend.png"></image>
                 </button>
-                <button plain="true" class="button" @tap="shareTimeline">
+                <button wx:if="{{type!=3}}" plain="true" class="button" @tap="shareTimeline">
                     <image class="img" src="../img/redpack-btn-timeline.png"></image>
                 </button>
             </view>
@@ -315,6 +313,12 @@
                 height: unit(119, rpx);
                 margin: unit(66, rpx) auto 0;
             }
+            .title3 {
+                display: block;
+                width: unit(310, rpx);
+                height: unit(79, rpx);
+                margin: unit(66, rpx) auto 0;
+            }
             .message {
                 display: flex;
                 margin: unit(66, rpx) auto 0;
@@ -380,12 +384,12 @@
             .buttons {
                 margin-top: unit(36, rpx);
                 display: flex;
-                justify-content: space-between;
+                justify-content: center;
                 .button {
                     width: unit(272, rpx);
                     height: unit(98, rpx);
                     padding: 0;
-                    margin: 0;
+                    margin: 0 unit(4, rpx);
 
                     .img {
                         width: unit(272, rpx);
