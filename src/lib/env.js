@@ -2,7 +2,7 @@ const ENV = {
     dev: 'develop',
     pre: 'beta',
     prod: 'stable'
-}.dev;
+}.prod;
 
 const SSOHOST = {}
 
