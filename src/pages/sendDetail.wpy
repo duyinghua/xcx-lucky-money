@@ -26,9 +26,9 @@
                 <view class="red">{{sendedFee}}</view>
                 元
             </view>
-            <view class="explain" @tap="more">
+            <!--<view class="explain" @tap="more">
                 答更多题目>
-            </view>
+            </view>-->
         </view>
         <view class="list">
             <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"

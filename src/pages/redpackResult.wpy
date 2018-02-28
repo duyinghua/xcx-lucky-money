@@ -45,7 +45,7 @@
                     元，已被
                     <text class="b">{{totalCount}}</text>
                     位朋友领取
-                    <view class="more" @tap="toSquare">答更多题目></view>
+                   <!-- <view class="more" @tap="toSquare">答更多题目></view>-->
                 </view>
                 <view class="list">
                     <view class="li {{maxFee==item.receiveFee?'light':''}}" wx:for="{{detailList}}" wx:for-item="item"
