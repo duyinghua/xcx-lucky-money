@@ -38,7 +38,7 @@
                 <view class="item">
                     <view class="label">金额(元)</view>
                     <view class="value">{{receiveTotalFee}}</view>
-                    <view class="extract" @tap="extractHandler">余额提现</view>
+                    <!--<view class="extract" @tap="extractHandler">余额提现</view>-->
                 </view>
                 <view class="item">
                     <view class="label">数量(个)</view>
@@ -77,7 +77,7 @@
         }
         methods = {
             extractHandler(){
-                wx.navigateTo({
+                wx.switchTab({
                     url: 'extract'
                 })
             },

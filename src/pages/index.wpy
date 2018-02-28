@@ -12,7 +12,7 @@
             </view>
             <image class="button" src="../img/index-btn1.png" @tap="play(1)"></image>
             <image class="button" src="../img/index-btn3.png" @tap="play(3)"></image>
-            <image class="button" src="../img/index-btn2.png" @tap="play(2)"></image>
+            <!--<image class="button" src="../img/index-btn2.png" @tap="play(2)"></image>-->
         </view>
 
     </view>

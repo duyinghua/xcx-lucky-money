@@ -134,7 +134,7 @@
         computed = {}
         methods = {
             extractHandler(){
-                wx.navigateTo({
+                wx.switchTab({
                     url: 'extract'
                 })
             },

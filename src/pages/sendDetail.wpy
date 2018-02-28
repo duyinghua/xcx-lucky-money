@@ -79,7 +79,7 @@
                 })
             },
             extractHandler(){
-                wx.navigateTo({
+                wx.switchTab({
                     url: 'extract'
                 })
             },

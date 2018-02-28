@@ -7,10 +7,10 @@
                 </text>
             </view>
         </scroll-view>
-        <view class="tab">
-            <view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">推荐题库</view>
-            <view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">自定义题</view>
-        </view>
+        <!--<view class="tab">-->
+            <!--<view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">推荐题库</view>-->
+            <!--<view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">自定义题</view>-->
+        <!--</view>-->
         <view class="content">
             <scroll-view class="scroll-view" scroll-y="true">
                 <view class="scroll-cont">
