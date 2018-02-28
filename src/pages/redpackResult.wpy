@@ -32,7 +32,7 @@
                         <image class="icon" src="../img/icon-hongbao.png"></image>
                         我要出题
                     </button>
-                    <button plain="true" class="li" @tap="shareHandler" wx:if="{{serviveCard.shared===1}}">
+                    <button plain="true" class="li" open-type="share" wx:if="{{serviveCard.shared===1}}">
                         <image class="icon" src="../img/icon-fenxiang.png"></image>
                         分享
                     </button>
@@ -73,16 +73,16 @@
                     <image class="icon" src="../img/icon-fenxiang.png"></image>
                     转发
                 </button>
-                <button wx:if="{{type!=3}}" plain="true" class="button share-timeline" @tap="shareTimeline">
+                <!--<button wx:if="{{type!=3}}" plain="true" class="button share-timeline" @tap="shareTimeline">
                     <image class="icon" src="../img/icon-timeline.png"></image>
                     发朋友圈
-                </button>
+                </button>-->
             </view>
             <view class="banner" wx:if="{{serviveCard.leftServiveTime&&myInfo.intimacy!=100}}">
                 <image class="revive" mode="widthFix" src="../img/revive.png"></image>
                 <block wx:if="{{serviveCard.shared===0}}">
                     <view class="txt">分享获得复活卡</view>
-                    <button plain="true" class="button" @tap="shareHandler">分享</button>
+                    <button plain="true" class="button" open-type="share">分享</button>
                 </block>
                 <block wx:elif="{{serviveCard.shared===1}}">
                     <view class="txt">购买复活卡(最多{{serviveCard.leftServiveTime}}次)</view>
@@ -169,7 +169,7 @@
                         })
                     if (res._ok) {
                         let payParam = res.weixinpayParamLite || {};
-                        wxRequestPayment(payParam, async() => {
+                        wxRequestPayment(payParam, async () => {
                             let res = await http.post(apis.servivecard, {
                                 redPackageID: this.id
                             });
@@ -417,7 +417,7 @@
                     title: wepy.$instance.globalData.shareInfo[rand],
                     path: `pages/redpackStart?id=${this.id}`,
                     imageUrl: `../img/share-title${rand}.png`,
-                    success: async() => {
+                    success: async () => {
                         await this.shareRelive();
                     }
                 }
@@ -425,7 +425,7 @@
                 return {
                     title: this.myInfo.msg,
                     path: `pages/redpackStart?id=${this.id}`,
-                    success: async() => {
+                    success: async () => {
                         await this.shareRelive();
                     }
                 }
@@ -535,7 +535,7 @@
                     }
                 }
                 &.ctrl2 {
-                    margin: unit(50, rpx) unit(186, rpx) 0;
+                    margin: unit(50, rpx) unit(186, rpx) unit(30, rpx);
                 }
             }
         }
@@ -613,7 +613,8 @@
         .share-bar {
             display: flex;
             position: fixed;
-            justify-content: space-between;
+            /*justify-content: space-between;*/
+            justify-content: center;
             align-items: center;
             padding: 0 unit(120, rpx);
             width: 100%;

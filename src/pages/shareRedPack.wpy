@@ -48,9 +48,9 @@
                 <button plain="true" class="button" open-type="share">
                     <image class="img" src="../img/redpack-btn-friend.png"></image>
                 </button>
-                <button wx:if="{{type!=3}}" plain="true" class="button" @tap="shareTimeline">
+               <!-- <button wx:if="{{type!=3}}" plain="true" class="button" @tap="shareTimeline">
                     <image class="img" src="../img/redpack-btn-timeline.png"></image>
-                </button>
+                </button>-->
             </view>
             <view class="redpack-sprite rs1" animation="{{redpackAnimation.ra1}}">
                 <image class="img " src="../img/redpack-sprite.png"></image>
