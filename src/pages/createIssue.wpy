@@ -8,8 +8,8 @@
             </view>
         </scroll-view>
         <!--<view class="tab">-->
-            <!--<view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">推荐题库</view>-->
-            <!--<view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">自定义题</view>-->
+        <!--<view class="item {{curTab==1?'cur':''}}" @tap="tabHandler(1)">推荐题库</view>-->
+        <!--<view class="item {{curTab==2?'cur':''}}" @tap="tabHandler(2)">自定义题</view>-->
         <!--</view>-->
         <view class="content">
             <scroll-view class="scroll-view" scroll-y="true">
@@ -19,9 +19,8 @@
                             <view hidden="{{curTab!=1}}">
                                 <image wx:if="{{curIssue.question.picURL}}" class="picture-img"
                                        mode="widthFix"
-                                       src="{{curIssue.question.picURL}}{{qiniuClip}}"
-                                       @tap="uploadImage"></image>
-                                <view wx:else class="picture" @tap="uploadImage">
+                                       src="{{curIssue.question.picURL}}{{qiniuClip}}"></image>
+                                <view wx:else class="picture">
                                     <image class="add-img" src="../img/picture-add.png"></image>
                                     <text class="add-desc">添加照片</text>
                                 </view>
@@ -259,7 +258,7 @@
                 }
 
             },
-            confirmQuestion: utils.debounce(async() => {
+            confirmQuestion: utils.debounce(async () => {
                 let curIssue = this.currentIssue();
 
                 let msg = this.checkIssue(curIssue);
