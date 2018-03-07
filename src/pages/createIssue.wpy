@@ -32,12 +32,12 @@
                                 <view class="qsn-input">
                                     {{curIssue.question.content}}
                                 </view>
-                                <view class="tip">(答案可点击修改)</view>
+                                <!--<view class="tip">(答案可点击修改)</view>-->
                                 <view class="aws-input">
                                     <view class="li {{item.isRight?'cur':''}}"
                                           wx:for="{{curIssue.answerList}}" wx:for-item="item"
                                           wx:for-index="a_index" wx:key="{{item.id}}">
-                                        <input class="txt" placeholder="输入答案"
+                                        <input class="txt" placeholder="输入答案" disabled
                                                maxlength="16" value="{{item.content}}"
                                                bindinput="answerInput({{a_index}})"/>
                                         <view class="sub" @tap="setAnswer({{a_index}})">设为正确</view>
